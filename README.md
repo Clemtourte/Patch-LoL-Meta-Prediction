@@ -6,3 +6,4 @@ It will be centered around Python and will tend to grow in the future
 
 ## Useful Links 
 https://victorzhou.com/blog/intro-to-neural-networks/
+https://machinelearningmastery.com/pytorch-tutorial-develop-deep-learning-models/
