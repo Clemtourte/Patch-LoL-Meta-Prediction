@@ -14,11 +14,13 @@ model = tf.keras.models.Sequential()
 model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
 model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
 model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
+model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
+model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
 model.add(tf.keras.layers.Dense(10, activation=tf.nn.softmax))
 
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=3)
+model.fit(x_train, y_train, epochs=10)
 
 model.save('digit_recognition.keras')"""
 
@@ -30,7 +32,8 @@ while os.path.isfile(f"digits/digit{image_number}.png"):
         img = cv2.imread(f"digits/digit{image_number}.png")[:,:,0]
         img = np.invert(np.array([img]))
         prediction = model.predict(img)
-        print(f"This digit is probably a {np.argmax(prediction)}")
+        print(f"This digit is probably a {np.argmax(prediction)} but it is actually a"
+              if np.argmax(prediction) != image_number else "This digit is correctly recognized as a ",image_number)
         plt.imshow(img[0], cmap=plt.cm.binary)
         plt.show
     except:
