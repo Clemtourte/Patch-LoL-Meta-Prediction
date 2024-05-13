@@ -47,7 +47,7 @@ opencv-python==4.9.0.80
 opt-einsum==3.3.0
 optree==0.11.0
 packaging==23.2
-pandas==2.1.1
+pandas==2.2.2
 parso==0.8.3
 pickleshare==0.7.5
 Pillow==10.0.1
