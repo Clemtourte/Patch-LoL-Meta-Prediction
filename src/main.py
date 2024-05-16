@@ -1,7 +1,7 @@
 import requests
 
 class User:
-    API_key = "RGAPI-ce843069-ebfd-4778-af0c-45840713c8a2"
+    API_key = "RGAPI-1c59560a-c466-4cfc-877b-7f54c078b8c3"
 
     def __init__(self, username, tag):
         self.username = username
@@ -25,27 +25,32 @@ class User:
         game_id = match_data['metadata']['matchId']
         game_duration = match_data['info']['gameDuration']
         game_version = match_data['info']['gameVersion']
-        participants = match_data['info']['participants']
-        teams = match_data['info']['teams']
-        timeline = match_data['info']['timeline']
+        participant_id = match_data['info']['participants'][0]['puuid']
+        team = match_data['info']['participants'][0]['teamId']
+        champ_level = match_data['info']['participants'][0]['champLevel']
 
         return {
             'game_id': game_id,
-            'game_duration':game_duration,
-            'game_version': game_version,
-            'participants': participants,
-            'teams': teams,
-            'timeline': timeline,
+            'game_duration':round(game_duration/60,2),
+            'patch': game_version[:2],
+            'participant_id': participant_id,
+            'team': team,
+            'champ_level': champ_level,
         }
 
 user = User('MenuMaxiBestFlop','EUW')
 print(user.puuid)
 
 match_type = "ranked"  # replace with the actual match type
-match_count = 50  # replace with the actual match count
+match_count = 1  # replace with the actual match count
 match_id_list = user.get_matches(match_type, match_count)
 print(match_id_list)
 
-if match_id_list:
-    match_data = user.get_match_data(match_id_list[0])
-    print(match_data)
+match_info_list = []
+for match_id in match_id_list:
+    match_info = user.get_match_info(match_id)
+    match_info_list.append(match_info)
+
+# Now match_info_list contains the specific information for all matches
+for match_info in match_info_list:
+    print(match_info)
