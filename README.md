@@ -4,6 +4,8 @@
 This repository is used to get introductory knowledge to MachineLearning, DeepLearning, Neural Networks concepts and many more starting from zero.
 It will be centered around Python and will tend to grow in the future
 
+The main project is about creating a DL model around the League Of Legends game. Data will either provided through the LOL API or the Leaguepedia API.
+
 ## Useful Links 
 <li> https://victorzhou.com/blog/intro-to-neural-networks/ </li>
 <li> https://machinelearningmastery.com/pytorch-tutorial-develop-deep-learning-models/ </li>
