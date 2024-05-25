@@ -1,7 +1,10 @@
 import requests
+import os
+from dotenv import load_dotenv
 
 class User:
-    API_key = "RGAPI-dff5bed1-fca9-4686-bd58-507014fd001b"
+    load_dotenv()
+    API_key = os.getenv('API_KEY')
 
     def __init__(self, username, tag):
         self.username = username
