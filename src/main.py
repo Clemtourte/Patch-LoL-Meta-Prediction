@@ -2,6 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
+import json
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -9,10 +10,6 @@ class User:
     def __init__(self, username, tag, region):
         load_dotenv()  # Load environment variables from .env file
         self.API_key = os.getenv('API_KEY')
-        if not self.API_key:
-            logging.error("API_KEY not found in .env file")
-        else:
-            logging.info(f"API_KEY loaded successfully: {self.API_key}")
         self.username = username
         self.tag = tag
         self.region = region
@@ -92,7 +89,11 @@ class User:
     def get_match_info(self, match_id):
         match_data = self.get_match_data(match_id)
         if not match_data:
-            return {}
+            return None, None
+        
+        mode = match_data['info']['gameMode']
+        if mode != 'CLASSIC':
+            return None, None
 
         try:
             game_id = match_data['metadata']['matchId']
@@ -102,7 +103,8 @@ class User:
             general_info = {
                 'game_id': game_id,
                 'game_duration': round(game_duration / 60, 2),
-                'patch': game_version.split('.')
+                'patch': game_version.split('.'),
+                'mode' : match_data['info']['gameMode']
             }
 
             participant_info = {'Blue Side': {}, 'Red Side': {}}
@@ -112,6 +114,7 @@ class User:
                     'summoner_id': participant['puuid'],
                     'summoner_name': participant['summonerName'],
                     'team': participant['teamId'],
+                    'win': participant['win'],
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
                     'champ_id': participant['championId'],
@@ -124,19 +127,22 @@ class User:
 
         except KeyError as e:
             logging.error("Key error: %s. Here's the entire response: %s", e, match_data)
-            return {}
+            return None, None
 
-# Example usage
 if __name__ == '__main__':
     user = User('MenuMaxiBestFlop', 'EUW', 'EUW1')
     user.display_user_info()
     
-    match_ids = user.get_matches('ranked', 1)
+    match_ids = user.get_matches('ranked', 20)
+    all_participants_info = []
     for match_id in match_ids:
         general_info, participant_info = user.get_match_info(match_id)
-        if general_info:
+        if general_info is None and participant_info is None :
+            continue
+        else:
             print(f"Match ID: {general_info['game_id']}")
             print(f"Game Duration: {general_info['game_duration']} minutes")
+            print(f"Game Mode: {general_info['mode']}")
             print(f"Patch: {'.'.join(general_info['patch'])}")
             print("Participants Info:")
             for team, participants in participant_info.items():
@@ -144,5 +150,6 @@ if __name__ == '__main__':
                 for summoner, details in participants.items():
                     print(f"{summoner}: {details}")
             print("\n")
-        else:
-            print(f"Failed to retrieve data for match ID: {match_id}")
+            all_participants_info.append(participant_info)
+        with open("../datasets/match_data.json", "w") as out_file:
+            json.dump(all_participants_info, out_file, indent=4)
