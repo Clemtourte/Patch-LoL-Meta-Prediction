@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import logging
 import json
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -68,12 +69,22 @@ class User:
             game_duration = match_data['info']['gameDuration']
             game_version = match_data['info']['gameVersion']
 
+            # Formatting game duration to minutes and seconds
+            minutes, seconds = divmod(game_duration, 60)
+            formatted_duration = f"{minutes}m {seconds}s"
+
+            # Simplifying patch version
+            patch = '.'.join(game_version.split('.')[:2])
+
+            # Formatting timestamp
+            timestamp = datetime.fromtimestamp(match_data['info']['gameCreation'] / 1000).strftime('%Y-%m-%d %H:%M:%S')
+
             general_info = {
                 'game_id': game_id,
-                'game_duration': round(game_duration / 60, 2),
-                'patch': game_version.split('.'),
+                'game_duration': formatted_duration,
+                'patch': patch,
+                'timestamp': timestamp,
                 'mode': mode,
-                'timestamp': match_data['info']['gameCreation'],
                 'platform': match_data['info']['platformId']
             }
 
@@ -133,16 +144,20 @@ if __name__ == '__main__':
         if game_id is None or game_id in existing_match_ids:
             continue
         print(f"Match ID: {general_info['game_id']}")
-        print(f"Game Duration: {general_info['game_duration']} minutes")
+        print(f"Game Duration: {general_info['game_duration']}")
         print(f"Game Mode: {general_info['mode']}")
-        print(f"Patch: {'.'.join(general_info['patch'])}")
+        print(f"Patch: {general_info['patch']}")
+        print(f"Timestamp: {general_info['timestamp']}")
         print("Participants Info:")
         for team, participants in participant_info.items():
             print(team)
             for summoner, details in participants.items():
                 print(f"{summoner}: {details}")
         print("\n")
-        all_participants_info.append({"game_id": general_info['game_id'], "details": participant_info, "general_info": general_info})
-        
+        all_participants_info.append({
+            "general_info": general_info,
+            "details": participant_info
+        })
+
     with open("../datasets/match_data.json", "w") as out_file:
         json.dump(all_participants_info, out_file, indent=4)
