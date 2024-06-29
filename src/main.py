@@ -18,39 +18,17 @@ class User:
 
     def get_puuid(self):
         url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{self.username}/{self.tag}?api_key={self.API_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            try:
-                return response.json()['puuid']
-            except KeyError:
-                logging.error("Key 'puuid' not found in response. Response: %s", response.json())
-        else:
-            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
-        return None
-    
+        response = self._get_response(url)
+        return response.get('puuid')
+
     def get_summoner_id(self):
         url = f"https://{self.region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{self.puuid}?api_key={self.API_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            try:
-                return response.json()['id']
-            except KeyError:
-                logging.error("Key 'id' not found in response. Response: %s", response.json())
-        else:
-            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
-        return None
+        response = self._get_response(url)
+        return response.get('id')
 
     def get_ranked_data(self, summoner_id):
         url = f"https://{self.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={self.API_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            try:
-                return response.json()
-            except Exception as e:
-                logging.error("Error parsing response: %s. Response: %s", e, response.text)
-        else:
-            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
-        return []
+        return self._get_response(url, default=[])
 
     def display_user_info(self):
         summoner_id = self.get_summoner_id()
@@ -70,21 +48,11 @@ class User:
 
     def get_matches(self, match_type, match_count):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?type={match_type}&start=0&count={match_count}&api_key={self.API_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
-        return []
+        return self._get_response(url, default=[])
 
     def get_match_data(self, match_id):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={self.API_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
-        return {}
+        return self._get_response(url, default={})
 
     def get_match_info(self, match_id):
         match_data = self.get_match_data(match_id)
@@ -104,7 +72,9 @@ class User:
                 'game_id': game_id,
                 'game_duration': round(game_duration / 60, 2),
                 'patch': game_version.split('.'),
-                'mode' : match_data['info']['gameMode']
+                'mode': mode,
+                'timestamp': match_data['info']['gameCreation'],
+                'platform': match_data['info']['platformId']
             }
 
             participant_info = {'Blue Side': {}, 'Red Side': {}}
@@ -129,27 +99,50 @@ class User:
             logging.error("Key error: %s. Here's the entire response: %s", e, match_data)
             return None, None
 
+    def _get_response(self, url, default=None):
+        response = requests.get(url)
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except Exception as e:
+                logging.error("Error parsing response: %s. Response: %s", e, response.text)
+                return default
+        else:
+            logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
+            return default
+
 if __name__ == '__main__':
     user = User('MenuMaxiBestFlop', 'EUW', 'EUW1')
     user.display_user_info()
-    
     match_ids = user.get_matches('ranked', 20)
     all_participants_info = []
+
+    try:
+        with open("../datasets/match_data.json", "r") as in_file:
+            all_participants_info = json.load(in_file)
+    except FileNotFoundError:
+        all_participants_info = []
+
+    existing_match_ids = {match['game_id'] for match in all_participants_info if 'game_id' in match}
+
     for match_id in match_ids:
         general_info, participant_info = user.get_match_info(match_id)
-        if general_info is None and participant_info is None :
+        if general_info is None and participant_info is None:
             continue
-        else:
-            print(f"Match ID: {general_info['game_id']}")
-            print(f"Game Duration: {general_info['game_duration']} minutes")
-            print(f"Game Mode: {general_info['mode']}")
-            print(f"Patch: {'.'.join(general_info['patch'])}")
-            print("Participants Info:")
-            for team, participants in participant_info.items():
-                print(team)
-                for summoner, details in participants.items():
-                    print(f"{summoner}: {details}")
-            print("\n")
-            all_participants_info.append(participant_info)
-        with open("../datasets/match_data.json", "w") as out_file:
-            json.dump(all_participants_info, out_file, indent=4)
+        game_id = general_info.get('game_id')
+        if game_id is None or game_id in existing_match_ids:
+            continue
+        print(f"Match ID: {general_info['game_id']}")
+        print(f"Game Duration: {general_info['game_duration']} minutes")
+        print(f"Game Mode: {general_info['mode']}")
+        print(f"Patch: {'.'.join(general_info['patch'])}")
+        print("Participants Info:")
+        for team, participants in participant_info.items():
+            print(team)
+            for summoner, details in participants.items():
+                print(f"{summoner}: {details}")
+        print("\n")
+        all_participants_info.append({"game_id": general_info['game_id'], "details": participant_info, "general_info": general_info})
+        
+    with open("../datasets/match_data.json", "w") as out_file:
+        json.dump(all_participants_info, out_file, indent=4)

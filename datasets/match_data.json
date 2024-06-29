@@ -1,1514 +1,2558 @@
 [
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "-X2G624jgYEMB7P-gljFD0jQc_GhXH99XkiLnNe7Ne3W_pKKclLyatkBaN31-lKA4f0kDMVZI7XVXQ",
-                "summoner_name": "Hatchimon",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Teemo",
-                "champ_id": 17,
-                "kills": 5,
-                "deaths": 9,
-                "assists": 9
+        "game_id": "EUW1_6983692908",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "nXGFQPuw9jsESsqJCKvxAY_KTok3RRTrOenZpHgC0-LHN4VhRDEDRHxxA1lwC-qyPTITE3pXZkFomg",
+                    "summoner_name": "Bigus Dikus1",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Garen",
+                    "champ_id": 86,
+                    "kills": 6,
+                    "deaths": 8,
+                    "assists": 2
+                },
+                "Summoner 2": {
+                    "summoner_id": "W925Wlglu7D4Pvc7f9YVoixCMnnP3mEZXvr5_YOBCHPLvvKSjUNk8UvUWFd7ZnQMenypvYesw1uQlA",
+                    "summoner_name": "James44",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Lillia",
+                    "champ_id": 876,
+                    "kills": 3,
+                    "deaths": 9,
+                    "assists": 4
+                },
+                "Summoner 3": {
+                    "summoner_id": "wO46f_QQls_GTVkBiXF15yp1cRpdRQB2Si6OOJn-UL9YpAZpI7Ww9q4Z7LRbBIlBoJFEBRJ5EKLEcw",
+                    "summoner_name": "Waljis",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Akshan",
+                    "champ_id": 166,
+                    "kills": 3,
+                    "deaths": 12,
+                    "assists": 2
+                },
+                "Summoner 4": {
+                    "summoner_id": "cBAwok2q65eEvvX0aHQuDIqxrTpVoxqC2Qo27tpbbaY0PIlZAD-4LDOYdqfrGWNEGWILOrdIbSL6HQ",
+                    "summoner_name": "YuKiM013",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Samira",
+                    "champ_id": 360,
+                    "kills": 3,
+                    "deaths": 11,
+                    "assists": 1
+                },
+                "Summoner 5": {
+                    "summoner_id": "MUReJpHLsO8pyDwuo7m6hwdRrndhcVa-GgVdbq5DkyKXEXQV-4QEOUELFzAzJ0-6v4WrRKJCU22mFA",
+                    "summoner_name": "FSGust",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Maokai",
+                    "champ_id": 57,
+                    "kills": 3,
+                    "deaths": 9,
+                    "assists": 4
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "Q4-TKlyWhXX_flSNdDQgjDLa9XeOmkBxIKzGHgJC-4D8IO5TfJE0oDt95v9pOYxpQWv0fOuuahlBkg",
-                "summoner_name": "Sm0ljo",
-                "team": 100,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Hecarim",
-                "champ_id": 120,
-                "kills": 10,
-                "deaths": 5,
-                "assists": 8
-            },
-            "Summoner 3": {
-                "summoner_id": "gF2eFtMmPOLmYC7BUbt8LPT_fYV5cQdek9mKy7oT_bOvsGC_9AwjvrYCKZf8wVuBbXZCOiN1lROR8g",
-                "summoner_name": "Vitalic",
-                "team": 100,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Fizz",
-                "champ_id": 105,
-                "kills": 10,
-                "deaths": 8,
-                "assists": 3
-            },
-            "Summoner 4": {
-                "summoner_id": "xngdDYmXIyNwR0mOQLSkgcTfZggWxx-NNcXvc2ZbLAsRAHAXQi8HLhRBAhPIS_0eC16tWaLV_7gFxw",
-                "summoner_name": "MilkHasCalcium",
-                "team": 100,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Ashe",
-                "champ_id": 22,
-                "kills": 8,
-                "deaths": 6,
-                "assists": 15
-            },
-            "Summoner 5": {
-                "summoner_id": "nwxdZrVvG9dcH3VQhweElhyC_b_fsMWCie2nUsm_EIGxa0LdOTK-sX15E969lA0TX8LkQhbslUjdkw",
-                "summoner_name": "",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Morgana",
-                "champ_id": 25,
-                "kills": 1,
-                "deaths": 7,
-                "assists": 17
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "UD4GWmN1eW8MNHE3thy719grmzZnq3vOe37TXaXpGcUpnWxemKhIbkCJTtskINfBMzm0sgHNWpUFGg",
+                    "summoner_name": "Avilably",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Teemo",
+                    "champ_id": 17,
+                    "kills": 10,
+                    "deaths": 7,
+                    "assists": 4
+                },
+                "Summoner 7": {
+                    "summoner_id": "DKLrG_3vuraIYzc2lAFuRZqRcYV_MswpYieJ6EriQnKOjtcS6LZb4z09le2pXVG33ENsimYCau8aOA",
+                    "summoner_name": "pwZh73H6sSFkuf4",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Zac",
+                    "champ_id": 154,
+                    "kills": 6,
+                    "deaths": 2,
+                    "assists": 20
+                },
+                "Summoner 8": {
+                    "summoner_id": "mlyhBPzz2eSESmg9DpfX0-6CkUaHPxoDxQ3l5cm4aRo8QVLwvacICcM0KOOjzPgAmP5IjRVFdYrysQ",
+                    "summoner_name": "Egonix",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Ahri",
+                    "champ_id": 103,
+                    "kills": 6,
+                    "deaths": 5,
+                    "assists": 14
+                },
+                "Summoner 9": {
+                    "summoner_id": "H_bEszzMLsalCj_m8C8ETRxMi6AMHi9L9Ul8cWWnWRdPFhUuAT7V3QrCJ5Ot0rikLPwJDd6NOKIYjg",
+                    "summoner_name": "Yet\u00edn",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 21,
+                    "deaths": 2,
+                    "assists": 4
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 6,
+                    "deaths": 2,
+                    "assists": 26
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "NrJuePl_EcCAPQP9wD1CyKeAomvpg_1EkGaRomc2PnAYL5LTPGMpzT5-eaaLjlCStDVw_06_1Zc67w",
-                "summoner_name": "\u03c8\u0398C\u039e\u039b\u03a0S\u03c8",
-                "team": 200,
-                "win": false,
-                "champ_level": 17,
-                "champ_name": "Heimerdinger",
-                "champ_id": 74,
-                "kills": 12,
-                "deaths": 6,
-                "assists": 4
-            },
-            "Summoner 7": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 2,
-                "deaths": 8,
-                "assists": 10
-            },
-            "Summoner 8": {
-                "summoner_id": "uVO8QfuOTUhsk7P2LJw1LvdyXIxorWDsLwEq_GUoHdF2jmVSpj2pkPlgtu4qbuAbpwNJ6gCmozDbaQ",
-                "summoner_name": "LPF Whisky91",
-                "team": 200,
-                "win": false,
-                "champ_level": 17,
-                "champ_name": "Syndra",
-                "champ_id": 134,
-                "kills": 10,
-                "deaths": 8,
-                "assists": 5
-            },
-            "Summoner 9": {
-                "summoner_id": "v6i-1PdXodjmcjNLJoo33f_D1sTbDlbqjJR_sIIsGy1R6nD04YuVvkNCOCgV55iiSaJdPflfvcOcjw",
-                "summoner_name": "Playmz",
-                "team": 200,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Caitlyn",
-                "champ_id": 51,
-                "kills": 5,
-                "deaths": 6,
-                "assists": 4
-            },
-            "Summoner 10": {
-                "summoner_id": "k8Uljo_L0Zb8Hy-n_w1mh16DLNBB-k5Vds5w5eJGbohuWvIYoxfmPgmgwYEQDVw8uL-g7Vw0RdFKEA",
-                "summoner_name": "K\u00ednj\u00ed Hakar\u00ed",
-                "team": 200,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Volibear",
-                "champ_id": 106,
-                "kills": 6,
-                "deaths": 6,
-                "assists": 9
-            }
+        "general_info": {
+            "game_id": "EUW1_6983692908",
+            "game_duration": 29.8,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719183628751,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "cIrIfAkkvCM09QL06RgeYV_3h1x2BIpxIuaaOOd_02cWSS5D0gixSw1A2pb4dZgW2Xr6y9iBPImp_g",
-                "summoner_name": "G\u03b4d C\u03b4mplex",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Vladimir",
-                "champ_id": 8,
-                "kills": 7,
-                "deaths": 13,
-                "assists": 2
+        "game_id": "EUW1_6983677773",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "RLBORvZyONJ9jSbcOalGtigLR1u_1bAP5DB7CwTB2DPXbzhRwIdRrhYbgIhF2TiGuYj-ljWyQAGY5w",
+                    "summoner_name": "Taintworm",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 11,
+                    "champ_name": "Jax",
+                    "champ_id": 24,
+                    "kills": 2,
+                    "deaths": 3,
+                    "assists": 1
+                },
+                "Summoner 2": {
+                    "summoner_id": "tO4VamDn5n070kgwdBgfhtV0MpjIqNlbn4VWpZJczua6Nkb1u1sH1lXrCSPD2fmRTVD0lGfwFfMQiQ",
+                    "summoner_name": "Unisro11s",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 8,
+                    "champ_name": "Udyr",
+                    "champ_id": 77,
+                    "kills": 2,
+                    "deaths": 6,
+                    "assists": 1
+                },
+                "Summoner 3": {
+                    "summoner_id": "8_a1HrPpJrRS-p8OmWzQ8FyaujxGKEYh016K9IqjRnYkKOV5nwQR5wyjsaCYghYhHptSdRQxwXoU0g",
+                    "summoner_name": "Snerkules",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 10,
+                    "champ_name": "TwistedFate",
+                    "champ_id": 4,
+                    "kills": 0,
+                    "deaths": 5,
+                    "assists": 0
+                },
+                "Summoner 4": {
+                    "summoner_id": "ro3M-JTB9HmfY1ufTqWiXE_PuX6JA09K18D7sCrRBM6FM44x71d9P9zhppBQPwTbaIL6hEg3j6gXNg",
+                    "summoner_name": "B\u00e2ton du haut",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 9,
+                    "champ_name": "Varus",
+                    "champ_id": 110,
+                    "kills": 2,
+                    "deaths": 5,
+                    "assists": 2
+                },
+                "Summoner 5": {
+                    "summoner_id": "eNzvVIBgCoQq8VhHnXa4VoDxK0oB-sXyBlfNI-qeYdziEksrH_aDZkcTobXPJecBuDmsWpJRkADQPw",
+                    "summoner_name": "Shiv me Daddy",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 8,
+                    "champ_name": "Zilean",
+                    "champ_id": 26,
+                    "kills": 2,
+                    "deaths": 7,
+                    "assists": 2
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "Q4-TKlyWhXX_flSNdDQgjDLa9XeOmkBxIKzGHgJC-4D8IO5TfJE0oDt95v9pOYxpQWv0fOuuahlBkg",
-                "summoner_name": "Sm0ljo",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Hecarim",
-                "champ_id": 120,
-                "kills": 8,
-                "deaths": 9,
-                "assists": 11
-            },
-            "Summoner 3": {
-                "summoner_id": "QEwEQppZ2ICPJDiTBt_zhIyc4wPREckMnM_Oy2hvW9eCcHvpaIO3yVLq2Pn7jvP6x6_70H-zP2LFtg",
-                "summoner_name": "Re0",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Zed",
-                "champ_id": 238,
-                "kills": 8,
-                "deaths": 10,
-                "assists": 9
-            },
-            "Summoner 4": {
-                "summoner_id": "49yK3vldJTwGBTQSKGZIULZ5C8l-iqWPrx6d8CNuTkF_nwUguG_UUSd-0VuoNL2KLlI7SeRq-Mmqsg",
-                "summoner_name": "BinngChilling",
-                "team": 100,
-                "win": false,
-                "champ_level": 17,
-                "champ_name": "Caitlyn",
-                "champ_id": 51,
-                "kills": 9,
-                "deaths": 6,
-                "assists": 5
-            },
-            "Summoner 5": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 100,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 1,
-                "deaths": 14,
-                "assists": 18
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "aDZtI8jxcQe0rXbd57rUi15C_gtqDrdcMjBKmxaQ3FidnBWTvSWXYVPpBRvrnL5ddzaBV9AJqcaSPg",
+                    "summoner_name": "Zedong",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 11,
+                    "champ_name": "Shen",
+                    "champ_id": 98,
+                    "kills": 2,
+                    "deaths": 3,
+                    "assists": 3
+                },
+                "Summoner 7": {
+                    "summoner_id": "yobZrhp53q_Cvyxvkx7D_XYq6_ZuPFRB3MVpek7V1Exa4cLJeRyXFiyln2yhYhiXO2wekEuigynYZw",
+                    "summoner_name": "",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 10,
+                    "champ_name": "Warwick",
+                    "champ_id": 19,
+                    "kills": 8,
+                    "deaths": 1,
+                    "assists": 5
+                },
+                "Summoner 8": {
+                    "summoner_id": "EeyjnwY4cQ1z85Ec89y50-7of9-yGIz_su_8iyCvgHB_OPRWOhRs7MMnax5DlsuvT9QqVMwCYfU_-w",
+                    "summoner_name": "LatteLP",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 11,
+                    "champ_name": "Fizz",
+                    "champ_id": 105,
+                    "kills": 2,
+                    "deaths": 0,
+                    "assists": 6
+                },
+                "Summoner 9": {
+                    "summoner_id": "8LEpKmObfjm8nIoJiQuuT2xP1pMj2QR-N-O5rPm-c2V309IJDZ7JfR6mJ-NCmoLyRGKsHZeTK7NI1A",
+                    "summoner_name": "",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 10,
+                    "champ_name": "Samira",
+                    "champ_id": 360,
+                    "kills": 13,
+                    "deaths": 2,
+                    "assists": 4
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 9,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 1,
+                    "deaths": 2,
+                    "assists": 13
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "EhOt65_rEKY4P8LiEEzz3IN9l9iRr2DnxRiu6qOsCXYnhZMhIWp_BYCx8506ACdiIWKeFW86C9vAug",
-                "summoner_name": "FeelsSadMan",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "TahmKench",
-                "champ_id": 223,
-                "kills": 24,
-                "deaths": 1,
-                "assists": 13
-            },
-            "Summoner 7": {
-                "summoner_id": "m1GhKhu-td38HAICnC4jGCNQYIrlZS_Jj3VkhXjpoPQWYmbNjF6ghlNRDO384hDROi4clh4oE_MQxw",
-                "summoner_name": "chown",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Volibear",
-                "champ_id": 106,
-                "kills": 5,
-                "deaths": 11,
-                "assists": 13
-            },
-            "Summoner 8": {
-                "summoner_id": "JePJIwuvQl0ByTKumcZa2t7JtVJ5RXrlEo4gwXCzSI1RnOgBxJC6hhWlvd9z6H5lIs6vKb0imIVkQQ",
-                "summoner_name": "BlackForest115",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Xerath",
-                "champ_id": 101,
-                "kills": 9,
-                "deaths": 9,
-                "assists": 18
-            },
-            "Summoner 9": {
-                "summoner_id": "g066g4RfP1ThLe43WtX0faJDFh7o7TZDNjTSTVhbZF9OWvQLD3GQEzSOcXtCZyh8E9K4waCSfNVHrw",
-                "summoner_name": "EXS Rolup",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Jinx",
-                "champ_id": 222,
-                "kills": 11,
-                "deaths": 5,
-                "assists": 10
-            },
-            "Summoner 10": {
-                "summoner_id": "1brkyhhfyRbk__t7WDTJriV9YgXRMtnqJM1BpBhM0F94HcKw5AlPtwTbqrD9ftmeVpy3PDbbyQ6sEA",
-                "summoner_name": "aint fun anymore",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Morgana",
-                "champ_id": 25,
-                "kills": 3,
-                "deaths": 7,
-                "assists": 23
-            }
+        "general_info": {
+            "game_id": "EUW1_6983677773",
+            "game_duration": 16.25,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719182266137,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "Cp6WbqsHvi0klPYZVd15xfgvJpEK6NUd8u36CGANLxXMaWASI-0M73ibxlVuDXLUIcKj66yT5sQovA",
-                "summoner_name": "Bolbol gamed",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Sett",
-                "champ_id": 875,
-                "kills": 5,
-                "deaths": 10,
-                "assists": 8
+        "game_id": "EUW1_6983636931",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "iHGEq-QJHdxnY-gninPAv_KH_4qRp9GadmxNKVVdyVesp8PST9zOSrFj35fjVLx4Xg6BW4og7F4nTw",
+                    "summoner_name": "Hek\u00e4rim Benzema",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Camille",
+                    "champ_id": 164,
+                    "kills": 11,
+                    "deaths": 10,
+                    "assists": 1
+                },
+                "Summoner 2": {
+                    "summoner_id": "bDIzQ_G_m72EM-kViDV-ydFhGzl9-pSuByzdlQIWPiyVbXF_c5Ze2zxDXM2o1jPF6YnKJo17mxoM2g",
+                    "summoner_name": "BigSliprax",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Talon",
+                    "champ_id": 91,
+                    "kills": 7,
+                    "deaths": 10,
+                    "assists": 5
+                },
+                "Summoner 3": {
+                    "summoner_id": "1yP7FWU8jUwZb_DqtpJaf_5K3PXGVJkDYtdu7i6DSUzQS2R-_qMQJuNLqfgnjE_Yr4ih4ZlM1x4cHw",
+                    "summoner_name": "SIXTUS",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Brand",
+                    "champ_id": 63,
+                    "kills": 1,
+                    "deaths": 10,
+                    "assists": 4
+                },
+                "Summoner 4": {
+                    "summoner_id": "xxK0cnx18JtZuyWGqwAHTsB5f6gBjogG0Oq5CLLPLnUdeSAzdeu_FA5gcYaagnwYWqQv6TQT1b2dGw",
+                    "summoner_name": "MikkiMC",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 7,
+                    "deaths": 6,
+                    "assists": 9
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 2,
+                    "deaths": 10,
+                    "assists": 11
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "R8lLoXXGW4sSZCa2kN-8LvsEr7yIIUitEWtkntZ64gPB-Hr4AWVggAQD9dS5cIOVWGMVdH-e1IuFrA",
-                "summoner_name": "swoman99",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Belveth",
-                "champ_id": 200,
-                "kills": 6,
-                "deaths": 14,
-                "assists": 3
-            },
-            "Summoner 3": {
-                "summoner_id": "5QUEjdoNrfhg-tH6mJ1YZ6ddhWqUlzX-5cv7O4w3u3WybV-1I4ToAs5AeCNAB3-DcouiBrJMSfl9zw",
-                "summoner_name": "Hide On Mid7",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Zed",
-                "champ_id": 238,
-                "kills": 17,
-                "deaths": 7,
-                "assists": 4
-            },
-            "Summoner 4": {
-                "summoner_id": "3ArC7pP5YeZTPeHBHhrRlDeR6WAjSq6lYrvJ-DY_pPh0q2w2p2d0UiNyt9RIgNSWC5lnLBGnCQLypg",
-                "summoner_name": "4 pigs 1 pro",
-                "team": 100,
-                "win": false,
-                "champ_level": 17,
-                "champ_name": "Kaisa",
-                "champ_id": 145,
-                "kills": 10,
-                "deaths": 13,
-                "assists": 12
-            },
-            "Summoner 5": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 100,
-                "win": false,
-                "champ_level": 15,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 6,
-                "deaths": 11,
-                "assists": 18
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "wWOagtoGz6kkgg5Ie3_HKNYJfV9muf-KNW_cly89yW9gjJY4N8YLfGJk4pBILpsOLTY9vtK9xttiXg",
+                    "summoner_name": "l0T1ZZz",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Shen",
+                    "champ_id": 98,
+                    "kills": 11,
+                    "deaths": 5,
+                    "assists": 16
+                },
+                "Summoner 7": {
+                    "summoner_id": "0QxUnMJlXA8qQrsyQgFX2m-KlqY1iVU7LBHt5MqJqp8Fh8TBspMPBQlJ9KdQrnrHFI-WcZxrIpxiVw",
+                    "summoner_name": "YourMomzFavorite",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Diana",
+                    "champ_id": 131,
+                    "kills": 11,
+                    "deaths": 6,
+                    "assists": 10
+                },
+                "Summoner 8": {
+                    "summoner_id": "Jh306w-mTC2s-fjKky-wG22B5FWe0fgRewoxJvwfhf-9nh8NKwFfQbk34ZL47xPlqJgyy_oeG4WwVQ",
+                    "summoner_name": "Hanno123",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Yasuo",
+                    "champ_id": 157,
+                    "kills": 1,
+                    "deaths": 7,
+                    "assists": 5
+                },
+                "Summoner 9": {
+                    "summoner_id": "H_M4aCVbtz7OScNZq9f9_g7UDltkO9Tg8e0R5fOBOAbdcuFSybLGD8itFbadyEMLH1HsS9AzQSZZPw",
+                    "summoner_name": "Rezvan",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "KogMaw",
+                    "champ_id": 96,
+                    "kills": 20,
+                    "deaths": 5,
+                    "assists": 12
+                },
+                "Summoner 10": {
+                    "summoner_id": "zi_y-WIGs9gy0SeRJpCPjEDJWptMZsxFaxBSpU94JpvJ0ErLmpEa5Jqku10tH-ARwDMHM7QPOW7bqw",
+                    "summoner_name": "McM1dget",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Renata",
+                    "champ_id": 888,
+                    "kills": 3,
+                    "deaths": 5,
+                    "assists": 32
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "1SiZUzlN2Ndeqh3ra38yqMVXGl3NfTHg-exVPLboyr64Tr5h7dUEXB91lffPoe_u30nq--qeIWv-_Q",
-                "summoner_name": "gmqmxbmi",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Skarner",
-                "champ_id": 72,
-                "kills": 2,
-                "deaths": 9,
-                "assists": 20
-            },
-            "Summoner 7": {
-                "summoner_id": "LWWvl378u3QcAVRP4UvtaTX3qeiU0koafrl8m0aPbL16aOKk7BJlfiht_xoXWizlC5hnwoSz916i0g",
-                "summoner_name": "Dcengo",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Zyra",
-                "champ_id": 143,
-                "kills": 11,
-                "deaths": 5,
-                "assists": 16
-            },
-            "Summoner 8": {
-                "summoner_id": "iR4UGDClvU2gIFkA8p3Cw6xjrqbUBTAJOF_lSeDKYK77ChG_ZpIScNEF18Fc7f4n5ah1M1uWugDaIw",
-                "summoner_name": "ImB0X",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Leblanc",
-                "champ_id": 7,
-                "kills": 16,
-                "deaths": 7,
-                "assists": 12
-            },
-            "Summoner 9": {
-                "summoner_id": "ou2f0A-Sctx4w08k5GqYB3BInw97S9BJ53fCFtnIHbzoP6S9WqoWsxJZ02Wm2IjCLUeFkY6bo4cEFw",
-                "summoner_name": "Creed ing",
-                "team": 200,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Jinx",
-                "champ_id": 222,
-                "kills": 11,
-                "deaths": 13,
-                "assists": 13
-            },
-            "Summoner 10": {
-                "summoner_id": "kUBvorfBTuEtLhN219LuR_jloOgZybgBqScol8mrElXx6bWFzMqgrmsO-OUCjEzOMWcdaOeF7_Wfqg",
-                "summoner_name": "Ath\u00e9no",
-                "team": 200,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Pantheon",
-                "champ_id": 80,
-                "kills": 15,
-                "deaths": 10,
-                "assists": 16
-            }
+        "general_info": {
+            "game_id": "EUW1_6983636931",
+            "game_duration": 35.75,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719179808859,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "f66l6UwWcIIxIjSkF9d73g-YH3mnZWkbWk7-qjz8klWAK9820dvWFfZ_7tFh2yop_ypbzRboi9do6g",
-                "summoner_name": "Grinndal",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "DrMundo",
-                "champ_id": 36,
-                "kills": 2,
-                "deaths": 0,
-                "assists": 4
+        "game_id": "EUW1_6983305950",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "t1Qh4w8RI65k-n0sZPFqe_Jl2uW4cskuWrpsWSUfKJYwDSSEWOt6QtsqSOvJtU9e8EFBC5JMWVyj1w",
+                    "summoner_name": "EvangheliaSFR",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Pantheon",
+                    "champ_id": 80,
+                    "kills": 9,
+                    "deaths": 9,
+                    "assists": 9
+                },
+                "Summoner 2": {
+                    "summoner_id": "PSy7ZSIfeXuy1mnmeptkXKulygEUJW24gnLnfT8Z7GQ_32WDOchtt7SWq7hLR7v8K_c1d9nhaeHYzg",
+                    "summoner_name": "c\u00ebna",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Elise",
+                    "champ_id": 60,
+                    "kills": 12,
+                    "deaths": 6,
+                    "assists": 11
+                },
+                "Summoner 3": {
+                    "summoner_id": "WvwJwphR-SOheaNQaiR95ehqwKufd7aQ_e8UE0EB3NdhobUCyj_bzfI_iMBzZkztI8G91TtS7po97w",
+                    "summoner_name": "",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 14,
+                    "champ_name": "Katarina",
+                    "champ_id": 55,
+                    "kills": 8,
+                    "deaths": 10,
+                    "assists": 7
+                },
+                "Summoner 4": {
+                    "summoner_id": "ClauMFUjCrg2VPs-T85ydCDtqUDis18J8B3UC8ypSTTbePuMn8BRgjtDV1n9rjk3LV0WQxpcEkRgUw",
+                    "summoner_name": "phjigf",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 12,
+                    "deaths": 6,
+                    "assists": 10
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 13,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 2,
+                    "deaths": 6,
+                    "assists": 16
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "g7DvJ2CvJ6UdqBbAJK-gHCCdbTqc3h2qYQX4_VifbNLtXYE74WRkS75OaZcEQKo7yVeR_JW46LmYYQ",
-                "summoner_name": "",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Lillia",
-                "champ_id": 876,
-                "kills": 5,
-                "deaths": 3,
-                "assists": 5
-            },
-            "Summoner 3": {
-                "summoner_id": "18VS5-wzCv1UWdsnYrjfTmgvYTE3U0b6KmNLXGBa5JdzZ1mYeIfsoKF0tqVYWhnjB6WybGorgXV5FA",
-                "summoner_name": "SMIDS",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Syndra",
-                "champ_id": 134,
-                "kills": 4,
-                "deaths": 6,
-                "assists": 5
-            },
-            "Summoner 4": {
-                "summoner_id": "JmE38QWxBd1g44McKP0mxkymoHBiCyPIRMu9RCXzCPgXSvsswP39kSLQkOrhLKYCDu_NE1nYxR0GTw",
-                "summoner_name": "Kartoffelotto",
-                "team": 100,
-                "win": true,
-                "champ_level": 13,
-                "champ_name": "Ezreal",
-                "champ_id": 81,
-                "kills": 11,
-                "deaths": 3,
-                "assists": 8
-            },
-            "Summoner 5": {
-                "summoner_id": "j2x0_uUdkDojMrJa_wCuQkACpnPVPen2aedqiVcyHvaCNRir8cTAK0t4v5HFoX5lgt5PGEbVo6NNtg",
-                "summoner_name": "ViegoTiSpiego",
-                "team": 100,
-                "win": true,
-                "champ_level": 12,
-                "champ_name": "TahmKench",
-                "champ_id": 223,
-                "kills": 6,
-                "deaths": 4,
-                "assists": 13
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "yi1FNCQRUNMfSlsI7kc5_AXgICX2Ni8wV_OTt8kOfxVJ3Wwpc0MYjW2N-kaRHic2DfJZ-xmjXcUuow",
+                    "summoner_name": "M\u00efll\u00ef",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Vayne",
+                    "champ_id": 67,
+                    "kills": 8,
+                    "deaths": 9,
+                    "assists": 7
+                },
+                "Summoner 7": {
+                    "summoner_id": "ZqOjs1P1D10AWaTWBl669rremnD0SzS0r3pIV9cgy8J4li-ovbSI0sGvoBisg6JDi-l5KvHnxaFqDw",
+                    "summoner_name": "Baaarile2caca",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Viego",
+                    "champ_id": 234,
+                    "kills": 7,
+                    "deaths": 10,
+                    "assists": 6
+                },
+                "Summoner 8": {
+                    "summoner_id": "phEjJg4Qms5P394Iybz8aQep5XyeuQXkdaAv9QsWd23Bh8FHoRuqdZIoPjwDjLspNEJhmueIEjn5DA",
+                    "summoner_name": "eboulemen2caca",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Cassiopeia",
+                    "champ_id": 69,
+                    "kills": 12,
+                    "deaths": 6,
+                    "assists": 8
+                },
+                "Summoner 9": {
+                    "summoner_id": "vcuwULKF1JL-w9yATiRZItL8rNSg0-R6_Rb6m-TdxmvsLDWT3p3iBp7CbMAnw1x97Tm8iU30kS--Yw",
+                    "summoner_name": "Hustl3rk1D",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 5,
+                    "deaths": 8,
+                    "assists": 9
+                },
+                "Summoner 10": {
+                    "summoner_id": "FCEKrgOixfLIoLEg_8Q7GC6WwSmL8R2Ws7zawiUxdJ62gmYpGJIJsdAaB668AdmrBResgx-lJWqL3A",
+                    "summoner_name": "Sveenmaister",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Xerath",
+                    "champ_id": 101,
+                    "kills": 5,
+                    "deaths": 10,
+                    "assists": 20
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "kC48oUtUGSn5XKO83D90POsR59yhc2ENakFCXCQKD91bAg7uqRfOYutwaS-Vagttj8-KcDHA-7fuYg",
-                "summoner_name": "B4rb4s",
-                "team": 200,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Mordekaiser",
-                "champ_id": 82,
-                "kills": 1,
-                "deaths": 3,
-                "assists": 0
-            },
-            "Summoner 7": {
-                "summoner_id": "R8ouHj8SRWo_861o_rMwAvs_fp8wp3SpYMxNA1Bs0TbH8_99RWIS2mU1NrwsDKCOhOWq8mKDpyl_sA",
-                "summoner_name": "NocTurned0ff",
-                "team": 200,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "MasterYi",
-                "champ_id": 11,
-                "kills": 2,
-                "deaths": 3,
-                "assists": 3
-            },
-            "Summoner 8": {
-                "summoner_id": "v5wxWMDgam8HhrDRfO9tiZ9qdsUTjbbGD3Ju5LthGHQSDKSxSfpC3ZwrG4m5LOX1ca0nxaJnggd2cA",
-                "summoner_name": "My Sanctuary",
-                "team": 200,
-                "win": false,
-                "champ_level": 12,
-                "champ_name": "Ahri",
-                "champ_id": 103,
-                "kills": 3,
-                "deaths": 4,
-                "assists": 1
-            },
-            "Summoner 9": {
-                "summoner_id": "lwiBu4OMJh-8CoYQYctf3aidsdnkJRT6mfGYxkMrvAyg9XstBq9lhaOkUMjl1XHlELvThsitTXtxwg",
-                "summoner_name": "Jacy",
-                "team": 200,
-                "win": false,
-                "champ_level": 12,
-                "champ_name": "Jhin",
-                "champ_id": 202,
-                "kills": 9,
-                "deaths": 8,
-                "assists": 0
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": false,
-                "champ_level": 10,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 1,
-                "deaths": 10,
-                "assists": 8
-            }
+        "general_info": {
+            "game_id": "EUW1_6983305950",
+            "game_duration": 29.05,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719163879857,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "GvT-5x4GiPY1IHJFeBGqGRv0dR2hEhzop67h2aHz2jC2O7D0gPPnHu9_4v7h65qvwKrMcooEHU8PSQ",
-                "summoner_name": "Mr Salta3",
-                "team": 100,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Urgot",
-                "champ_id": 6,
-                "kills": 13,
-                "deaths": 8,
-                "assists": 5
+        "game_id": "EUW1_6983262607",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "zt5AwBCc-kFbfvOVwC-GbF7-dHcsbMYzvirTypGfAyEwgrYH9SWetOQn2tVo6YoPmFQ6bcjQfFJd_A",
+                    "summoner_name": "Gigantic Grizzly",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Darius",
+                    "champ_id": 122,
+                    "kills": 13,
+                    "deaths": 11,
+                    "assists": 3
+                },
+                "Summoner 2": {
+                    "summoner_id": "i03LfKFvu2eddXUD6eRT-o0ApXKjOOHwlyX6Ag-j6I_B2-YK2yDxxPmgmFvU9a0SXb89GeFeNHXQMg",
+                    "summoner_name": "Feuerkill",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Shyvana",
+                    "champ_id": 102,
+                    "kills": 11,
+                    "deaths": 8,
+                    "assists": 15
+                },
+                "Summoner 3": {
+                    "summoner_id": "5XcRwlntTz52UoyDCGjgvEuU2lx1b6n1ijPg29cdWGomB7sevC9jD7j0r6Y801agOUS7o6pSN8aP3g",
+                    "summoner_name": "Foulster",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Leblanc",
+                    "champ_id": 7,
+                    "kills": 7,
+                    "deaths": 5,
+                    "assists": 9
+                },
+                "Summoner 4": {
+                    "summoner_id": "Q8ROvJGquztCA3RdsAsYIcctovOUkD5pToY01ALswrA56Vsau3eT6InCWqM8xvlzpkngsBk8yCGZqg",
+                    "summoner_name": "Frank",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Vayne",
+                    "champ_id": 67,
+                    "kills": 15,
+                    "deaths": 9,
+                    "assists": 12
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 4,
+                    "deaths": 11,
+                    "assists": 26
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "U0c0F0hlyqfqi8_tyXn4AJrSVD-Pc-gYteHsw1qZe-2d0iNpN1DU4Cxlsff8-VB9cejzl7uIP2f9iw",
-                "summoner_name": "smallreaper12",
-                "team": 100,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Brand",
-                "champ_id": 63,
-                "kills": 8,
-                "deaths": 4,
-                "assists": 19
-            },
-            "Summoner 3": {
-                "summoner_id": "d0Q1Tpl0l3pDQx5FrilLgqfsWSueiqKDpXO1Eo6M7HEVAMLG-MHigZaSlOW1Ae9R8HDJPpa-3MrcyQ",
-                "summoner_name": "midyassuo",
-                "team": 100,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Sylas",
-                "champ_id": 517,
-                "kills": 14,
-                "deaths": 6,
-                "assists": 3
-            },
-            "Summoner 4": {
-                "summoner_id": "K1dVTlmKzpwjo2G0msu8rML7xLaJf10G6sFiM_ayWh0U1etv3ixcyLJ2ZKbxv_xZHQl_SAU1Kewd1w",
-                "summoner_name": "Extremeist",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Corki",
-                "champ_id": 42,
-                "kills": 6,
-                "deaths": 10,
-                "assists": 9
-            },
-            "Summoner 5": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 100,
-                "win": true,
-                "champ_level": 14,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 0,
-                "deaths": 8,
-                "assists": 21
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "XZAfwtZRUG8dJ5OVIf2jAsmdqnOKLIOShBwfrFHmZpDdOEoZbzQbRQZKT454wDZf2igfGoD8iN89Dg",
+                    "summoner_name": "Roy Ratnik",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Yone",
+                    "champ_id": 777,
+                    "kills": 9,
+                    "deaths": 12,
+                    "assists": 2
+                },
+                "Summoner 7": {
+                    "summoner_id": "WTwKdTFsbSE9aaw7C8ioIJWoVgfap8r9pI8m8ciYuebt4bwLvapMy0EhPR6IG-Sc58ZSxT9fBqqIDQ",
+                    "summoner_name": "ROIISBIRE",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Teemo",
+                    "champ_id": 17,
+                    "kills": 7,
+                    "deaths": 10,
+                    "assists": 14
+                },
+                "Summoner 8": {
+                    "summoner_id": "XPqbJeWg7aOtcEKkmelnVMOqdlo2Yek5RDakz-eaFichRSG_zhGCfJaqiBYdsvJhwnEmehGjPW5aQQ",
+                    "summoner_name": "8LaBbsitaBbLean8",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Katarina",
+                    "champ_id": 55,
+                    "kills": 3,
+                    "deaths": 8,
+                    "assists": 9
+                },
+                "Summoner 9": {
+                    "summoner_id": "Tuw8KxXH5enoueSSb6t5MqQAXLKOHfTF-86K-4dso-StD6HQ-y9b1T5x41y8pxxAg889mUt6NEGC-w",
+                    "summoner_name": "ELO TERR0RlST",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 20,
+                    "deaths": 5,
+                    "assists": 11
+                },
+                "Summoner 10": {
+                    "summoner_id": "cUKfMZZapM8QY6-9ID-3UqQ7G9c7qD8CU5l-Csd7SY60zoZ5WkXfo0CCly-E57di-dR2kK-w3zRKIA",
+                    "summoner_name": "MtfB",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Poppy",
+                    "champ_id": 78,
+                    "kills": 5,
+                    "deaths": 15,
+                    "assists": 17
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "JkamfLpBzGwmHWDstB9l4H0uSlq2mAHrtABDNw4q8temvHfJw-eF8MWp9DECHRBNufswPLrd5rhLAg",
-                "summoner_name": "teesecond",
-                "team": 200,
-                "win": false,
-                "champ_level": 15,
-                "champ_name": "Shen",
-                "champ_id": 98,
-                "kills": 7,
-                "deaths": 10,
-                "assists": 13
-            },
-            "Summoner 7": {
-                "summoner_id": "CVHP6VUgZUGTbGCi9OopRGhfqhsgI92L3s8BebICL4TYTTY1mDCLEY9pxNDpVQrTBNSuZ9veSz6BcQ",
-                "summoner_name": "Zerio2",
-                "team": 200,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "RekSai",
-                "champ_id": 421,
-                "kills": 10,
-                "deaths": 8,
-                "assists": 7
-            },
-            "Summoner 8": {
-                "summoner_id": "eGhRFfhFSTMI0xt6xLU6OEMKgcvwtzW419ksHLQKwAHSt7gTR-gLJRDjXjY-ISfiEsVb4YrhcuO1pg",
-                "summoner_name": "Hemat\u00f8ph\u00f8bia",
-                "team": 200,
-                "win": false,
-                "champ_level": 17,
-                "champ_name": "Zed",
-                "champ_id": 238,
-                "kills": 9,
-                "deaths": 7,
-                "assists": 12
-            },
-            "Summoner 9": {
-                "summoner_id": "lT66FyB7tcdFSfm0UGtCDCKSglfV78HGoOy3qAhBWkvlj9R9RRHTnM7OIFrEEsRMws2k1QWjLOg_pg",
-                "summoner_name": "Rwn04",
-                "team": 200,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Ashe",
-                "champ_id": 22,
-                "kills": 7,
-                "deaths": 8,
-                "assists": 15
-            },
-            "Summoner 10": {
-                "summoner_id": "qCK7fLL0f4wFsIDWKoUfKwxhifcy2LpFvdKkhePgYabJnFqPPii5XN9t5DXVDraZHYD224pTKymyFw",
-                "summoner_name": "Azzagi",
-                "team": 200,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Rakan",
-                "champ_id": 497,
-                "kills": 3,
-                "deaths": 8,
-                "assists": 21
-            }
+        "general_info": {
+            "game_id": "EUW1_6983262607",
+            "game_duration": 35.17,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719161458196,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "ykFt3DzbynHxHn-OLQpeRytQctpLD7IIfBrjNF9nvG08Tzorc2Ik8oy9tGWRanfk8x2baxgEgb5khg",
-                "summoner_name": "furiouscash",
-                "team": 100,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Riven",
-                "champ_id": 92,
-                "kills": 20,
-                "deaths": 10,
-                "assists": 10
+        "game_id": "EUW1_6983220604",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "S5YQV2UF_9L7S-OxNZs8UI0TQsiQBujs34a4tIrknu2GZBl9MuAEiuY-FJD0_D2YjhaPQ2pMIEaWVg",
+                    "summoner_name": "Kuijoopy",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Illaoi",
+                    "champ_id": 420,
+                    "kills": 4,
+                    "deaths": 9,
+                    "assists": 4
+                },
+                "Summoner 2": {
+                    "summoner_id": "4yOyIJlI5X-borY9OIzfkuQ-Hrb7T-fJwewqG3nXZ9JVODPhyfXW1EXXNGsvzMAjptgGvENdHD34oQ",
+                    "summoner_name": "Rolmachine",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Karthus",
+                    "champ_id": 30,
+                    "kills": 9,
+                    "deaths": 9,
+                    "assists": 9
+                },
+                "Summoner 3": {
+                    "summoner_id": "5yLXzrBMqoM7lWGOoNA86HR75RLrTjqtML3PmMAGUmiaYUxKLbHxIl9RX92x8v7RZl9ZrFbviWXXyw",
+                    "summoner_name": "Chyrpupn",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Tristana",
+                    "champ_id": 18,
+                    "kills": 4,
+                    "deaths": 9,
+                    "assists": 5
+                },
+                "Summoner 4": {
+                    "summoner_id": "9jCkcqiDoDxpKZ_05y363_0-CiXyBQk4saVmXL6oYOZrTvDKYFGvgyECbe2OPso3M7rvbjIvRsRiBw",
+                    "summoner_name": "TOPLANE CHAMPlON",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Jhin",
+                    "champ_id": 202,
+                    "kills": 8,
+                    "deaths": 15,
+                    "assists": 8
+                },
+                "Summoner 5": {
+                    "summoner_id": "XZ5hwvO9--F7Tcw1UMXkcC_GsM8eM5ERzPghdy-MO8m17nMKrun0QOfM0sCkSp_k9xRTy0G59HUYvw",
+                    "summoner_name": "BooBam",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Annie",
+                    "champ_id": 1,
+                    "kills": 6,
+                    "deaths": 16,
+                    "assists": 14
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "tjHxd9TxiPBQOBVEgo1kL054xi_2Rl9ICJuWuFuYg87fPM--Xo5WXl1LjkGjv5dKB90mPcssPegTFg",
-                "summoner_name": "tripple k mafia",
-                "team": 100,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Nidalee",
-                "champ_id": 76,
-                "kills": 7,
-                "deaths": 8,
-                "assists": 15
-            },
-            "Summoner 3": {
-                "summoner_id": "oYxHJ3lj7yTYlO1yTgvGo24hZjG4u44JXprgI2_0A28Tn90RYUn06jrKixl8-3aGSKxV5UVnihYymQ",
-                "summoner_name": "t0pgap on instaa",
-                "team": 100,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Zed",
-                "champ_id": 238,
-                "kills": 12,
-                "deaths": 9,
-                "assists": 5
-            },
-            "Summoner 4": {
-                "summoner_id": "7Idyz-ApgRcrAs9890A-_L8S3RXIo1CoQrVqMx6TroaWQWHp1MmzXNkGm_2fLP6G0hiRMMw1eqZh8w",
-                "summoner_name": "you matter",
-                "team": 100,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Brand",
-                "champ_id": 63,
-                "kills": 12,
-                "deaths": 17,
-                "assists": 12
-            },
-            "Summoner 5": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 100,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 2,
-                "deaths": 16,
-                "assists": 20
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "Mb3vnQx0dAsSG-JIJwqOUvew9UiWDocqu5uiXWIHd4I1ZnxXXezMrWgcMMxQn-bD8Rfj6LbIq7fgJA",
+                    "summoner_name": "George De La F\u00f4r",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Sejuani",
+                    "champ_id": 113,
+                    "kills": 7,
+                    "deaths": 6,
+                    "assists": 11
+                },
+                "Summoner 7": {
+                    "summoner_id": "RgGeIU_XTbLDtxdaG5EvE02lnni23fLdGan-jFD0F7Vv11oFgdUqgy90iP_GKposf-DNqsph_5BMLg",
+                    "summoner_name": "BBE Luna",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "FiddleSticks",
+                    "champ_id": 9,
+                    "kills": 7,
+                    "deaths": 3,
+                    "assists": 17
+                },
+                "Summoner 8": {
+                    "summoner_id": "Z4Mp7CDIMxTiWAhYnTDHVvMob_A2h5Kvs-A6mKJu7fXuBk4kV6qH22VNMGXTlJ9PwylSqPpKSyHjCQ",
+                    "summoner_name": "Nydaling",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Taliyah",
+                    "champ_id": 163,
+                    "kills": 14,
+                    "deaths": 7,
+                    "assists": 16
+                },
+                "Summoner 9": {
+                    "summoner_id": "BdXTNo7bWRTBjj9qaTqHSirrxyjuObGsEaFKDIyg0kk8VvQKhjhYowaxmncIU5wJE1k9s3Br1c4JNw",
+                    "summoner_name": "O \u0394",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Zeri",
+                    "champ_id": 221,
+                    "kills": 21,
+                    "deaths": 10,
+                    "assists": 9
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 9,
+                    "deaths": 5,
+                    "assists": 25
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "rBC4-w-sQKQ7AuZJPoqnTIcVNt19MPJrV8j2u_uLFjrEaF2JntJJwES5S_fThiR0sBZa4DIYj6Axww",
-                "summoner_name": "French Mini",
-                "team": 200,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Garen",
-                "champ_id": 86,
-                "kills": 6,
-                "deaths": 11,
-                "assists": 13
-            },
-            "Summoner 7": {
-                "summoner_id": "cxURCFnMK05p1yum7-yCRI88AaYjnbLFhWhuDkmtu_o_YxLj_emvMvLdILx3bZUveoGRr9Gqp-xhWQ",
-                "summoner_name": "Darki XVI",
-                "team": 200,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Kindred",
-                "champ_id": 203,
-                "kills": 10,
-                "deaths": 9,
-                "assists": 27
-            },
-            "Summoner 8": {
-                "summoner_id": "LvdAhcZNV-Ps2SDPjqaDBsXx2kx3skAe3Zncd5GN4hYnAs0ndzFP3RrZl7Y84aS7ZICtyPiNjzuuHg",
-                "summoner_name": "Wissky",
-                "team": 200,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Lux",
-                "champ_id": 99,
-                "kills": 12,
-                "deaths": 8,
-                "assists": 20
-            },
-            "Summoner 9": {
-                "summoner_id": "oPkAc3Jp-iTPRJtzPcXNU_4hsR99qc7agfAV15apCrIW4CvyxjKlHLG9mggxV6fpp-whP7D40zpvLQ",
-                "summoner_name": "Anurpo v2",
-                "team": 200,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Kaisa",
-                "champ_id": 145,
-                "kills": 28,
-                "deaths": 12,
-                "assists": 17
-            },
-            "Summoner 10": {
-                "summoner_id": "pada212al67mrTsHDYmYMz4A4feLVzP-jME16W8O-SDGvZwMEb1mXzAsxg3jtaks2aTLsoW09P8Jfw",
-                "summoner_name": "GonzoV2",
-                "team": 200,
-                "win": false,
-                "champ_level": 15,
-                "champ_name": "Rell",
-                "champ_id": 526,
-                "kills": 3,
-                "deaths": 13,
-                "assists": 39
-            }
+        "general_info": {
+            "game_id": "EUW1_6983220604",
+            "game_duration": 29.4,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719159398228,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "MhjGOs_54sdhXPjI8wXWNpgqC6l0kR2rq4U0yveb8wlg2yvZYMaaTkFtddWDkSk8QWY0JJk1DvVeAQ",
-                "summoner_name": "MoGrimei",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Riven",
-                "champ_id": 92,
-                "kills": 3,
-                "deaths": 8,
-                "assists": 9
+        "game_id": "EUW1_6983203313",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "5NPC_RU-tEdgOEfTA6-hV-TGHpH5m54tmxNUgygKYzIt9kiC82CcW3j9Ky4UOqSVbK3hKdZafhe6zA",
+                    "summoner_name": "",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 1,
+                    "champ_name": "Irelia",
+                    "champ_id": 39,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 2": {
+                    "summoner_id": "-CZ0wAjLeYaJWCmt21O1X-Xj5YWJAQDWq-Aqcny-g51p5U_ZKNeki7jeZkSsiCaC072sz1MSkgkG5w",
+                    "summoner_name": "Dirty Den 69",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 1,
+                    "champ_name": "Evelynn",
+                    "champ_id": 28,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 3": {
+                    "summoner_id": "IzcKcXnbVt3-70hVKlC1eAJufQvDJzRr7z3S6ZM5JSEGK0eLkWQsINtyaUNAKXD1UphG3EWhOwe_QA",
+                    "summoner_name": "Shablau",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 1,
+                    "champ_name": "AurelionSol",
+                    "champ_id": 136,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 4": {
+                    "summoner_id": "ovaXMt3UOXQIA1I7EV4YWY4_G0-8AaUL528TuSJP9dHd-h2wcA_3d8noJ78dY68vVZHNWJ2DCPnC3g",
+                    "summoner_name": "1 Team 5 D0gs",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 1,
+                    "champ_name": "Varus",
+                    "champ_id": 110,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 5": {
+                    "summoner_id": "wS0WO3cIYdp1ojJSwUtN1ixQBARB29TYFIrzEaANkqjOi-71wCHBUFEngg_8IK8G8z5XawZ3LWwGbg",
+                    "summoner_name": "Fenir15",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 1,
+                    "champ_name": "TahmKench",
+                    "champ_id": 223,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "oEfzzXZigghJdfkA4MSQEpiToyP0bv2AxSJ8VLpOsBDQGLqKHSW_CUSt_b26zcpd6U7UdgyAWG1yCA",
-                "summoner_name": "Tentakill Smash",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Brand",
-                "champ_id": 63,
-                "kills": 8,
-                "deaths": 11,
-                "assists": 17
-            },
-            "Summoner 3": {
-                "summoner_id": "DKY1dy9sJagtEvcHONfXHqBnAOe91nfjHjuGhF9wGIiBQYkoKkSkruRdQNreaSTM1_9Jyoq3_dIKmg",
-                "summoner_name": "nachavvv",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Akshan",
-                "champ_id": 166,
-                "kills": 22,
-                "deaths": 9,
-                "assists": 14
-            },
-            "Summoner 4": {
-                "summoner_id": "3Bw4wPIhWXgM5rTadiOXyEx7tSnNZUyCUG8VM-dWtkIpZWwZMlrrEERSYaykn0egQ_uI0keuVHLaAQ",
-                "summoner_name": "Victor Vibing",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Twitch",
-                "champ_id": 29,
-                "kills": 11,
-                "deaths": 13,
-                "assists": 13
-            },
-            "Summoner 5": {
-                "summoner_id": "gROuPZCnLG4GvcqrYv-tSjrRtBz71A84xLtxjWvD01cReqVs1PaqkVOZlAg4pTnqX8SxThpa3Yf2Tw",
-                "summoner_name": "Babalagrenouille",
-                "team": 100,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Braum",
-                "champ_id": 201,
-                "kills": 0,
-                "deaths": 10,
-                "assists": 22
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "CoItTIaQXHVEojQ7axgaFbgGxKCx9eaZZXyAKhh1EmjkbXxtix6TEIPC0qLAMB_zPR0wt6pKXi5Seg",
+                    "summoner_name": "Ludvan",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 1,
+                    "champ_name": "Nasus",
+                    "champ_id": 75,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 7": {
+                    "summoner_id": "TqZRdIx28lDUV5egWcrUSdAgKyjBLC6fMdHT-Me-_OyWcnbszhq_b_s2mx3KHS_vuKipnY0T26uXKA",
+                    "summoner_name": "Definitely \u00dcdyr ",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 1,
+                    "champ_name": "Lillia",
+                    "champ_id": 876,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 8": {
+                    "summoner_id": "mJk0E5olUPfOU9L4ikgNkMEdOpR-rJOsb5jnOGYdV2eVPkmzQVwrEoNipLItOSEJPej0TDzckIx5Nw",
+                    "summoner_name": "plushiie",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 1,
+                    "champ_name": "Malphite",
+                    "champ_id": 54,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 9": {
+                    "summoner_id": "lVSWA_CeOZW44rW_KXppAlnOr8CyztgwymCJUtD2nu2cskVygyCP6MdPqsE42Fjt0G5icoEduQBdQQ",
+                    "summoner_name": "Kovadvsgs",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 1,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 1,
+                    "champ_name": "Blitzcrank",
+                    "champ_id": 53,
+                    "kills": 0,
+                    "deaths": 0,
+                    "assists": 0
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "uaDu_Q27-ZaIgUceQPd1a0tmFz4-d0DEuGvQi5osKHVEkJsdkeXJJt8gBxD20qyq1m1vY9qHFDY9yg",
-                "summoner_name": "HolyBen10",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Illaoi",
-                "champ_id": 420,
-                "kills": 6,
-                "deaths": 7,
-                "assists": 9
-            },
-            "Summoner 7": {
-                "summoner_id": "M1H7sgNMBNGyIZDPhFdFpaJn6A6aRGdC9c6WxGycXwa394zeCB12nTzxSzwrZDP4DVmkT0o7WxBh4g",
-                "summoner_name": "Ryuug",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Diana",
-                "champ_id": 131,
-                "kills": 19,
-                "deaths": 7,
-                "assists": 9
-            },
-            "Summoner 8": {
-                "summoner_id": "S9tFKQjSpxW9X_gLYYRg46yAFgf04C9O7bV2N_TjoEpYzicK9WWqHEQHx3f1XO_WkWD24XYxNhHqZw",
-                "summoner_name": "erdmdrn",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Qiyana",
-                "champ_id": 246,
-                "kills": 15,
-                "deaths": 8,
-                "assists": 10
-            },
-            "Summoner 9": {
-                "summoner_id": "7hkTNrXAXwECm0RJUqNKDnCZubGsDC5fY60mRZxjTwYpl7ijmtGyCYZIl4bEumf_ofNyXgdF2BsmvQ",
-                "summoner_name": "Garruke",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Ezreal",
-                "champ_id": 81,
-                "kills": 9,
-                "deaths": 11,
-                "assists": 14
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": true,
-                "champ_level": 14,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 2,
-                "deaths": 11,
-                "assists": 24
-            }
+        "general_info": {
+            "game_id": "EUW1_6983203313",
+            "game_duration": 1.77,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719158998151,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "ck1LGGOqdickjEabd2ZFKYemdYDwBrsHkvcQjCy5EsvtaDkxf7MZzTT9c3xpPiulww4Jxwfe4UVXkg",
-                "summoner_name": "CNG vlaking",
-                "team": 100,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Renekton",
-                "champ_id": 58,
-                "kills": 4,
-                "deaths": 3,
-                "assists": 1
+        "game_id": "EUW1_6983158452",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "juCEyVRv3LEtinBqUdNiCCe47wns-qfB21Rh0-pYpjqhBxiJhBX5CPtts0hFQHQpKt9UVfAlNCnffQ",
+                    "summoner_name": "DELTA 4 0",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "MonkeyKing",
+                    "champ_id": 62,
+                    "kills": 4,
+                    "deaths": 7,
+                    "assists": 2
+                },
+                "Summoner 2": {
+                    "summoner_id": "eQtGlgk4IjiaCXr0juuZrR4UN_pHsbuGl7qYfwGMT6QB3s7M2I_UCz_jyjkKo7WlZ_d38sii3ZbVSg",
+                    "summoner_name": "HTC Capit\u00e3o",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Volibear",
+                    "champ_id": 106,
+                    "kills": 6,
+                    "deaths": 6,
+                    "assists": 8
+                },
+                "Summoner 3": {
+                    "summoner_id": "LvD_c2YDfjImfz90FkGLRvACrN6FZe3V5ipMouL0CXBZRj4Y-aV20_dTVQWDr3FgGJnhHSL6eu6KjQ",
+                    "summoner_name": "Itharas",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Lux",
+                    "champ_id": 99,
+                    "kills": 10,
+                    "deaths": 5,
+                    "assists": 7
+                },
+                "Summoner 4": {
+                    "summoner_id": "qirt1wpYl4-TAkeAMlbZSz3nbWqzZjujli0gsKHiUSfYmI1YYx-kZowsN9ybiWn4CWrR6LR7LXMCqQ",
+                    "summoner_name": "Jhin Toniccc pls",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Kaisa",
+                    "champ_id": 145,
+                    "kills": 6,
+                    "deaths": 10,
+                    "assists": 10
+                },
+                "Summoner 5": {
+                    "summoner_id": "NfEC_jwAbEqmOLnlxPDMq5MY8HxlXAfymHvZNzetbJ55kkCQJVqo7CxCYUgq7AzJpr_JVNt-yImazg",
+                    "summoner_name": "TheFattestNinja",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 12,
+                    "champ_name": "Alistar",
+                    "champ_id": 12,
+                    "kills": 0,
+                    "deaths": 11,
+                    "assists": 18
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "F8mndzpQQgu_KtovOYeEGIl39dW6sWsT556CZL8hYlnfKgAaWulxcs8HOZEac2FdFJDaqsZVibvrHg",
-                "summoner_name": "NerfMorzok",
-                "team": 100,
-                "win": false,
-                "champ_level": 10,
-                "champ_name": "MasterYi",
-                "champ_id": 11,
-                "kills": 0,
-                "deaths": 4,
-                "assists": 1
-            },
-            "Summoner 3": {
-                "summoner_id": "RBeX7namfK3nMPoCKh8V0SI8xdhblV6EtWxFKj420IWy8TOU5kCvFwHhmabqYJWWQIOht6rOBdpZDw",
-                "summoner_name": "DBB Xiu",
-                "team": 100,
-                "win": false,
-                "champ_level": 12,
-                "champ_name": "Galio",
-                "champ_id": 3,
-                "kills": 4,
-                "deaths": 3,
-                "assists": 2
-            },
-            "Summoner 4": {
-                "summoner_id": "XCBM1EcNoEd3jWIcfwBfpOZ83TQ4fK7arSxos8WMQPyHgO8murs-risheifIz1NxOBsJ6daGhMhH6w",
-                "summoner_name": "Chokadin",
-                "team": 100,
-                "win": false,
-                "champ_level": 10,
-                "champ_name": "Ashe",
-                "champ_id": 22,
-                "kills": 0,
-                "deaths": 8,
-                "assists": 4
-            },
-            "Summoner 5": {
-                "summoner_id": "12Qa1cPLWWjfrNcDzS11htiIawREYnJscbJdFXK0WhIK8jI7vLH8CRD2Fs4FBH2Eu6IGpse177usDg",
-                "summoner_name": "Supperturbo",
-                "team": 100,
-                "win": false,
-                "champ_level": 9,
-                "champ_name": "Thresh",
-                "champ_id": 412,
-                "kills": 1,
-                "deaths": 8,
-                "assists": 4
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "bdDXAmJzaaQhHSMffDRBKJKFd57_Wwqyb1jpqmSJ4IZCaL7BWkLu2JrTQ96l-bzSiij6iYFqsVqIgg",
+                    "summoner_name": "RYUga ZAKIon L8",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "KSante",
+                    "champ_id": 897,
+                    "kills": 6,
+                    "deaths": 9,
+                    "assists": 9
+                },
+                "Summoner 7": {
+                    "summoner_id": "egmqUtReoBvjlqqXhuKl4RWZLVGA01tTC2TJ5k9adDykCFH8qcyqpyE4wD44KWT8HoozFGxDHpGcTg",
+                    "summoner_name": "Sir Janhus",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Khazix",
+                    "champ_id": 121,
+                    "kills": 13,
+                    "deaths": 0,
+                    "assists": 10
+                },
+                "Summoner 8": {
+                    "summoner_id": "RxviyzgJVt-g-Aw6coTIjfYlbXHBIA_XQpz1h81yFHh0OZP2AhkyBOko39kXFFHkKMb7bUv-FKJP7g",
+                    "summoner_name": "S04 Murthag",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Sylas",
+                    "champ_id": 517,
+                    "kills": 9,
+                    "deaths": 9,
+                    "assists": 9
+                },
+                "Summoner 9": {
+                    "summoner_id": "sbUhoR9lfBjwK3sp4Lxc4EdX7xGiWuYXy1ZnhdLHvkEeRcSKK3lwWTXONO08eUOnqVewCRPtVAj-fA",
+                    "summoner_name": "Xanctium",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 8,
+                    "deaths": 5,
+                    "assists": 9
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 14,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 3,
+                    "deaths": 4,
+                    "assists": 23
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "f32O2OBkUOvQ2xPX6JCADmjVAaJJEzCKe6svQBPoqqY3ywdZYpyDFGHvKwX2z7Dtw_v_P89a-iw2xA",
-                "summoner_name": "Hambo",
-                "team": 200,
-                "win": true,
-                "champ_level": 12,
-                "champ_name": "Tryndamere",
-                "champ_id": 23,
-                "kills": 1,
-                "deaths": 2,
-                "assists": 2
-            },
-            "Summoner 7": {
-                "summoner_id": "0tL5OWfHvh--ec4J-RwLU1j38mg6uQqpJU0MZjzwOKqqY1laScnJeCDZIi-cSmLW40-D-CqQQ43Lpg",
-                "summoner_name": "Linh Nguyen",
-                "team": 200,
-                "win": true,
-                "champ_level": 11,
-                "champ_name": "LeeSin",
-                "champ_id": 64,
-                "kills": 7,
-                "deaths": 3,
-                "assists": 11
-            },
-            "Summoner 8": {
-                "summoner_id": "UPI1zcM6M2fO6ZfkZff-1ApXigkh7FK1HA7VWhR1cLwD-zhmA_GDeDPWGhEzcNk0h8pn49Kc2ihLRA",
-                "summoner_name": "ChonkyChonkers",
-                "team": 200,
-                "win": true,
-                "champ_level": 12,
-                "champ_name": "Sylas",
-                "champ_id": 517,
-                "kills": 5,
-                "deaths": 1,
-                "assists": 11
-            },
-            "Summoner 9": {
-                "summoner_id": "6_nThYPCjYYfHq0KDbyNqRj0Sm55LYFQdefY5NZJ1JOxHy81sh6WglogGxzIrLJkrxXkEI_7YNv_MQ",
-                "summoner_name": "KenJhin130",
-                "team": 200,
-                "win": true,
-                "champ_level": 12,
-                "champ_name": "Samira",
-                "champ_id": 360,
-                "kills": 13,
-                "deaths": 2,
-                "assists": 4
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": true,
-                "champ_level": 10,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 0,
-                "deaths": 1,
-                "assists": 15
-            }
+        "general_info": {
+            "game_id": "EUW1_6983158452",
+            "game_duration": 29.08,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719156944295,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "iC9Z2rgNK8TIyPioNBpbjxG0RwSJY-2Yxh4tAvN8O50oJaJCH6ZiXMd5Tq7R80YXyUaMT_7DJ78dXg",
-                "summoner_name": "tempyrqetxqfbawb",
-                "team": 100,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Sion",
-                "champ_id": 14,
-                "kills": 10,
-                "deaths": 6,
-                "assists": 12
+        "game_id": "EUW1_6983111113",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "aSj8O9-zcefJHvn7b7gWS30jYo5NXxn2aJy2FJgT213RlBP7PGijeT1C4gvEe3ZzoMW5KyFELyG6Lg",
+                    "summoner_name": "",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Volibear",
+                    "champ_id": 106,
+                    "kills": 15,
+                    "deaths": 6,
+                    "assists": 16
+                },
+                "Summoner 2": {
+                    "summoner_id": "ZtsdmMY3tMPi7oiL7LBcCG-NwLmVu5SFrAVtAYKF5OQ3W9faQbBlMD1QMRsBiLuapGsn-ojhuM6kpw",
+                    "summoner_name": "Lirge",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Khazix",
+                    "champ_id": 121,
+                    "kills": 17,
+                    "deaths": 9,
+                    "assists": 8
+                },
+                "Summoner 3": {
+                    "summoner_id": "omESgqg79__LKf680DWYCExxCaLdNQ9eeeLBDDDNGxjQYKYS5pxwWdUjVEv3BRsBlpTTy0mUxy269w",
+                    "summoner_name": "Katacllysme",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Brand",
+                    "champ_id": 63,
+                    "kills": 11,
+                    "deaths": 3,
+                    "assists": 13
+                },
+                "Summoner 4": {
+                    "summoner_id": "SnMxlIf59ntkVU0mQjBPJO4tn2bnFYwV_HJ4t0NKPc6ZQ1EmvtAaXTt55fRtRpQ5SOnADnz5wcmQXg",
+                    "summoner_name": "Hiyest",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Draven",
+                    "champ_id": 119,
+                    "kills": 6,
+                    "deaths": 10,
+                    "assists": 16
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 7,
+                    "deaths": 4,
+                    "assists": 28
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "Jq0XeY0KT2BicioyAdY6f5bsRjLyJ9wBGo4APZ9xyTopYgctFp8z1Sc1a4Vg56IGr8DpBgPbDmKsGA",
-                "summoner_name": "MeHow16",
-                "team": 100,
-                "win": true,
-                "champ_level": 14,
-                "champ_name": "Viego",
-                "champ_id": 234,
-                "kills": 6,
-                "deaths": 6,
-                "assists": 9
-            },
-            "Summoner 3": {
-                "summoner_id": "TQ_zXJf-SnWzvQUdxJnDLE9ifcvQsfl-91qPQRjLjJ_DZpC2zCgOd-vNAUu-_rVTSFfpapiYmD35hQ",
-                "summoner_name": "The Cold Sausage",
-                "team": 100,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Ahri",
-                "champ_id": 103,
-                "kills": 5,
-                "deaths": 4,
-                "assists": 8
-            },
-            "Summoner 4": {
-                "summoner_id": "rP5leC_uVTawKCN5ZPgWIKSjk5PPhe2yg5k685cDYstra7R5QK1hyifWq-qBU-S5tu44jiy9QzUwfw",
-                "summoner_name": "PhonKz",
-                "team": 100,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Kaisa",
-                "champ_id": 145,
-                "kills": 8,
-                "deaths": 4,
-                "assists": 7
-            },
-            "Summoner 5": {
-                "summoner_id": "ZhGcUjo3GcI6Hzz0HW4T7eN5FIpGX_9B2Kse_PmQbUYSqQ4PF6VzqTJuvxTa-dHer81x0UUGKRQSGw",
-                "summoner_name": "Master of JGN",
-                "team": 100,
-                "win": true,
-                "champ_level": 13,
-                "champ_name": "Braum",
-                "champ_id": 201,
-                "kills": 3,
-                "deaths": 4,
-                "assists": 14
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "bPsgyNsALtL-fqtMiP2JAx5_8NFGbI5BV_i5YcaXrh47Vu_ea5cDUyvXpcfhCXWzM7IzC6-ybXxhZA",
+                    "summoner_name": "S00X",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Mordekaiser",
+                    "champ_id": 82,
+                    "kills": 7,
+                    "deaths": 12,
+                    "assists": 6
+                },
+                "Summoner 7": {
+                    "summoner_id": "eZ-pxRF3B2AW2OVSGbn9ZgvEyihaCzQ37H2uZka11PAOXqC5bb9Qzc44pYscAYiy0t_wH_cOQ2togA",
+                    "summoner_name": "InstaSamerTH",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Warwick",
+                    "champ_id": 19,
+                    "kills": 13,
+                    "deaths": 11,
+                    "assists": 6
+                },
+                "Summoner 8": {
+                    "summoner_id": "-xuIkqWuV3JnU-0ga6JGWGXZvn3828lnefrz4Uw6CyrvPr4aRI7GtpwtEgZ5KKP2eEEKpAvC1k7zyQ",
+                    "summoner_name": "pikaSeka",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Orianna",
+                    "champ_id": 61,
+                    "kills": 7,
+                    "deaths": 11,
+                    "assists": 13
+                },
+                "Summoner 9": {
+                    "summoner_id": "SYFb8hDr3ZIxozI0oIJMp0W-4Mn5_KovqYwFHa7-j4vbtSt8FImcD4wxmgxuwt5cf2QQgZryvfxRlA",
+                    "summoner_name": "mylifesmiserable",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Ezreal",
+                    "champ_id": 81,
+                    "kills": 5,
+                    "deaths": 10,
+                    "assists": 5
+                },
+                "Summoner 10": {
+                    "summoner_id": "y5WH3nsbOTQ35B2Mz09nEvyOCVdWu899VFWDv55X4bVwXD_Vw1GyDYlTC7VzW_Xx8c92Rq2bcLbNOg",
+                    "summoner_name": "Kimmy Wexler",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Rakan",
+                    "champ_id": 497,
+                    "kills": 0,
+                    "deaths": 12,
+                    "assists": 11
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "hkBhyIESWLOEmEsnWaX5DXUHCnTwV-l_s4F1yoXnWB47yE_9rxfcEU9pJIuXN3W1W111nbK7jHkXmQ",
-                "summoner_name": "2KC Troy",
-                "team": 200,
-                "win": false,
-                "champ_level": 15,
-                "champ_name": "Fiora",
-                "champ_id": 114,
-                "kills": 3,
-                "deaths": 9,
-                "assists": 8
-            },
-            "Summoner 7": {
-                "summoner_id": "KsrPWc-PVzIsD3WSDsT-E9G6KOGjTWcYxVPap5bLZE0keWDIaCPJJdOq31IM1lnVFEEUIOr5cXV-cg",
-                "summoner_name": "jaioubliemonmdp",
-                "team": 200,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Lillia",
-                "champ_id": 876,
-                "kills": 3,
-                "deaths": 8,
-                "assists": 6
-            },
-            "Summoner 8": {
-                "summoner_id": "Wr1RoxlhgjWz7QwW88uyNPF7eRgzQMQ6aqGProHQcYI5sKtjT2rD8G3EYOALq1Z4yqmTLy_NS9p8Pw",
-                "summoner_name": "waseunday",
-                "team": 200,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Fizz",
-                "champ_id": 105,
-                "kills": 12,
-                "deaths": 3,
-                "assists": 1
-            },
-            "Summoner 9": {
-                "summoner_id": "qaIorADndDMSyI7_EwPPB4tdBeXpz0zw6SMRlr_pTdavV42-MTrFLEzUxv_mf81C2Ovlom1kJsH5Xg",
-                "summoner_name": "GiammyQ8",
-                "team": 200,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Samira",
-                "champ_id": 360,
-                "kills": 5,
-                "deaths": 8,
-                "assists": 1
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 1,
-                "deaths": 4,
-                "assists": 9
-            }
+        "general_info": {
+            "game_id": "EUW1_6983111113",
+            "game_duration": 33.78,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719154602104,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "7QHGXhq_MSV1fJHr0isS-ESw6cM9rIh1ZomJxE6qk9F16ECzn0AlXi6C9BhKrveRGqYHQUri6dpAag",
-                "summoner_name": "",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Vayne",
-                "champ_id": 67,
-                "kills": 6,
-                "deaths": 3,
-                "assists": 1
+        "game_id": "EUW1_6983065774",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "eOmHnENnu7FGQpoIBK5WfY69xyX_1IXAcJmz_ObpfqEpC6Omrhm5IolMa6-vG-GwLWvMOeFokXj4Ww",
+                    "summoner_name": "Zephirmir",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Mordekaiser",
+                    "champ_id": 82,
+                    "kills": 3,
+                    "deaths": 9,
+                    "assists": 3
+                },
+                "Summoner 2": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Amumu",
+                    "champ_id": 32,
+                    "kills": 3,
+                    "deaths": 11,
+                    "assists": 6
+                },
+                "Summoner 3": {
+                    "summoner_id": "FTpL3kCE7HZDKG7uJcWU_T99FOENUxlDeEM0ZdqjxVmbpYbFCyBwaaB7tAiFRAWfrQxKDpnXFmsMhg",
+                    "summoner_name": "\u00e5bner",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Yone",
+                    "champ_id": 777,
+                    "kills": 5,
+                    "deaths": 4,
+                    "assists": 6
+                },
+                "Summoner 4": {
+                    "summoner_id": "VNG96FK3K0pxQzjBjtvZog6JyErijyoSA_OIe06fdwHlsjQ_eferzPX4TfYOcMpdy35dh7zEKsm5Ew",
+                    "summoner_name": "",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "MissFortune",
+                    "champ_id": 21,
+                    "kills": 10,
+                    "deaths": 9,
+                    "assists": 3
+                },
+                "Summoner 5": {
+                    "summoner_id": "PBAsnXycU8hOwhmkXGA8rRlMgXrXt8Y9AUKOsrnarbVs7CmZibfvvg674RXqVv20Xm2BJkFANXv2ig",
+                    "summoner_name": "Maxima Uncus",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Lillia",
+                    "champ_id": 876,
+                    "kills": 2,
+                    "deaths": 7,
+                    "assists": 12
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "rKKFjirbuikwx9Y6Mqn_kflqHqDzI8ozO0MbZ3guZOMyLXYla82LRD4zOPf4bXFEFhpxXrZgping9Q",
-                "summoner_name": "The Dzik",
-                "team": 100,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "LeeSin",
-                "champ_id": 64,
-                "kills": 2,
-                "deaths": 12,
-                "assists": 8
-            },
-            "Summoner 3": {
-                "summoner_id": "FVHHms_hP_EEkdH1XDReiWs6wNDBbsEexnRKhRitHS8uwUPV8xsL_OsyhmRoLvS395o5D8x_bEOOQA",
-                "summoner_name": "Urraa",
-                "team": 100,
-                "win": false,
-                "champ_level": 15,
-                "champ_name": "Xerath",
-                "champ_id": 101,
-                "kills": 5,
-                "deaths": 8,
-                "assists": 4
-            },
-            "Summoner 4": {
-                "summoner_id": "MdqgS-qSekdUB_-N-wMuJmW7p-rP3ALqYNPWKlo90c9J4HdgRpyzmMmjRSQo0toUBy2gHxA3ee50gg",
-                "summoner_name": "T\u00f8tte",
-                "team": 100,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Jinx",
-                "champ_id": 222,
-                "kills": 4,
-                "deaths": 7,
-                "assists": 6
-            },
-            "Summoner 5": {
-                "summoner_id": "qywocSWte5bK1lixkPTCge-uS-V7SXrZrjuZ9hGX8n4QdpxtWThZTFAbRHHG2qKQIms60Md62EWtmw",
-                "summoner_name": "Adu3s",
-                "team": 100,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Nami",
-                "champ_id": 267,
-                "kills": 1,
-                "deaths": 5,
-                "assists": 11
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "CuwQ7l_cbO5zp7--Haix6nd6hnkUqvr_ziVf4KMlfsUtphrDxXD7cn0QCtjW5KvL-y-2r5mkVoxuFg",
+                    "summoner_name": "heydoo",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "DrMundo",
+                    "champ_id": 36,
+                    "kills": 9,
+                    "deaths": 2,
+                    "assists": 2
+                },
+                "Summoner 7": {
+                    "summoner_id": "AWpnfvCYqkk2aVivlLRdzPzr7Fi0GXVMFCJTTICh3yCU2EHsBA3XIyERPXPTwbcqplmeRJLjR0Z6_A",
+                    "summoner_name": "L\u00eat me die",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Senna",
+                    "champ_id": 235,
+                    "kills": 6,
+                    "deaths": 5,
+                    "assists": 20
+                },
+                "Summoner 8": {
+                    "summoner_id": "pcl1qs-8-WW-_8I2SRzlY9GM4zUJtGVkY-_HyknPTDAwTZWT4dg7x6FnXdnprLXcisXxwsnrkireIg",
+                    "summoner_name": "FNC grnick75",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Anivia",
+                    "champ_id": 34,
+                    "kills": 4,
+                    "deaths": 4,
+                    "assists": 8
+                },
+                "Summoner 9": {
+                    "summoner_id": "MPEQSmFuWZRUq1TDWTq5ZdfTMptXzBVrj5vE0Rb2sSJ5SOgQgqrWeOWm8_2gEAiX4IQE-mobXz4RGQ",
+                    "summoner_name": "glizzy deleter",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 18,
+                    "deaths": 6,
+                    "assists": 7
+                },
+                "Summoner 10": {
+                    "summoner_id": "cMyl7cLffD2siOGb869_jlIbpXYcrcp1p2X4WV-XnwYwyu8ygUcBAo-U-v2QFbt2Dh02dGrTrKUA9g",
+                    "summoner_name": "Abdul RAVAGE",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Skarner",
+                    "champ_id": 72,
+                    "kills": 3,
+                    "deaths": 6,
+                    "assists": 19
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "q7yGj9P75egIQOjEJ7DyOwaV3xo8XyK_fJIyS8zdUY23MWSAwtS4NhjKPKwNRT86CQK4C217iK5fKQ",
-                "summoner_name": "ADEMASTOR",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Urgot",
-                "champ_id": 6,
-                "kills": 3,
-                "deaths": 3,
-                "assists": 7
-            },
-            "Summoner 7": {
-                "summoner_id": "ajRtlQHq7AfoIiMbZCBBv6y1BInopC5UKLRuQDtieK03wYpFPn1v_IhyTNgtn21uLz243-R3B3rcSA",
-                "summoner_name": "HyperXCITE",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Vi",
-                "champ_id": 254,
-                "kills": 9,
-                "deaths": 2,
-                "assists": 6
-            },
-            "Summoner 8": {
-                "summoner_id": "xzyEppEg11CmP84n23kuPu2PA-lZDCAys31PD8gYfdLTYY-Q5eCMAeal1mjZ7NgUOsT0BLjwHw9-HA",
-                "summoner_name": "NCS LAMA",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Leblanc",
-                "champ_id": 7,
-                "kills": 10,
-                "deaths": 3,
-                "assists": 6
-            },
-            "Summoner 9": {
-                "summoner_id": "KJICzgrOdF8BjYIwSYlKSHLZjE4cp-AfQburTqd3_2zH95jOG3lmpuxe3rzFlWdXQjcuiqxaj4UVQA",
-                "summoner_name": "Zashimaxill",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Ezreal",
-                "champ_id": 81,
-                "kills": 11,
-                "deaths": 5,
-                "assists": 9
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": true,
-                "champ_level": 13,
-                "champ_name": "Blitzcrank",
-                "champ_id": 53,
-                "kills": 2,
-                "deaths": 5,
-                "assists": 10
-            }
+        "general_info": {
+            "game_id": "EUW1_6983065774",
+            "game_duration": 34.02,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719152289416,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "ohjh9gRC8zscc8703dgKpgr7p1MZP_Rhbu5I4qSEs6KmgWIuiiKN-zV0QXbaKkUNE6zOLqCzlk80YQ",
-                "summoner_name": "Sexy Mom Hunter",
-                "team": 100,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Skarner",
-                "champ_id": 72,
-                "kills": 4,
-                "deaths": 5,
-                "assists": 3
+        "game_id": "EUW1_6983009900",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "GeD55YDwmF72nBD8A4XLmo5EDPnrSH4lR-9uPANs-soAMuK9pygwEryNpEmBVQXgpTbAcqDe-8ljWQ",
+                    "summoner_name": "killmEshka",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Ornn",
+                    "champ_id": 516,
+                    "kills": 9,
+                    "deaths": 6,
+                    "assists": 11
+                },
+                "Summoner 2": {
+                    "summoner_id": "aFtBaw5HW9KYaV8LxEWvE2yINd73OVLMy-IoaDAmGihD9tq4tkXEDNJhZvFYaxHj1IxNM0YY09-DPQ",
+                    "summoner_name": "nEngage",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "LeeSin",
+                    "champ_id": 64,
+                    "kills": 8,
+                    "deaths": 7,
+                    "assists": 10
+                },
+                "Summoner 3": {
+                    "summoner_id": "1Eae1rVY1spRJCVyBXOKTGOdLYaVyFEx1IBpJkYwO2-av9iRDYzKGVO6-1Q0IVZVvvE2mC_SBjIdYQ",
+                    "summoner_name": "Z de Zairon",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Irelia",
+                    "champ_id": 39,
+                    "kills": 9,
+                    "deaths": 10,
+                    "assists": 3
+                },
+                "Summoner 4": {
+                    "summoner_id": "IYPoyArx2n7Y0gq6rIoF7IMl6IzR8-C5rnLSY1KCb-yZNBthRW4jYhcpy5ZPt_9hHWs2r7LCMfqz7A",
+                    "summoner_name": "Make it easy",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Brand",
+                    "champ_id": 63,
+                    "kills": 3,
+                    "deaths": 11,
+                    "assists": 8
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 2,
+                    "deaths": 7,
+                    "assists": 11
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "GMWDwgYZjDwv-GmCfOIuGmnLmqUug-t2MVVomfois3hgMUUi2F4q0tt8aqfHM9eClmbIGD2oUUQrMA",
-                "summoner_name": "Carlos Vidange",
-                "team": 100,
-                "win": false,
-                "champ_level": 13,
-                "champ_name": "Kayn",
-                "champ_id": 141,
-                "kills": 4,
-                "deaths": 4,
-                "assists": 2
-            },
-            "Summoner 3": {
-                "summoner_id": "oo2OqWfwnbPh-pKID2JD1X7dE3TW5Xy4b1cPhKE80NKzrEggGNL8zujAquqUsXjujELlVPYzIzruNA",
-                "summoner_name": "blade0075",
-                "team": 100,
-                "win": false,
-                "champ_level": 14,
-                "champ_name": "Anivia",
-                "champ_id": 34,
-                "kills": 2,
-                "deaths": 8,
-                "assists": 6
-            },
-            "Summoner 4": {
-                "summoner_id": "UR6-GQM9-Cmjf8AXm_X7SlRf7xHVWrNOmu9sP4faLhD8AHrXjT-QMAblCB4TqG0lE9jRF-hq4qDZrw",
-                "summoner_name": "CP9 SMBTDN",
-                "team": 100,
-                "win": false,
-                "champ_level": 12,
-                "champ_name": "Tristana",
-                "champ_id": 18,
-                "kills": 10,
-                "deaths": 11,
-                "assists": 1
-            },
-            "Summoner 5": {
-                "summoner_id": "S1UVIRuCMV1mgqVkOXZbjeY8uLhnASebCtWalL3cnWSroGFjWrdWDu3mV9VgQVEVUYZuXJNKo-1RnQ",
-                "summoner_name": "Saioki",
-                "team": 100,
-                "win": false,
-                "champ_level": 12,
-                "champ_name": "Lulu",
-                "champ_id": 117,
-                "kills": 0,
-                "deaths": 5,
-                "assists": 11
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "gVZmQA6RvETDmTWQ5rpwS7THWVlDF3REeNa01RFbpp_wUW50W0qhbXiyt0UYes2Kx4PdfujnZlJ4CA",
+                    "summoner_name": "Wish Faker",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Quinn",
+                    "champ_id": 133,
+                    "kills": 3,
+                    "deaths": 13,
+                    "assists": 4
+                },
+                "Summoner 7": {
+                    "summoner_id": "PunuNA-KGCVPUPSWk9UMBSFHnjmYC_XH1387hoZIjsHjwGykF_P4wWyB41byEPavb9A8RPQ9DT-SFQ",
+                    "summoner_name": "daveroxlikehell",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Olaf",
+                    "champ_id": 2,
+                    "kills": 13,
+                    "deaths": 6,
+                    "assists": 17
+                },
+                "Summoner 8": {
+                    "summoner_id": "UopnHyEsLZUnU9vVCIWR5VRvrX3KlqB_kmzovpo5TE12enpBpXZTvOt8dmR6Le_JWh3fx2OPB9gzqA",
+                    "summoner_name": "Derekukac",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Ahri",
+                    "champ_id": 103,
+                    "kills": 10,
+                    "deaths": 1,
+                    "assists": 18
+                },
+                "Summoner 9": {
+                    "summoner_id": "hb2UZqmoRXchxvdpisy1L4VsoDmDb65PxxB0Rphufmwk5u-_jeodIU-m17C5a8kuPRoLxVY8c_M6Zw",
+                    "summoner_name": "O Xerty O",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 12,
+                    "deaths": 7,
+                    "assists": 11
+                },
+                "Summoner 10": {
+                    "summoner_id": "rILuOfeSaIAQhosHl5EoJJt1Sw9A1HpvdQwcAhfgvw3FIyyhT5ngdbIKNxlPDDUQ98ghWWQxzNadqg",
+                    "summoner_name": "Lym",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Seraphine",
+                    "champ_id": 147,
+                    "kills": 3,
+                    "deaths": 4,
+                    "assists": 28
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "7G66oqzP20-efll4rAUnuaNv0ZKZEaw-DAr_9qQGnlxZ9XRwOXhUtNoZxdDASprEY7hZDAFNpmAoZg",
-                "summoner_name": "MekOWTV",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Sejuani",
-                "champ_id": 113,
-                "kills": 2,
-                "deaths": 5,
-                "assists": 6
-            },
-            "Summoner 7": {
-                "summoner_id": "Yp96Q6gP3HlWWaHxTL0gc7NpWwQNL91ROsKWml9GtiYvIYS3m4HJqIfUWwmgUBZgaDy0P41Xg6MG6A",
-                "summoner_name": "EVEVIEG ATO",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Viego",
-                "champ_id": 234,
-                "kills": 13,
-                "deaths": 3,
-                "assists": 5
-            },
-            "Summoner 8": {
-                "summoner_id": "EuxbSD6oaPQHzigqyYRepeI3Iha4ug26o3QYPOyXQXQi32BzF_cPleZW922g-839R54ydZU9QN8Mdg",
-                "summoner_name": "Oxileinchen",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "AurelionSol",
-                "champ_id": 136,
-                "kills": 5,
-                "deaths": 4,
-                "assists": 7
-            },
-            "Summoner 9": {
-                "summoner_id": "C7ZMN_wiRX4A7nZXAXOyoxHmo6TZRj1X9exsDNunTMuNJoQyCNyTX0TcLfRKfu4bAgwjjoC4wBdYqw",
-                "summoner_name": "Farm x",
-                "team": 200,
-                "win": true,
-                "champ_level": 14,
-                "champ_name": "Caitlyn",
-                "champ_id": 51,
-                "kills": 3,
-                "deaths": 4,
-                "assists": 11
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": true,
-                "champ_level": 13,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 10,
-                "deaths": 4,
-                "assists": 14
-            }
+        "general_info": {
+            "game_id": "EUW1_6983009900",
+            "game_duration": 35.37,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719149503968,
+            "platform": "EUW1"
         }
     },
     {
-        "Blue Side": {
-            "Summoner 1": {
-                "summoner_id": "ESAfSWwdqgQrZQqYgC-2lr_CcIKWI-2fO5OM9FZcA032MeM_vaFcAlb4bnhdXPt1AaGiOkOFSewM7w",
-                "summoner_name": "Sleepalways",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Warwick",
-                "champ_id": 19,
-                "kills": 7,
-                "deaths": 9,
-                "assists": 5
+        "game_id": "EUW1_6982966340",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "EGnFIzoHXGQ5E1v_K30msVontCwu9ppea5Kxy7CoU6IWzrRoJNu05nBfwvQibS0XyAJGpayVED0wpA",
+                    "summoner_name": "G2 Tetass",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Garen",
+                    "champ_id": 86,
+                    "kills": 12,
+                    "deaths": 4,
+                    "assists": 1
+                },
+                "Summoner 2": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Amumu",
+                    "champ_id": 32,
+                    "kills": 2,
+                    "deaths": 6,
+                    "assists": 8
+                },
+                "Summoner 3": {
+                    "summoner_id": "4sSOp96Mg-gtnvA_hS3Y6H5ULw6xKH7v18oBvP0nlBBDzCqlV0haZYEBkV7NjicSGjgWRqxHCPv5DQ",
+                    "summoner_name": "oliiAm",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Lux",
+                    "champ_id": 99,
+                    "kills": 14,
+                    "deaths": 1,
+                    "assists": 5
+                },
+                "Summoner 4": {
+                    "summoner_id": "flrzmpUj1R3nTPxVjzhYW86niplkCGShHMFAnE8t8MCstKuwzK8SIZTmoFCmTuHBhQK2Qi2FnPN26A",
+                    "summoner_name": "Lady in wolf",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 1,
+                    "deaths": 5,
+                    "assists": 6
+                },
+                "Summoner 5": {
+                    "summoner_id": "b178-TdWQSPfvTmQAgrlvu_yxl8bAxNg2ifOSnCapb5JobtqNNdVTpr3xQyzH5xMTLiX4YkB_xl7FQ",
+                    "summoner_name": "1VALMET1",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 13,
+                    "champ_name": "Soraka",
+                    "champ_id": 16,
+                    "kills": 0,
+                    "deaths": 4,
+                    "assists": 13
+                }
             },
-            "Summoner 2": {
-                "summoner_id": "lD4er4AI0laKEbpilP027A9sfzEGJXFv5a2lQcSAVMFB0k1oc580xNIc3uhJOYhN5WcNstBZzoaplg",
-                "summoner_name": "StargirLx3",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Taliyah",
-                "champ_id": 163,
-                "kills": 12,
-                "deaths": 8,
-                "assists": 12
-            },
-            "Summoner 3": {
-                "summoner_id": "oKAvh5wDMr5ydsstPx2f5G5KCy-CTsyd_PyvAVCefDEFaScrG1s6hP935gypx4Zcr_OdamAjClKaHQ",
-                "summoner_name": "Orodon",
-                "team": 100,
-                "win": false,
-                "champ_level": 18,
-                "champ_name": "Syndra",
-                "champ_id": 134,
-                "kills": 8,
-                "deaths": 12,
-                "assists": 10
-            },
-            "Summoner 4": {
-                "summoner_id": "PHwkHQsIIlFpl4pb5Ig3qDagQC_HZHxRHI8w-UmXC8hp2p7le3WqgAowAq0Bu-VvcPMJokXzN7LXJA",
-                "summoner_name": "Bellamie",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "KogMaw",
-                "champ_id": 96,
-                "kills": 13,
-                "deaths": 10,
-                "assists": 11
-            },
-            "Summoner 5": {
-                "summoner_id": "YIsKHQTq7LcO0a3tfiVGHjMPPod-Qmbpi0EbjmV-dz1rwmrHifkl29XrPWNI3L43UqBhhuewHUrrmQ",
-                "summoner_name": "Sephyra",
-                "team": 100,
-                "win": false,
-                "champ_level": 16,
-                "champ_name": "Sona",
-                "champ_id": 37,
-                "kills": 1,
-                "deaths": 7,
-                "assists": 25
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "qQFe4pCy9icuzvOaWj7Gy3tH8o9aCymdZGQ8m05HaWrqRuMla2gpioXL-Gk2dOVlQax_i_w9IkKBTQ",
+                    "summoner_name": "saihide",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Chogath",
+                    "champ_id": 31,
+                    "kills": 3,
+                    "deaths": 7,
+                    "assists": 3
+                },
+                "Summoner 7": {
+                    "summoner_id": "a7hKoTqljnBk9cQQjsARlEU4EaBcWGo94VDlVPt8ilLEJLkXx_tdLBSiBWwj8GZIM-HBHv2R_KLBTg",
+                    "summoner_name": "pdfhunter01",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Viego",
+                    "champ_id": 234,
+                    "kills": 6,
+                    "deaths": 8,
+                    "assists": 5
+                },
+                "Summoner 8": {
+                    "summoner_id": "YdT_v9oZHOC7kFzV14FxGctKZqE2aD9Kp-kDWaL4rRZnQvRvvWZD1GUyKDrQvHADMmMOYNq6WoWaSg",
+                    "summoner_name": "lrakli",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Veigar",
+                    "champ_id": 45,
+                    "kills": 5,
+                    "deaths": 5,
+                    "assists": 7
+                },
+                "Summoner 9": {
+                    "summoner_id": "w_63iQjaFTwAaAIR7qVkrBHS_1qaOB4HrF7vLJE_TerC842N1KEN1F07W6DIP5ZOIgZD9BcITZpLpg",
+                    "summoner_name": "GIUSTO",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Seraphine",
+                    "champ_id": 147,
+                    "kills": 3,
+                    "deaths": 5,
+                    "assists": 8
+                },
+                "Summoner 10": {
+                    "summoner_id": "eTnjMPV-7sDZIjA4S69cmhRImAycika6ole9vnKe2iZzFYItnLcDsLM5wF-oGmAf2TxQ4uV0yHaZTg",
+                    "summoner_name": "Baba Gump",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Nami",
+                    "champ_id": 267,
+                    "kills": 3,
+                    "deaths": 4,
+                    "assists": 10
+                }
             }
         },
-        "Red Side": {
-            "Summoner 6": {
-                "summoner_id": "iV4PGN2TLltFJYg7Y-dKhACH75mrk4nUBX0y1_F7I2xvJC9YR5ehiSADiFXMDIM_NfLrw-jHqw6z1Q",
-                "summoner_name": "Sria",
-                "team": 200,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Aatrox",
-                "champ_id": 266,
-                "kills": 5,
-                "deaths": 9,
-                "assists": 6
+        "general_info": {
+            "game_id": "EUW1_6982966340",
+            "game_duration": 30.07,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719147311493,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982929152",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "C0P1b9LQ-tQ3H4DQgJsWTEPzzc0EE-7NsSoD2DIpW8lOhlxSjoI_yBOeKCBrwVxLEQ_9oZJMd_2nJA",
+                    "summoner_name": "Kayysp",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Aatrox",
+                    "champ_id": 266,
+                    "kills": 2,
+                    "deaths": 7,
+                    "assists": 4
+                },
+                "Summoner 2": {
+                    "summoner_id": "HyJ_20x6HrxHEpMNDiv7vhR9OTxMiTC0N1nlpmAmzYMnWjNBk8N6IplIvN0Nq21BVB-QcrvqQneFNg",
+                    "summoner_name": "I Sebastianos I",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Khazix",
+                    "champ_id": 121,
+                    "kills": 3,
+                    "deaths": 7,
+                    "assists": 1
+                },
+                "Summoner 3": {
+                    "summoner_id": "SUD2jGdt7qkZcH9Hg_yGSmmoyPk-Ud3fosWPhwQGGr_k-wIMILaOaJRzojWhFLxPlmVNpH9SJm31Xg",
+                    "summoner_name": "Karar",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Vladimir",
+                    "champ_id": 8,
+                    "kills": 4,
+                    "deaths": 6,
+                    "assists": 1
+                },
+                "Summoner 4": {
+                    "summoner_id": "928D-MCysy-w_y7nHHtdvPEcEd99Qknbd2aQOZ4WPdF-P117M0Koe5yuxxqsVTV_Vgm8TVSZl-KpSw",
+                    "summoner_name": "Vromega",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 12,
+                    "champ_name": "Seraphine",
+                    "champ_id": 147,
+                    "kills": 4,
+                    "deaths": 5,
+                    "assists": 6
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 11,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 1,
+                    "deaths": 4,
+                    "assists": 9
+                }
             },
-            "Summoner 7": {
-                "summoner_id": "2VwGH8sMu-18zDN40-yz3Ea7VZH7m5Jw5bGPOJ4UQeE21xJWFG1HBsV43SRdf6MG_u-_eaaRIu2a0A",
-                "summoner_name": "Cornelmaster",
-                "team": 200,
-                "win": true,
-                "champ_level": 17,
-                "champ_name": "Hecarim",
-                "champ_id": 120,
-                "kills": 8,
-                "deaths": 7,
-                "assists": 10
-            },
-            "Summoner 8": {
-                "summoner_id": "iQhXvu24s6VFpc6QSJ5ttRZ9CHP6ktHIIbomMbjOPLI84MG3CgIZc4oFnZ6QgtsCfPGTJgBeugG-qQ",
-                "summoner_name": "Focuss On Me",
-                "team": 200,
-                "win": true,
-                "champ_level": 18,
-                "champ_name": "Viktor",
-                "champ_id": 112,
-                "kills": 23,
-                "deaths": 8,
-                "assists": 9
-            },
-            "Summoner 9": {
-                "summoner_id": "SKbElC8S84N7fUy1q6AijWyUULXuEU1KK6p6a4vqBCve7vbZc39qZ0tcB3AlkYA3TgbH1fFKtKXCiA",
-                "summoner_name": "SiLenc3Ninjaz",
-                "team": 200,
-                "win": true,
-                "champ_level": 16,
-                "champ_name": "Draven",
-                "champ_id": 119,
-                "kills": 8,
-                "deaths": 11,
-                "assists": 8
-            },
-            "Summoner 10": {
-                "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
-                "summoner_name": "MenuMaxiBestFlop",
-                "team": 200,
-                "win": true,
-                "champ_level": 15,
-                "champ_name": "Nautilus",
-                "champ_id": 111,
-                "kills": 2,
-                "deaths": 7,
-                "assists": 24
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "YpHVpe62Zjm5Yt9IycSpMIf1i3Y5lSBKpi1u8dosWKxQ4BUfOrBeBHLKDDmlL7XLE2kLGAqzbh7cxA",
+                    "summoner_name": "River Technology",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Nasus",
+                    "champ_id": 75,
+                    "kills": 9,
+                    "deaths": 1,
+                    "assists": 6
+                },
+                "Summoner 7": {
+                    "summoner_id": "WB4tXZkRyJ4agvqr0S8M1PRC3J7N2XDPKJWcsPPtqbtUAMeYlj6NfBSHHwlfaEoEidnKk4ao9xlPdg",
+                    "summoner_name": "Kung Fu Kangaroo",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 14,
+                    "champ_name": "Nocturne",
+                    "champ_id": 56,
+                    "kills": 8,
+                    "deaths": 5,
+                    "assists": 6
+                },
+                "Summoner 8": {
+                    "summoner_id": "YLUVJYapM2CzdKQ-Dj7Od9mCijCFGeE4-rJPdB7vidWwjVELQtqQftBb5hm80KZsMgUzmxR_HLQKTg",
+                    "summoner_name": "FORS\u00cbN L9",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Viktor",
+                    "champ_id": 112,
+                    "kills": 8,
+                    "deaths": 0,
+                    "assists": 8
+                },
+                "Summoner 9": {
+                    "summoner_id": "0_lak5XoZdqmnBtUBlcGFZjnptGQjJHDw7TRWvC53bJYlslSXNvv4kum3aSgDrez8U_eN-UyMQGgkw",
+                    "summoner_name": "L\u00e0Tombo",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 11,
+                    "champ_name": "Xayah",
+                    "champ_id": 498,
+                    "kills": 3,
+                    "deaths": 4,
+                    "assists": 2
+                },
+                "Summoner 10": {
+                    "summoner_id": "usVzwdkYeLQttKkQhxLRAr3oBGRqdHOs2ehRm-caCTJM8AEjXxBTEcCakOu04hTu0wDUk5_I47iRxA",
+                    "summoner_name": "PrinzessinBubbIe",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 12,
+                    "champ_name": "Soraka",
+                    "champ_id": 16,
+                    "kills": 1,
+                    "deaths": 4,
+                    "assists": 14
+                }
             }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982929152",
+            "game_duration": 24.68,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719145266046,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982663645",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "D7EUrjMv64-pST8HfsyYwILTDvj5ey_TdK3axlCVocCQ_QLK_7sNTQmrD_MTo4jVsMg94Kici-6r4g",
+                    "summoner_name": "miguelidas",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "DrMundo",
+                    "champ_id": 36,
+                    "kills": 3,
+                    "deaths": 3,
+                    "assists": 4
+                },
+                "Summoner 2": {
+                    "summoner_id": "HVDPpi8RRQg-W1gJv-hz_7uj8_BkezoIj1dIT-_-T0wSFFWmNebUl36yC6F6sLqBIo9E6OkV7w7wow",
+                    "summoner_name": "Ayyyy lmao",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 14,
+                    "champ_name": "Shyvana",
+                    "champ_id": 102,
+                    "kills": 3,
+                    "deaths": 7,
+                    "assists": 9
+                },
+                "Summoner 3": {
+                    "summoner_id": "_bmteY5OfqE1L2coUeAk2Q7jMpL7febSb0BHK5fI_V4iQGy4uu8ooivvAiOvYTZZE8QLJuHpMHdCpw",
+                    "summoner_name": "lampardox",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Naafiri",
+                    "champ_id": 950,
+                    "kills": 17,
+                    "deaths": 10,
+                    "assists": 5
+                },
+                "Summoner 4": {
+                    "summoner_id": "XFFZRFesJssS54nqV0UwaVickfBFDiITKO6nL8nFDZ56F8ZjTLuqgsHnMEErsVm-bWQPBeCDysjsQw",
+                    "summoner_name": "Madofte",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Vayne",
+                    "champ_id": 67,
+                    "kills": 12,
+                    "deaths": 5,
+                    "assists": 12
+                },
+                "Summoner 5": {
+                    "summoner_id": "-QC8II0aq7aOWwtPPM40vm3zwchscBBKAMpELaTd539fJJV1CfgbcqLq-9nNEvm5NudnLbZuiYZAfg",
+                    "summoner_name": "Sadne\u0161\u0161",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 13,
+                    "champ_name": "Alistar",
+                    "champ_id": 12,
+                    "kills": 4,
+                    "deaths": 10,
+                    "assists": 14
+                }
+            },
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "G5R9Rr_j62irAhRytzfau2Xo2gMxBn1tAv1SwFvb3-14qlruH_6E-CgJthh6zOUcRqsLSaEFDy7JyQ",
+                    "summoner_name": "lvlr",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Renekton",
+                    "champ_id": 58,
+                    "kills": 2,
+                    "deaths": 8,
+                    "assists": 3
+                },
+                "Summoner 7": {
+                    "summoner_id": "01zJQ82IRfkA8vK8mJBQwn6bzsq2W2k7V8PrQsEaE-BhSqaXU2mJalDO9VlpYG00mlk0GlmebTxQwA",
+                    "summoner_name": "Isrtayund",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Kayn",
+                    "champ_id": 141,
+                    "kills": 12,
+                    "deaths": 7,
+                    "assists": 8
+                },
+                "Summoner 8": {
+                    "summoner_id": "zMjhwimK7zGvUZdL4Oq08wdX-1bCYa6pZjorCaJJvM7rUFwvUu7PdvMVGMUhiMuQneUgqdgCbPK2xg",
+                    "summoner_name": "microvvaves",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Ekko",
+                    "champ_id": 245,
+                    "kills": 8,
+                    "deaths": 9,
+                    "assists": 7
+                },
+                "Summoner 9": {
+                    "summoner_id": "wk4ssTyah8E2T58zCJN0SBkB5se8xM0f6mBPnEvOTkgLaLh6MwG8Y5p1qibuQDlf-Co7tCWWVEpzOw",
+                    "summoner_name": "Xderaz",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Aphelios",
+                    "champ_id": 523,
+                    "kills": 5,
+                    "deaths": 6,
+                    "assists": 10
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Velkoz",
+                    "champ_id": 161,
+                    "kills": 8,
+                    "deaths": 9,
+                    "assists": 12
+                }
+            }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982663645",
+            "game_duration": 30.53,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719107326854,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982645926",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "DOW_s4Zvztj828NbiZ1M4Cy9BeWcXTOqHX7JLAeCDKsSUUibfHleMxzlxekIpsGJ6ZlX6agYtWs02A",
+                    "summoner_name": "Faladon",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Garen",
+                    "champ_id": 86,
+                    "kills": 4,
+                    "deaths": 8,
+                    "assists": 6
+                },
+                "Summoner 2": {
+                    "summoner_id": "UK7LKIOGQJw6qKyXQDjB0H_YCb7vnREW10-NA8eJJBjJJGXtguQ5yjLQct-h9QWZfUYtzOcOKQAZKg",
+                    "summoner_name": "Hawkinz 75",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Kayn",
+                    "champ_id": 141,
+                    "kills": 10,
+                    "deaths": 11,
+                    "assists": 8
+                },
+                "Summoner 3": {
+                    "summoner_id": "2t_4NGKr1F4EsNOScEVMoAGXKAw-Z7xaD3mEkXdV-6FDAq-Q9Yh-L3a5z6uSuCweLZ335Gv4-Auehg",
+                    "summoner_name": "Ky1in",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Lissandra",
+                    "champ_id": 127,
+                    "kills": 3,
+                    "deaths": 10,
+                    "assists": 8
+                },
+                "Summoner 4": {
+                    "summoner_id": "fFJKjGjrGMZW7fn9v7K6_NYV9kiWAXM8gpGJlnYkrpWe1MzudbrfQ2ATCF6eLEMbUbg8sgMZIoCuUg",
+                    "summoner_name": "Ne\u00eft",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 13,
+                    "deaths": 10,
+                    "assists": 6
+                },
+                "Summoner 5": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 1,
+                    "deaths": 10,
+                    "assists": 17
+                }
+            },
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "qepTczaW5am6tuePGMGOlbIiGbRQpQySnNmXHxCh-9VXIH24ZltNmENoT4-jzjj3AIafj9UUOchK8g",
+                    "summoner_name": "Llivmorhin",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Teemo",
+                    "champ_id": 17,
+                    "kills": 6,
+                    "deaths": 6,
+                    "assists": 16
+                },
+                "Summoner 7": {
+                    "summoner_id": "-2sRmQH9U3CqSwt7OdvRtxigPFi6_1d5-yOl-Hpx0RBf5ny8WWtB_yY3T7t1tXosRXE2Q1jc-huVJA",
+                    "summoner_name": "Run Down 2 Iron",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Khazix",
+                    "champ_id": 121,
+                    "kills": 12,
+                    "deaths": 4,
+                    "assists": 11
+                },
+                "Summoner 8": {
+                    "summoner_id": "syoWmZO2rPgDexA8hF8Ye8M0xInNfUE-ofLDg7MAQQ1Rc1ic_zOz9AXd9n5rK3Uc9th58K1y78aS2A",
+                    "summoner_name": "HecTaWolf",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Cassiopeia",
+                    "champ_id": 69,
+                    "kills": 10,
+                    "deaths": 4,
+                    "assists": 23
+                },
+                "Summoner 9": {
+                    "summoner_id": "O4MMxs5eTHuNDJDiLQ-oSHHVk9_rHJNP35m4QwWXYj6M4BrJM3fsox69pHkQGk19w5Ejd92rL0GxBw",
+                    "summoner_name": "GALA92i",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Kaisa",
+                    "champ_id": 145,
+                    "kills": 15,
+                    "deaths": 7,
+                    "assists": 12
+                },
+                "Summoner 10": {
+                    "summoner_id": "ELIvpwhtW2QbkiCdeiRknJaUcmjgrq5A0YZJyMHHicwZmm2sXbuGRoX7idrPPoKXUPgaAnDnoBCMRA",
+                    "summoner_name": "Najoo",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 14,
+                    "champ_name": "Poppy",
+                    "champ_id": 78,
+                    "kills": 6,
+                    "deaths": 11,
+                    "assists": 19
+                }
+            }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982645926",
+            "game_duration": 33.8,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719104948499,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982629543",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "z_zm_mkO4exQBA_BXmka5Ln8cR--Fp3ECG-DRh8ScmylXsRGpNKIv9mT-SodqO8oCQ5XBdJMPWu27Q",
+                    "summoner_name": "Cryptcandle",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Gnar",
+                    "champ_id": 150,
+                    "kills": 8,
+                    "deaths": 6,
+                    "assists": 9
+                },
+                "Summoner 2": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Amumu",
+                    "champ_id": 32,
+                    "kills": 7,
+                    "deaths": 8,
+                    "assists": 15
+                },
+                "Summoner 3": {
+                    "summoner_id": "2t_4NGKr1F4EsNOScEVMoAGXKAw-Z7xaD3mEkXdV-6FDAq-Q9Yh-L3a5z6uSuCweLZ335Gv4-Auehg",
+                    "summoner_name": "Ky1in",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 18,
+                    "champ_name": "Sylas",
+                    "champ_id": 517,
+                    "kills": 9,
+                    "deaths": 11,
+                    "assists": 5
+                },
+                "Summoner 4": {
+                    "summoner_id": "NUwuZ8Q2JaQdYtYJkI98nMIjuRtgdWcvZmRBorqasZxPfoWPE0PlTer0R8MXrUCPr4N_mRIvA8dXbw",
+                    "summoner_name": "DestruyePenes",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Caitlyn",
+                    "champ_id": 51,
+                    "kills": 16,
+                    "deaths": 12,
+                    "assists": 10
+                },
+                "Summoner 5": {
+                    "summoner_id": "yIRUHyYdrgmfDZk7R2u4uEr4LKT2IXed_RkkNlt92M14Gyaw8rU-HTJZaL19O85MI4ZTE9IdWw8x_g",
+                    "summoner_name": "Rex8GM",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Brand",
+                    "champ_id": 63,
+                    "kills": 13,
+                    "deaths": 9,
+                    "assists": 13
+                }
+            },
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "9X-mQ80l0jakE8jsBU_-KZDta1c8PTyllvg8lZ8kf6fK1v2GY96YK7-IC6ZJuU8TlI4-eOj9pTZTlw",
+                    "summoner_name": "Altug \u00c7elikbilek",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 18,
+                    "champ_name": "Kennen",
+                    "champ_id": 85,
+                    "kills": 6,
+                    "deaths": 7,
+                    "assists": 11
+                },
+                "Summoner 7": {
+                    "summoner_id": "BSB5BTLI4rxpN9dZO2zw-IT0dlPWyOe9YqcQvv9Qb9jDOa5WgiUNRpWdoc2YRRLfhx7xH3YM566G1w",
+                    "summoner_name": "Mike Yanguas",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "XinZhao",
+                    "champ_id": 5,
+                    "kills": 8,
+                    "deaths": 12,
+                    "assists": 17
+                },
+                "Summoner 8": {
+                    "summoner_id": "Ejw2txRv9b6lkf5MrT8oSud7IMJYMQWEAErrl4qjYXAK17cI_frqM1SJVRtLJ9d8UM3beRYnHJpfJA",
+                    "summoner_name": "moridezappa",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 17,
+                    "champ_name": "Ahri",
+                    "champ_id": 103,
+                    "kills": 9,
+                    "deaths": 12,
+                    "assists": 10
+                },
+                "Summoner 9": {
+                    "summoner_id": "fFJKjGjrGMZW7fn9v7K6_NYV9kiWAXM8gpGJlnYkrpWe1MzudbrfQ2ATCF6eLEMbUbg8sgMZIoCuUg",
+                    "summoner_name": "Ne\u00eft",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 16,
+                    "champ_name": "Samira",
+                    "champ_id": 360,
+                    "kills": 19,
+                    "deaths": 10,
+                    "assists": 8
+                },
+                "Summoner 10": {
+                    "summoner_id": "gydLKSJCqxgWGsxN1-I7KkIssj7eZ_TcG2IG8t_6A3Qqbglnt5qjNkgZKHhA-a7M6qkmnIvWD0ulFA",
+                    "summoner_name": "daddy yone",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Lux",
+                    "champ_id": 99,
+                    "kills": 4,
+                    "deaths": 12,
+                    "assists": 17
+                }
+            }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982629543",
+            "game_duration": 35.02,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719102427881,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982596165",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "euUZmxBwVUjOyn567QQPcrSmWcJV6mMRZAJaDXu2ZphWj1ZI-7k9Sfkn-0r3YVNAZyJOKV72KMFu6A",
+                    "summoner_name": "Triple Bao",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Darius",
+                    "champ_id": 122,
+                    "kills": 9,
+                    "deaths": 5,
+                    "assists": 4
+                },
+                "Summoner 2": {
+                    "summoner_id": "HLc3pGDR3K4OzpJm4ZfNVDHbhlfY6JfvAP0qskUVObuT6Xc8eUJ9Cuol1_8iVplpt-v82H0PcAlJaQ",
+                    "summoner_name": "LUDENSx777",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Viego",
+                    "champ_id": 234,
+                    "kills": 11,
+                    "deaths": 3,
+                    "assists": 5
+                },
+                "Summoner 3": {
+                    "summoner_id": "YXWmf8yTer53SJRjmrAZnsLuxzi5QemzUmEImLnQolVuCB5hyI9YLYQscJURldhLUUFUOWsnmXABXg",
+                    "summoner_name": "FakingTheFakerZz",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "Veigar",
+                    "champ_id": 45,
+                    "kills": 7,
+                    "deaths": 3,
+                    "assists": 9
+                },
+                "Summoner 4": {
+                    "summoner_id": "tFUIlvjJM1DO766vm-UA4NMBEKhaM1SHtBRjz1P3k0CSjEJ_VbK5HZes4GZx4ORAWcBVInZ97LH_7A",
+                    "summoner_name": "GAP legatixx",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 13,
+                    "champ_name": "Jhin",
+                    "champ_id": 202,
+                    "kills": 10,
+                    "deaths": 8,
+                    "assists": 10
+                },
+                "Summoner 5": {
+                    "summoner_id": "vGrbSX6ODe1ft2IL-OuEU3B9Go2q7qFyQJo5wF6G5Y3nFtHCc41T7ON0saIt0EouCJuWgl_flg-LRQ",
+                    "summoner_name": "Jorgeda",
+                    "team": 100,
+                    "win": true,
+                    "champ_level": 12,
+                    "champ_name": "Lux",
+                    "champ_id": 99,
+                    "kills": 6,
+                    "deaths": 5,
+                    "assists": 10
+                }
+            },
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "9yWO8ctmCRZw9ZO7PJb2vPhGti82PIy8TCC31Ki0shDX7FFIcqRwIiuorF93J0bdqb8ttKGyRKsk1g",
+                    "summoner_name": "improve beatch",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Irelia",
+                    "champ_id": 39,
+                    "kills": 4,
+                    "deaths": 11,
+                    "assists": 5
+                },
+                "Summoner 7": {
+                    "summoner_id": "hos5h7B98lJStVtO4C3xcEr6aXx__sagTHXvzQX8YOMrxeFjUBs_bv_76uSGDVzRFJuLyiQtX91tyg",
+                    "summoner_name": "Pacha Kutiq",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Shaco",
+                    "champ_id": 35,
+                    "kills": 2,
+                    "deaths": 9,
+                    "assists": 7
+                },
+                "Summoner 8": {
+                    "summoner_id": "7L0Xqk8rBC4eDR8h8xophX8v1axomv7gYDpJYiBpEFZGU8fqNxOh0jCrU19KCqT2c_dgT2rSh6ApKg",
+                    "summoner_name": "Warda ",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Diana",
+                    "champ_id": 131,
+                    "kills": 9,
+                    "deaths": 7,
+                    "assists": 9
+                },
+                "Summoner 9": {
+                    "summoner_id": "DUt5RSk3uzTMAQkKUONk0_t5q3Y57Hv0eFHmTvnDg0nbA-ypId71v3WcBYd2csmJK0KwO6xJB0n9Qw",
+                    "summoner_name": "Carto",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Jinx",
+                    "champ_id": 222,
+                    "kills": 6,
+                    "deaths": 9,
+                    "assists": 7
+                },
+                "Summoner 10": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 200,
+                    "win": false,
+                    "champ_level": 12,
+                    "champ_name": "Nautilus",
+                    "champ_id": 111,
+                    "kills": 3,
+                    "deaths": 7,
+                    "assists": 13
+                }
+            }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982596165",
+            "game_duration": 27.5,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719100363224,
+            "platform": "EUW1"
+        }
+    },
+    {
+        "game_id": "EUW1_6982571861",
+        "details": {
+            "Blue Side": {
+                "Summoner 1": {
+                    "summoner_id": "CZMaDVVwfCBMszz0Edu3e5FCgoLI3j9gewKxqsSZVKl0nCuyXNv3aXV93qJ-RTi48guyj9IZTK5MVQ",
+                    "summoner_name": "hoda2a",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Gangplank",
+                    "champ_id": 41,
+                    "kills": 2,
+                    "deaths": 6,
+                    "assists": 2
+                },
+                "Summoner 2": {
+                    "summoner_id": "EKrLfq1Q8WMfpi4WW0mnYzX3Mu35icMAwMs23R9M7GuBV0ysDlsS1W9P_i23P6h-QyG0wzkPcgQvfQ",
+                    "summoner_name": "MenuMaxiBestFlop",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 13,
+                    "champ_name": "Amumu",
+                    "champ_id": 32,
+                    "kills": 2,
+                    "deaths": 7,
+                    "assists": 9
+                },
+                "Summoner 3": {
+                    "summoner_id": "mAblPskz6fGkLCgUOJ3AoIGIbbhyX7L4y3jt3fvRJ0hozxaFgrf6lib1FrNSveCOzeU4Fk1lx-rzVg",
+                    "summoner_name": "DarkIron2500",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 15,
+                    "champ_name": "Anivia",
+                    "champ_id": 34,
+                    "kills": 9,
+                    "deaths": 3,
+                    "assists": 4
+                },
+                "Summoner 4": {
+                    "summoner_id": "26-bId0gFdr_DcZP_9lkMTiBgHOSATw6O_sa_mIo4cbgXfaB9t7it3Riwp1xZotnGPKqbD5-ippF9Q",
+                    "summoner_name": "ulkassss",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 14,
+                    "champ_name": "Sivir",
+                    "champ_id": 15,
+                    "kills": 9,
+                    "deaths": 5,
+                    "assists": 3
+                },
+                "Summoner 5": {
+                    "summoner_id": "besWJPf7Tz7bS5Rj7L9qtl45Vv_I2BPF-UJYriVjTjgMFPrVvfnv1Yl9XvOhR3H2boQvMjvfmJMoQA",
+                    "summoner_name": "me\u0131",
+                    "team": 100,
+                    "win": false,
+                    "champ_level": 11,
+                    "champ_name": "Soraka",
+                    "champ_id": 16,
+                    "kills": 0,
+                    "deaths": 7,
+                    "assists": 13
+                }
+            },
+            "Red Side": {
+                "Summoner 6": {
+                    "summoner_id": "2vqABCzZEhAamgGEW_nctoM2wh_XPr6CdM0UzLhlpW-ypJtXFvFXP7zaHdnHSGC53Qv8gPbZtfio9A",
+                    "summoner_name": "Might \u03c3f Demacia",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Kennen",
+                    "champ_id": 85,
+                    "kills": 4,
+                    "deaths": 2,
+                    "assists": 8
+                },
+                "Summoner 7": {
+                    "summoner_id": "OvWMHSsxZ2S3pmOST-6yTlOC-Bz11VTQuPzR9R0JY2qhzsSw0yWULPe_MPFz2U9RMHDDaVvYpo2ODQ",
+                    "summoner_name": "Im Nyring",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 15,
+                    "champ_name": "LeeSin",
+                    "champ_id": 64,
+                    "kills": 10,
+                    "deaths": 5,
+                    "assists": 7
+                },
+                "Summoner 8": {
+                    "summoner_id": "WF4ZQUFMUYxaP7yWXGnfAG2D_d1pRzS97djrZ9TuOdBM6u0LI5R1JkuECHAYQHjAYleVPfTrrMEJug",
+                    "summoner_name": "NL Utrecht SwA",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 17,
+                    "champ_name": "Hwei",
+                    "champ_id": 910,
+                    "kills": 4,
+                    "deaths": 2,
+                    "assists": 6
+                },
+                "Summoner 9": {
+                    "summoner_id": "eQfOAQXpCmbCZ2RfNzsqSnDo56LHxh-rim0QCurSF-ZZ-lpwyYRr_wmQ72GszTuAQC2XOxLGtCiZ5g",
+                    "summoner_name": "T\u00fbrkish Mid Lane",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 16,
+                    "champ_name": "Zeri",
+                    "champ_id": 221,
+                    "kills": 7,
+                    "deaths": 3,
+                    "assists": 13
+                },
+                "Summoner 10": {
+                    "summoner_id": "Rj0baRW9cQTYHbUuYwW3yn1ih-SMplbPXtmK6VwWD3TqkJuci1F0Gqs_yWUkesdq-C9b5pjles3GoQ",
+                    "summoner_name": "Lexiique",
+                    "team": 200,
+                    "win": true,
+                    "champ_level": 12,
+                    "champ_name": "Brand",
+                    "champ_id": 63,
+                    "kills": 3,
+                    "deaths": 10,
+                    "assists": 8
+                }
+            }
+        },
+        "general_info": {
+            "game_id": "EUW1_6982571861",
+            "game_duration": 28.37,
+            "patch": [
+                "14",
+                "12",
+                "594",
+                "4901"
+            ],
+            "mode": "CLASSIC",
+            "timestamp": 1719098237073,
+            "platform": "EUW1"
         }
     }
 ]
