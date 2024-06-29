@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 
 class User:
     def __init__(self, username, tag, region):
-        load_dotenv()  # Load environment variables from .env file
+        load_dotenv() 
         self.API_key = os.getenv('API_KEY')
         self.username = username
         self.tag = tag
@@ -69,14 +69,11 @@ class User:
             game_duration = match_data['info']['gameDuration']
             game_version = match_data['info']['gameVersion']
 
-            # Formatting game duration to minutes and seconds
             minutes, seconds = divmod(game_duration, 60)
             formatted_duration = f"{minutes}m {seconds}s"
 
-            # Simplifying patch version
             patch = '.'.join(game_version.split('.')[:2])
 
-            # Formatting timestamp
             timestamp = datetime.fromtimestamp(match_data['info']['gameCreation'] / 1000).strftime('%Y-%m-%d %H:%M:%S')
 
             general_info = {
