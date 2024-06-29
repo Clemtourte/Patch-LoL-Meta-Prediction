@@ -1,5 +1,5 @@
-[
-    {
+{
+    "match_1": {
         "general_info": {
             "game_id": "EUW1_6987318412",
             "game_duration": "45m 5s",
@@ -135,7 +135,7 @@
             }
         }
     },
-    {
+    "match_2": {
         "general_info": {
             "game_id": "EUW1_6987271849",
             "game_duration": "34m 48s",
@@ -271,7 +271,7 @@
             }
         }
     },
-    {
+    "match_3": {
         "general_info": {
             "game_id": "EUW1_6987224688",
             "game_duration": "24m 52s",
@@ -407,7 +407,7 @@
             }
         }
     },
-    {
+    "match_4": {
         "general_info": {
             "game_id": "EUW1_6987167255",
             "game_duration": "32m 13s",
@@ -543,7 +543,7 @@
             }
         }
     },
-    {
+    "match_5": {
         "general_info": {
             "game_id": "EUW1_6987147838",
             "game_duration": "20m 17s",
@@ -679,7 +679,7 @@
             }
         }
     },
-    {
+    "match_6": {
         "general_info": {
             "game_id": "EUW1_6987099192",
             "game_duration": "30m 14s",
@@ -815,7 +815,7 @@
             }
         }
     },
-    {
+    "match_7": {
         "general_info": {
             "game_id": "EUW1_6986699277",
             "game_duration": "21m 47s",
@@ -951,7 +951,7 @@
             }
         }
     },
-    {
+    "match_8": {
         "general_info": {
             "game_id": "EUW1_6986685307",
             "game_duration": "41m 12s",
@@ -1087,7 +1087,7 @@
             }
         }
     },
-    {
+    "match_9": {
         "general_info": {
             "game_id": "EUW1_6986679556",
             "game_duration": "27m 10s",
@@ -1223,7 +1223,7 @@
             }
         }
     },
-    {
+    "match_10": {
         "general_info": {
             "game_id": "EUW1_6986660133",
             "game_duration": "29m 40s",
@@ -1359,7 +1359,7 @@
             }
         }
     },
-    {
+    "match_11": {
         "general_info": {
             "game_id": "EUW1_6986640008",
             "game_duration": "23m 59s",
@@ -1495,7 +1495,7 @@
             }
         }
     },
-    {
+    "match_12": {
         "general_info": {
             "game_id": "EUW1_6986613819",
             "game_duration": "35m 36s",
@@ -1631,7 +1631,7 @@
             }
         }
     },
-    {
+    "match_13": {
         "general_info": {
             "game_id": "EUW1_6986585476",
             "game_duration": "31m 21s",
@@ -1767,7 +1767,7 @@
             }
         }
     },
-    {
+    "match_14": {
         "general_info": {
             "game_id": "EUW1_6986542778",
             "game_duration": "27m 32s",
@@ -1903,7 +1903,7 @@
             }
         }
     },
-    {
+    "match_15": {
         "general_info": {
             "game_id": "EUW1_6986514763",
             "game_duration": "18m 15s",
@@ -2039,7 +2039,7 @@
             }
         }
     },
-    {
+    "match_16": {
         "general_info": {
             "game_id": "EUW1_6986449434",
             "game_duration": "34m 12s",
@@ -2175,7 +2175,7 @@
             }
         }
     },
-    {
+    "match_17": {
         "general_info": {
             "game_id": "EUW1_6986422897",
             "game_duration": "19m 43s",
@@ -2311,7 +2311,7 @@
             }
         }
     },
-    {
+    "match_18": {
         "general_info": {
             "game_id": "EUW1_6986387960",
             "game_duration": "16m 12s",
@@ -2447,7 +2447,7 @@
             }
         }
     },
-    {
+    "match_19": {
         "general_info": {
             "game_id": "EUW1_6986339138",
             "game_duration": "34m 28s",
@@ -2583,4 +2583,4 @@
             }
         }
     }
-]
+}

@@ -123,38 +123,40 @@ if __name__ == '__main__':
     user = User('MenuMaxiBestFlop', 'EUW', 'EUW1')
     user.display_user_info()
     match_ids = user.get_matches('ranked', 20)
-    all_participants_info = []
+all_participants_info = {}
 
-    try:
-        with open("../datasets/match_data.json", "r") as in_file:
-            all_participants_info = json.load(in_file)
-    except FileNotFoundError:
-        all_participants_info = []
+try:
+    with open("../datasets/match_data.json", "r") as in_file:
+        all_participants_info = json.load(in_file)
+except FileNotFoundError:
+    all_participants_info = {}
 
-    existing_match_ids = {match['game_id'] for match in all_participants_info if 'game_id' in match}
+match_number= len(all_participants_info)+1
 
-    for match_id in match_ids:
-        general_info, participant_info = user.get_match_info(match_id)
-        if general_info is None and participant_info is None:
-            continue
-        game_id = general_info.get('game_id')
-        if game_id is None or game_id in existing_match_ids:
-            continue
-        print(f"Match ID: {general_info['game_id']}")
-        print(f"Game Duration: {general_info['game_duration']}")
-        print(f"Game Mode: {general_info['mode']}")
-        print(f"Patch: {general_info['patch']}")
-        print(f"Timestamp: {general_info['timestamp']}")
-        print("Participants Info:")
-        for team, participants in participant_info.items():
-            print(team)
-            for summoner, details in participants.items():
-                print(f"{summoner}: {details}")
-        print("\n")
-        all_participants_info.append({
-            "general_info": general_info,
-            "details": participant_info
-        })
+for match_id in match_ids:
+    general_info, participant_info = user.get_match_info(match_id)
+    if general_info is None and participant_info is None:
+        continue
+    game_id = general_info.get('game_id')
+    if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
+        continue
+    print(f"Match Number: {match_number}")
+    print(f"Match ID: {general_info['game_id']}")
+    print(f"Game Duration: {general_info['game_duration']}")
+    print(f"Game Mode: {general_info['mode']}")
+    print(f"Patch: {general_info['patch']}")
+    print(f"Timestamp: {general_info['timestamp']}")
+    print("Participants Info:")
+    for team, participants in participant_info.items():
+        print(team)
+        for summoner, details in participants.items():
+            print(f"{summoner}: {details}")
+    print("\n")
+    all_participants_info[f"match_{match_number}"] = {
+        "general_info": general_info,
+        "details": participant_info
+    }
+    match_number+=1
 
-    with open("../datasets/match_data.json", "w") as out_file:
-        json.dump(all_participants_info, out_file, indent=4)
+with open("../datasets/match_data.json", "w") as out_file:
+    json.dump(all_participants_info, out_file, indent=4)
