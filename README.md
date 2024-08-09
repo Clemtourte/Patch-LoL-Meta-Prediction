@@ -10,3 +10,4 @@ The main project is about creating a DL model around the League Of Legends game.
 <li> https://victorzhou.com/blog/intro-to-neural-networks/ </li>
 <li> https://machinelearningmastery.com/pytorch-tutorial-develop-deep-learning-models/ </li>
 <li> https://www.linkedin.com/posts/jean-m-595778118_data-python-projet-activity-7185574695893671937-Mo46?utm_source=share&utm_medium=member_desktop </li>
+<li> https://machinelearnia.com/wp-content/uploads/2019/11/Apprendre-le-ML-en-une-semaine.pdf </li>
