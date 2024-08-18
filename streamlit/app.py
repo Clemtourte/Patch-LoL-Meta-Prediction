@@ -4,13 +4,13 @@ import os
 import streamlit as st
 
 # Streamlit app to collect user information
-st.title("User Information Input")
+st.title("User Information")
 
+region = st.selectbox("Select your region (only EUW available for now):", ["EUW1"])
 username = st.text_input("Enter your username:")
 tag = st.text_input("Enter your tag:")
-region = st.text_input("Enter your region:")
 
-if st.button("Submit"):
+if st.button("Search"):
     # Get the path to the Python interpreter in the current environment
     python_interpreter = sys.executable
 
