@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # Exclude datafile
-match_data.json
+.match_data.json
