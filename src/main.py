@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import logging
 import json
 from datetime import datetime
+import sys
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -120,7 +121,14 @@ class User:
             return default
 
 if __name__ == '__main__':
-    user = User('MenuMaxiBestFlop', 'EUW', 'EUW1')
+    if len(sys.argv) != 4:
+        print("Usage: python main.py <username> <tag> <region>")
+        sys.exit(1)
+    
+    username = sys.argv[1]
+    tag = sys.argv[2]
+    region = sys.argv[3]
+    user = User(username, tag, region)
     user.display_user_info()
     match_ids = user.get_matches('ranked', 20)
 all_participants_info = {}
