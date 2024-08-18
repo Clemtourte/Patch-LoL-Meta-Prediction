@@ -159,5 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-#API_KEY
-.env
+# Exclude datafile
+match_data.json
