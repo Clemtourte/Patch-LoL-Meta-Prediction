@@ -16,7 +16,6 @@ class User:
         self.tag = tag
         self.region = region
         self.puuid = self.get_puuid()
-        print(f"Username: {username}")
 
     def get_puuid(self):
         url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{self.username}/{self.tag}?api_key={self.API_key}"
@@ -36,7 +35,7 @@ class User:
         summoner_id = self.get_summoner_id()
         if not summoner_id:
             logging.error("Failed to get summoner ID.")
-            return
+            return None
 
         ranked_data = self.get_ranked_data(summoner_id)
         for entry in ranked_data:
@@ -44,9 +43,9 @@ class User:
                 tier = entry['tier']
                 rank = entry['rank']
                 league_points = entry['leaguePoints']
-                print(f"Tier: {tier} {rank}, League Points: {league_points}")
                 return tier, rank, league_points
-        print("No ranked data found for the summoner.")
+        logging.info("No ranked data found for the summoner.")
+        return None
 
     def get_matches(self, match_type, match_count):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?type={match_type}&start=0&count={match_count}&api_key={self.API_key}"
@@ -120,6 +119,33 @@ class User:
             logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
             return default
 
+def save_match_data(user, match_ids, file_path="../datasets/match_data.json"):
+    all_participants_info = {}
+
+    try:
+        with open(file_path, "r") as in_file:
+            all_participants_info = json.load(in_file)
+    except FileNotFoundError:
+        all_participants_info = {}
+
+    match_number = len(all_participants_info) + 1
+
+    for match_id in match_ids:
+        general_info, participant_info = user.get_match_info(match_id)
+        if general_info is None and participant_info is None:
+            continue
+        game_id = general_info.get('game_id')
+        if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
+            continue
+        all_participants_info[f"match_{match_number}"] = {
+            "general_info": general_info,
+            "details": participant_info
+        }
+        match_number += 1
+
+    with open(file_path, "w") as out_file:
+        json.dump(all_participants_info, out_file, indent=4)
+
 if __name__ == '__main__':
     if len(sys.argv) != 4:
         print("Usage: python main.py <username> <tag> <region>")
@@ -131,40 +157,4 @@ if __name__ == '__main__':
     user = User(username, tag, region)
     user.display_user_info()
     match_ids = user.get_matches('ranked', 20)
-all_participants_info = {}
-
-try:
-    with open("../datasets/match_data.json", "r") as in_file:
-        all_participants_info = json.load(in_file)
-except FileNotFoundError:
-    all_participants_info = {}
-
-match_number= len(all_participants_info)+1
-
-for match_id in match_ids:
-    general_info, participant_info = user.get_match_info(match_id)
-    if general_info is None and participant_info is None:
-        continue
-    game_id = general_info.get('game_id')
-    if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
-        continue
-    print(f"Match Number: {match_number}")
-    print(f"Match ID: {general_info['game_id']}")
-    print(f"Game Duration: {general_info['game_duration']}")
-    print(f"Game Mode: {general_info['mode']}")
-    print(f"Patch: {general_info['patch']}")
-    print(f"Timestamp: {general_info['timestamp']}")
-    print("Participants Info:")
-    for team, participants in participant_info.items():
-        print(team)
-        for summoner, details in participants.items():
-            print(f"{summoner}: {details}")
-    print("\n")
-    all_participants_info[f"match_{match_number}"] = {
-        "general_info": general_info,
-        "details": participant_info
-    }
-    match_number+=1
-
-with open("../datasets/match_data.json", "w") as out_file:
-    json.dump(all_participants_info, out_file, indent=4)
+    save_match_data(user, match_ids)
