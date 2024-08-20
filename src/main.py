@@ -88,17 +88,27 @@ class User:
             participant_info = {'Blue Side': {}, 'Red Side': {}}
             for i, participant in enumerate(match_data['info']['participants'], 1):
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
+                kills = participant['kills']
+                deaths = participant['deaths']
+                assists = participant['assists']
+                win = participant['win']
+                if deaths == 0:
+                    kda = kills + assists
+                else:
+                    kda = round((kills + assists)/deaths,2)
+                if win == True:
+                    win = 'Win'
+                else:
+                    win = 'Loss'
+                
                 participant_info[team][f'Summoner {i}'] = {
-                    'summoner_id': participant['puuid'],
-                    'summoner_name': participant['summonerName'],
-                    'team': participant['teamId'],
-                    'win': participant['win'],
-                    'champ_level': participant['champLevel'],
-                    'champ_name': participant['championName'],
-                    'champ_id': participant['championId'],
-                    'kills': participant['kills'],
-                    'deaths': participant['deaths'],
-                    'assists': participant['assists'],
+                    'Summoner Name': participant['summonerName'],
+                    'Result': f"{win}",
+                    'Champion Name': participant['championName'],
+                    'Champion Level': participant['champLevel'],
+                    'K/D/A': f"{kills}/{deaths}/{assists} ({kda})",
+                    'Gold Earned': participant['goldEarned'],
+                    'Total Damage Dealt': participant['totalDamageDealtToChampions']
                 }
 
             return general_info, participant_info
