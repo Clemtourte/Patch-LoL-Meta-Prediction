@@ -6,7 +6,7 @@ st.title("League of Legends User Information")
 # Selection of region and input for username and tag
 region = st.selectbox("Select your region:", ["EUW1"])  # You can add other regions if necessary
 username = st.text_input("Enter your username:")
-tag = st.text_input("Enter your tag:")
+tag = st.text_input("Enter your tag (without #):")
 
 if st.button("Search"):
     if not username or not tag:
@@ -23,10 +23,10 @@ if st.button("Search"):
             st.write(f"**Tier**: {rank_info[0]} {rank_info[1]}")
             st.write(f"**League Points**: {rank_info[2]}")
         else:
-            st.error("Ranked data not found for this user.")
+            st.error("User might not be ranked yet.")
 
         # Retrieve recent matches
-        match_ids = user.get_matches('ranked', 10)
+        match_ids = user.get_matches('ranked', 1)
 
         if match_ids:
             st.header("Recent Matches")
@@ -34,7 +34,6 @@ if st.button("Search"):
                 general_info, participant_info = user.get_match_info(match_id)
                 if general_info and participant_info:
                     st.subheader(f"Match {i}")
-                    st.write(f"**Match ID**: {general_info['game_id']}")
                     st.write(f"**Game Duration**: {general_info['game_duration']}")
                     st.write(f"**Patch**: {general_info['patch']}")
                     st.write(f"**Timestamp**: {general_info['timestamp']}")
