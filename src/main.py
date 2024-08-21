@@ -8,7 +8,7 @@ import sys
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-class User:
+class UserData:
     def __init__(self, username, tag, region):
         load_dotenv() 
         self.API_key = os.getenv('API_KEY')
@@ -30,22 +30,6 @@ class User:
     def get_ranked_data(self, summoner_id):
         url = f"https://{self.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={self.API_key}"
         return self._get_response(url, default=[])
-
-    def display_user_info(self):
-        summoner_id = self.get_summoner_id()
-        if not summoner_id:
-            logging.error("Failed to get summoner ID.")
-            return None
-
-        ranked_data = self.get_ranked_data(summoner_id)
-        for entry in ranked_data:
-            if entry.get('queueType') == 'RANKED_SOLO_5x5':
-                tier = entry['tier']
-                rank = entry['rank']
-                league_points = entry['leaguePoints']
-                return tier, rank, league_points
-        logging.info("No ranked data found for the summoner.")
-        return None
 
     def get_matches(self, match_type, match_count):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?type={match_type}&start=0&count={match_count}&api_key={self.API_key}"
@@ -96,19 +80,21 @@ class User:
                     kda = kills + assists
                 else:
                     kda = round((kills + assists)/deaths,2)
-                if win == True:
-                    win = 'Win'
-                else:
-                    win = 'Loss'
                 
                 participant_info[team][f'Summoner {i}'] = {
-                    'Summoner Name': participant['summonerName'],
-                    'Result': f"{win}",
-                    'Champion Name': participant['championName'],
-                    'Champion Level': participant['champLevel'],
-                    'K/D/A': f"{kills}/{deaths}/{assists} ({kda})",
-                    'Gold Earned': participant['goldEarned'],
-                    'Total Damage Dealt': participant['totalDamageDealtToChampions']
+                    'summoner_id': participant['summonerId'],
+                    'summoner_name': participant['summonerName'],
+                    'team': participant['teamId'],
+                    'win': win,
+                    'champ_level': participant['champLevel'],
+                    'champ_name': participant['championName'],
+                    'champ_id': participant['championId'],
+                    'kills': kills,
+                    'deaths': deaths,
+                    'assists': assists,
+                    'kda': kda,
+                    'gold_earned': participant['goldEarned'],
+                    'total_damage_dealt': participant['totalDamageDealtToChampions']
                 }
 
             return general_info, participant_info
@@ -129,7 +115,46 @@ class User:
             logging.error("API request failed with status code %s. Response: %s", response.status_code, response.json())
             return default
 
-def save_match_data(user, match_ids, file_path="../datasets/match_data.json"):
+class UserDisplay:
+    def __init__(self, user_data):
+        self.user_data = user_data
+
+    def display_user_info(self):
+        summoner_id = self.user_data.get_summoner_id()
+        if not summoner_id:
+            logging.error("Failed to get summoner ID.")
+            return None
+
+        ranked_data = self.user_data.get_ranked_data(summoner_id)
+        for entry in ranked_data:
+            if entry.get('queueType') == 'RANKED_SOLO_5x5':
+                tier = entry['tier']
+                rank = entry['rank']
+                league_points = entry['leaguePoints']
+                return tier, rank, league_points
+        logging.info("No ranked data found for the summoner.")
+        return None
+
+    def display_match_info(self, match_id):
+        general_info, participant_info = self.user_data.get_match_info(match_id)
+        if general_info is None or participant_info is None:
+            return None
+        
+        # Combine both into a single dictionary
+        display_data = {
+            "game_id": general_info['game_id'],
+            "game_duration": general_info['game_duration'],
+            "patch": general_info['patch'],
+            "timestamp": general_info['timestamp'],
+            "mode": general_info['mode'],
+            "platform": general_info['platform'],
+            "teams": participant_info
+        }
+
+        return display_data
+
+
+def save_match_data(user_data, match_ids, file_path="../datasets/match_data.json"):
     all_participants_info = {}
 
     try:
@@ -141,7 +166,7 @@ def save_match_data(user, match_ids, file_path="../datasets/match_data.json"):
     match_number = len(all_participants_info) + 1
 
     for match_id in match_ids:
-        general_info, participant_info = user.get_match_info(match_id)
+        general_info, participant_info = user_data.get_match_info(match_id)
         if general_info is None and participant_info is None:
             continue
         game_id = general_info.get('game_id')
@@ -164,7 +189,13 @@ if __name__ == '__main__':
     username = sys.argv[1]
     tag = sys.argv[2]
     region = sys.argv[3]
-    user = User(username, tag, region)
-    user.display_user_info()
-    match_ids = user.get_matches('ranked', 20)
-    save_match_data(user, match_ids)
+    
+    user_data = UserData(username, tag, region)
+    
+    user_display = UserDisplay(user_data)
+
+    user_display.display_user_info()
+
+    match_ids = user_data.get_matches('ranked', 20)
+
+    save_match_data(user_data, match_ids)
