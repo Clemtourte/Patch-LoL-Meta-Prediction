@@ -65,8 +65,7 @@ class UserData:
                 'game_duration': formatted_duration,
                 'patch': patch,
                 'timestamp': timestamp,
-                'mode': mode,
-                'platform': match_data['info']['platformId']
+                'mode': mode
             }
 
             participant_info = {'Blue Side': {}, 'Red Side': {}}
@@ -79,12 +78,12 @@ class UserData:
                 if deaths == 0:
                     kda = kills + assists
                 else:
-                    kda = round((kills + assists)/deaths,2)
+                    kda = round((kills + assists)/deaths, 2)
                 
                 participant_info[team][f'Summoner {i}'] = {
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
-                    'team': participant['teamId'],
+                    'team': 'Blue' if participant['teamId'] == 100 else 'Red',
                     'win': win,
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
@@ -131,28 +130,23 @@ class UserDisplay:
                 tier = entry['tier']
                 rank = entry['rank']
                 league_points = entry['leaguePoints']
-                return tier, rank, league_points
+                return f"{tier} {rank} - {league_points} LP"
         logging.info("No ranked data found for the summoner.")
-        return None
+        return "No ranked data found."
 
     def display_match_info(self, match_id):
         general_info, participant_info = self.user_data.get_match_info(match_id)
         if general_info is None or participant_info is None:
             return None
         
-        # Combine both into a single dictionary
-        display_data = {
-            "game_id": general_info['game_id'],
-            "game_duration": general_info['game_duration'],
-            "patch": general_info['patch'],
-            "timestamp": general_info['timestamp'],
-            "mode": general_info['mode'],
-            "platform": general_info['platform'],
-            "teams": participant_info
+        return {
+            "Game ID": general_info['game_id'],
+            "Duration": general_info['game_duration'],
+            "Patch": general_info['patch'],
+            "Date": general_info['timestamp'],
+            "Game Mode": general_info['mode'],
+            "Teams": participant_info
         }
-
-        return display_data
-
 
 def save_match_data(user_data, match_ids, file_path="../datasets/match_data.json"):
     all_participants_info = {}
@@ -172,30 +166,11 @@ def save_match_data(user_data, match_ids, file_path="../datasets/match_data.json
         game_id = general_info.get('game_id')
         if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
             continue
-        all_participants_info[f"match_{match_number}"] = {
+        all_participants_info[f"Match_{match_number}"] = {
             "general_info": general_info,
-            "details": participant_info
+            "participant_info": participant_info
         }
         match_number += 1
 
     with open(file_path, "w") as out_file:
         json.dump(all_participants_info, out_file, indent=4)
-
-if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print("Usage: python main.py <username> <tag> <region>")
-        sys.exit(1)
-    
-    username = sys.argv[1]
-    tag = sys.argv[2]
-    region = sys.argv[3]
-    
-    user_data = UserData(username, tag, region)
-    
-    user_display = UserDisplay(user_data)
-
-    user_display.display_user_info()
-
-    match_ids = user_data.get_matches('ranked', 20)
-
-    save_match_data(user_data, match_ids)
