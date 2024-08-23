@@ -47,11 +47,13 @@ class UserData:
         mode = match_data['info']['gameMode']
         if mode != 'CLASSIC':
             return None, None
+        
 
         try:
             game_id = match_data['metadata']['matchId']
             game_duration = match_data['info']['gameDuration']
             game_version = match_data['info']['gameVersion']
+            type = match_data['info']['gameType']
 
             minutes, seconds = divmod(game_duration, 60)
             formatted_duration = f"{minutes}m {seconds}s"
@@ -65,7 +67,8 @@ class UserData:
                 'game_duration': formatted_duration,
                 'patch': patch,
                 'timestamp': timestamp,
-                'mode': mode
+                'mode': mode,
+                'type': type
             }
 
             participant_info = {'Blue Side': {}, 'Red Side': {}}
@@ -93,7 +96,8 @@ class UserData:
                     'assists': assists,
                     'kda': kda,
                     'gold_earned': participant['goldEarned'],
-                    'total_damage_dealt': participant['totalDamageDealtToChampions']
+                    'total_damage_dealt': participant['totalDamageDealtToChampions'],
+                    'cs': participant['totalMinionsKilled']
                 }
 
             return general_info, participant_info
@@ -145,6 +149,7 @@ class UserDisplay:
             "Patch": general_info['patch'],
             "Date": general_info['timestamp'],
             "Game Mode": general_info['mode'],
+            "Game Type": general_info['type'],
             "Teams": participant_info
         }
 
