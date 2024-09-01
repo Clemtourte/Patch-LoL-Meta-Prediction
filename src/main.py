@@ -4,10 +4,15 @@ from dotenv import load_dotenv
 import logging
 import json
 from datetime import datetime
+from models import init_db
+from models import Match, Team, Participant
 import sys
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+Session = init_db()
+
+session = Session()
 class UserData:
     def __init__(self, username, tag, region):
         load_dotenv() 
@@ -74,6 +79,7 @@ class UserData:
             participant_info = {'Blue Side': {}, 'Red Side': {}}
             for i, participant in enumerate(match_data['info']['participants'], 1):
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
+                role = participant['lane']
                 kills = participant['kills']
                 deaths = participant['deaths']
                 assists = participant['assists']
@@ -87,6 +93,7 @@ class UserData:
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
                     'team': 'Blue' if participant['teamId'] == 100 else 'Red',
+                    'role': role,
                     'win': win,
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
@@ -153,29 +160,52 @@ class UserDisplay:
             "Teams": participant_info
         }
 
-def save_match_data(user_data, match_ids, file_path="../datasets/match_data.json"):
-    all_participants_info = {}
-
-    try:
-        with open(file_path, "r") as in_file:
-            all_participants_info = json.load(in_file)
-    except FileNotFoundError:
-        all_participants_info = {}
-
-    match_number = len(all_participants_info) + 1
-
+def save_match_data(user_data, match_ids, session):
     for match_id in match_ids:
         general_info, participant_info = user_data.get_match_info(match_id)
         if general_info is None and participant_info is None:
             continue
-        game_id = general_info.get('game_id')
-        if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
+        
+        existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
+        if existing_match:
             continue
-        all_participants_info[f"Match_{match_number}"] = {
-            "general_info": general_info,
-            "participant_info": participant_info
-        }
-        match_number += 1
 
-    with open(file_path, "w") as out_file:
-        json.dump(all_participants_info, out_file, indent=4)
+        match = Match(
+            game_id=general_info['game_id'],
+            game_duration=general_info['game_duration'],
+            patch=general_info['patch'],
+            timestamp=general_info['timestamp'],
+            mode=general_info['mode'],
+            platform="EUW1"  # Peut être défini en fonction de la région sélectionnée
+        )
+        session.add(match)
+        session.commit()
+
+        for team_name, participants in participant_info.items():
+            team = Team(
+                match_id=match.match_id,
+                team_name=team_name,
+                win=next(iter(participants.values()))['win']
+            )
+            session.add(team)
+            session.commit()
+
+            for summoner, details in participants.items():
+                participant = Participant(
+                    team_id=team.team_id,
+                    summoner_id=details['summoner_id'],
+                    summoner_name=details['summoner_name'],
+                    champion_name=details['champ_name'],
+                    champion_id=details['champ_id'],
+                    champ_level=details['champ_level'],
+                    kills=details['kills'],
+                    deaths=details['deaths'],
+                    assists=details['assists'],
+                    kda=str(details['kda']),
+                    gold_earned=details['gold_earned'],
+                    total_damage_dealt=details['total_damage_dealt'],
+                    cs=details['cs']
+                )
+                session.add(participant)
+
+        session.commit()
