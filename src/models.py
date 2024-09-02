@@ -1,4 +1,3 @@
-# models.py
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
@@ -35,6 +34,7 @@ class Participant(Base):
     champion_name = Column(String, nullable=False)
     champion_id = Column(Integer, nullable=False)
     champ_level = Column(Integer, nullable=False)
+    role = Column(String, nullable=False)
     kills = Column(Integer, nullable=False)
     deaths = Column(Integer, nullable=False)
     assists = Column(Integer, nullable=False)

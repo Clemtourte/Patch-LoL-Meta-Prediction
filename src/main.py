@@ -2,17 +2,15 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
-import json
 from datetime import datetime
 from models import init_db
 from models import Match, Team, Participant
-import sys
+from sqlalchemy.orm.exc import NoResultFound
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 Session = init_db()
 
-session = Session()
 class UserData:
     def __init__(self, username, tag, region):
         load_dotenv() 
@@ -53,7 +51,6 @@ class UserData:
         if mode != 'CLASSIC':
             return None, None
         
-
         try:
             game_id = match_data['metadata']['matchId']
             game_duration = match_data['info']['gameDuration']
@@ -79,7 +76,6 @@ class UserData:
             participant_info = {'Blue Side': {}, 'Red Side': {}}
             for i, participant in enumerate(match_data['info']['participants'], 1):
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
-                role = participant['lane']
                 kills = participant['kills']
                 deaths = participant['deaths']
                 assists = participant['assists']
@@ -93,18 +89,18 @@ class UserData:
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
                     'team': 'Blue' if participant['teamId'] == 100 else 'Red',
-                    'role': role,
                     'win': win,
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
                     'champ_id': participant['championId'],
+                    'role': participant['role'],
                     'kills': kills,
                     'deaths': deaths,
                     'assists': assists,
                     'kda': kda,
                     'gold_earned': participant['goldEarned'],
                     'total_damage_dealt': participant['totalDamageDealtToChampions'],
-                    'cs': participant['totalMinionsKilled']
+                    'cs': participant['totalMinionsKilled'] + participant['neutralMinionsKilled']
                 }
 
             return general_info, participant_info
@@ -163,11 +159,13 @@ class UserDisplay:
 def save_match_data(user_data, match_ids, session):
     for match_id in match_ids:
         general_info, participant_info = user_data.get_match_info(match_id)
-        if general_info is None and participant_info is None:
+        if general_info is None or participant_info is None:
             continue
-        
+
+        # Vérifier si le match existe déjà
         existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
         if existing_match:
+            logging.info(f"Match {general_info['game_id']} already exists in the database.")
             continue
 
         match = Match(
@@ -191,6 +189,14 @@ def save_match_data(user_data, match_ids, session):
             session.commit()
 
             for summoner, details in participants.items():
+                existing_participant = session.query(Participant).filter_by(
+                    team_id=team.team_id,
+                    summoner_id=details['summoner_id']
+                ).first()
+                if existing_participant:
+                    logging.info(f"Participant {details['summoner_name']} already exists in the database.")
+                    continue
+
                 participant = Participant(
                     team_id=team.team_id,
                     summoner_id=details['summoner_id'],
@@ -198,6 +204,7 @@ def save_match_data(user_data, match_ids, session):
                     champion_name=details['champ_name'],
                     champion_id=details['champ_id'],
                     champ_level=details['champ_level'],
+                    role=details['role'],
                     kills=details['kills'],
                     deaths=details['deaths'],
                     assists=details['assists'],
@@ -209,3 +216,20 @@ def save_match_data(user_data, match_ids, session):
                 session.add(participant)
 
         session.commit()
+
+"""if __name__ == "__main__":
+    username = "YourUsername"
+    tag = "YourTag"
+    region = "euw1" 
+
+    user_data = UserData(username, tag, region)
+    match_ids = user_data.get_matches(match_type="ranked", match_count=10)
+
+    session = Session()
+
+    try:
+        save_match_data(user_data, match_ids, session)
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+    finally:
+        session.close()"""
