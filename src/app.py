@@ -54,12 +54,11 @@ if st.button("Search"):
                                     st.write(f"**Total Gold Earned:** {details['gold_earned']}")
                                     st.write(f"**CS:** {details['cs']}")
 
+                        save_match_data(user_data, [match_id], session)
+
                     else:
                         st.error(f"Match {i} information could not be retrieved or is not in the expected format.")
                         st.write(f"Raw match data: {user_data.get_match_data(match_id)}")
-                    
-                # Save match data to the database
-                save_match_data(user_data, match_ids, session)
 
             except Exception as e:
                 st.error(f"An error occurred: {e}")

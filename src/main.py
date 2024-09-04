@@ -164,10 +164,16 @@ def save_match_data(user_data, match_ids, session):
         if general_info is None or participant_info is None:
             continue
 
-        # Vérifier si le match existe déjà
         existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
         if existing_match:
-            logging.info(f"Match {general_info['game_id']} already exists in the database.")
+            for team in existing_match.teams:
+                for participant in team.participants:
+                    team_name = 'Blue Side' if team.team_name == 'Blue Side' else 'Red Side'
+                    summoner_details = next((p for p in participant_info[team_name].values() if p['summoner_id'] == participant.summoner_id), None)
+                    if summoner_details:
+                        participant.lane = summoner_details['lane']
+                        participant.position = summoner_details['position']
+            session.commit()
             continue
 
         match = Match(
@@ -176,10 +182,10 @@ def save_match_data(user_data, match_ids, session):
             patch=general_info['patch'],
             timestamp=general_info['timestamp'],
             mode=general_info['mode'],
-            platform="EUW1"  # Peut être défini en fonction de la région sélectionnée
+            platform="EUW1"  
         )
         session.add(match)
-        session.commit()
+        session.flush()
 
         for team_name, participants in participant_info.items():
             team = Team(
@@ -188,7 +194,7 @@ def save_match_data(user_data, match_ids, session):
                 win=next(iter(participants.values()))['win']
             )
             session.add(team)
-            session.commit()
+            session.flush()
 
             for summoner, details in participants.items():
                 existing_participant = session.query(Participant).filter_by(
