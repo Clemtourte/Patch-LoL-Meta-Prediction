@@ -47,6 +47,8 @@ if st.button("Search"):
                             for summoner, details in participants.items():
                                 with st.expander(f"**{details['summoner_name']}** ({details['champ_name']}) - KDA: {details['kills']}/{details['deaths']}/{details['assists']}"):
                                     st.write(f"**Role:** {details['role']}")
+                                    st.write(f"**Lane:** {details['lane']}")
+                                    st.write(f"**Position:** {details['position']}")
                                     st.write(f"**Level:** {details['champ_level']}")
                                     st.write(f"**Total Damage Dealt:** {details['total_damage_dealt']}")
                                     st.write(f"**Total Gold Earned:** {details['gold_earned']}")

@@ -35,6 +35,8 @@ class Participant(Base):
     champion_id = Column(Integer, nullable=False)
     champ_level = Column(Integer, nullable=False)
     role = Column(String, nullable=False)
+    lane = Column(String, nullable=False)
+    position = Column(String, nullable=False)
     kills = Column(Integer, nullable=False)
     deaths = Column(Integer, nullable=False)
     assists = Column(Integer, nullable=False)
