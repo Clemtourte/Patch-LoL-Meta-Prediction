@@ -8,13 +8,13 @@ import pandas as pd
 
 conn = sqlite3.connect('matches.db')
 
-query = "SELECT champion, champ_level, role, position, kills, deaths, assists, kda, gold_earned, total_damage_dealt, cs FROM participants;"
+query = "SELECT champion_name, champ_level, role, position, kills, deaths, assists, kda, gold_earned, total_damage_dealt, cs FROM participants;"
 df = pd.read_sql_query(query, conn)
 conn.close()
 
 le = LabelEncoder()
 df['role'] = le.fit_transform(df['role'])
-df['champion'] = le.fit_transform(df['champion'])
+df['champion_name'] = le.fit_transform(df['champion_name'])
 print(df.head())
 
 X = df.drop('position', axis=1)
