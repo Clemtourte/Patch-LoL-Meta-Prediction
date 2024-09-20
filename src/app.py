@@ -51,7 +51,6 @@ if st.button("Process Games"):
                                     for summoner, details in participants.items():
                                         st.write(f"- **{details['summoner_name']}** ({details['champ_name']}) - "
                                                  f"KDA: {details['kills']}/{details['deaths']}/{details['assists']}, "
-                                                 f"Role: {details['role']}, Lane: {details['lane']}, "
                                                  f"Position: {details['position']}")
 
                         if population_mode in ["Add to Database", "Both"]:
