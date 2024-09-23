@@ -11,6 +11,7 @@ class Match(Base):
     patch = Column(String, nullable=False)
     timestamp = Column(String, nullable=False)
     mode = Column(String, nullable=False)
+    queue_id = Column(Integer, nullable=False,default=0)
     platform = Column(String, nullable=False)
 
     teams = relationship("Team", back_populates="match")
