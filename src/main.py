@@ -2,11 +2,14 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
-import json
 from datetime import datetime
-import sys
+from models import init_db
+from models import Match, Team, Participant
+from sqlalchemy.orm.exc import NoResultFound
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+Session = init_db()
 
 class UserData:
     def __init__(self, username, tag, region):
@@ -31,8 +34,8 @@ class UserData:
         url = f"https://{self.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={self.API_key}"
         return self._get_response(url, default=[])
 
-    def get_matches(self, match_type, match_count):
-        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?type={match_type}&start=0&count={match_count}&api_key={self.API_key}"
+    def get_matches(self, queue_id, match_count):
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&start=0&count={match_count}&api_key={self.API_key}"
         return self._get_response(url, default=[])
 
     def get_match_data(self, match_id):
@@ -42,18 +45,14 @@ class UserData:
     def get_match_info(self, match_id):
         match_data = self.get_match_data(match_id)
         if not match_data:
-            return None, None
+            return None
         
-        mode = match_data['info']['gameMode']
-        if mode != 'CLASSIC':
-            return None, None
-        
-
         try:
             game_id = match_data['metadata']['matchId']
             game_duration = match_data['info']['gameDuration']
             game_version = match_data['info']['gameVersion']
-            type = match_data['info']['gameType']
+            queue_id = match_data['info']['queueId']
+            mode = match_data['info']['gameMode']
 
             minutes, seconds = divmod(game_duration, 60)
             formatted_duration = f"{minutes}m {seconds}s"
@@ -68,22 +67,19 @@ class UserData:
                 'patch': patch,
                 'timestamp': timestamp,
                 'mode': mode,
-                'type': type
+                'queue_id': queue_id
             }
 
             participant_info = {'Blue Side': {}, 'Red Side': {}}
-            for i, participant in enumerate(match_data['info']['participants'], 1):
+            for participant in match_data['info']['participants']:
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
                 kills = participant['kills']
                 deaths = participant['deaths']
                 assists = participant['assists']
                 win = participant['win']
-                if deaths == 0:
-                    kda = kills + assists
-                else:
-                    kda = round((kills + assists)/deaths, 2)
+                kda = (kills + assists) / deaths if deaths > 0 else kills + assists
                 
-                participant_info[team][f'Summoner {i}'] = {
+                participant_info[team][participant['summonerName']] = {
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
                     'team': 'Blue' if participant['teamId'] == 100 else 'Red',
@@ -91,20 +87,86 @@ class UserData:
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
                     'champ_id': participant['championId'],
+                    'role': participant.get('role', 'N/A'),
+                    'lane': participant.get('lane', 'N/A'),
+                    'position': participant.get('teamPosition', 'N/A'),
                     'kills': kills,
                     'deaths': deaths,
                     'assists': assists,
-                    'kda': kda,
+                    'kda': round(kda, 2),
                     'gold_earned': participant['goldEarned'],
                     'total_damage_dealt': participant['totalDamageDealtToChampions'],
-                    'cs': participant['totalMinionsKilled']
+                    'cs': participant['totalMinionsKilled'] + participant['neutralMinionsKilled'],
+                    'total_heal': participant.get('totalHeal', 'N/A')
                 }
 
             return general_info, participant_info
 
         except KeyError as e:
             logging.error("Key error: %s. Here's the entire response: %s", e, match_data)
-            return None, None
+            return None
+        
+    def get_player_statistics(self, session, queue_id):
+            logging.info(f"Retrieving statistics for queue_id: {queue_id}")
+            
+            # First, try to get matches with the exact queue_id
+            matches = session.query(Match).join(Team).join(Participant).filter(
+                Participant.summoner_name == self.username,
+                Match.queue_id == queue_id
+            ).all()
+            
+            logging.info(f"Found {len(matches)} matches with exact queue_id {queue_id}")
+            
+            # If no matches found, try to get all matches for this user
+            if not matches:
+                logging.warning(f"No matches found for queue_id {queue_id}. Retrieving all matches for the user.")
+                matches = session.query(Match).join(Team).join(Participant).filter(
+                    Participant.summoner_name == self.username
+                ).all()
+                logging.info(f"Found {len(matches)} total matches for the user")
+
+            total_games = len(matches)
+            wins = 0
+            champion_stats = {}
+            total_kills, total_deaths, total_assists, total_cs = 0, 0, 0, 0
+            roles_played = {}
+
+            for match in matches:
+                logging.debug(f"Processing match {match.game_id} with queue_id {match.queue_id}")
+                for team in match.teams:
+                    for participant in team.participants:
+                        if participant.summoner_name == self.username:
+                            if team.win:
+                                wins += 1
+                            if participant.champion_name not in champion_stats:
+                                champion_stats[participant.champion_name] = {'games': 0, 'wins': 0, 'kills': 0, 'deaths': 0, 'assists': 0, 'cs': 0}
+                            champ_stats = champion_stats[participant.champion_name]
+                            champ_stats['games'] += 1
+                            if team.win:
+                                champ_stats['wins'] += 1
+                            champ_stats['kills'] += participant.kills
+                            champ_stats['deaths'] += participant.deaths
+                            champ_stats['assists'] += participant.assists
+                            champ_stats['cs'] += participant.cs
+                            total_kills += participant.kills
+                            total_deaths += participant.deaths
+                            total_assists += participant.assists
+                            total_cs += participant.cs
+                            roles_played[participant.position] = roles_played.get(participant.position, 0) + 1
+
+            logging.info(f"Statistics summary: Total games={total_games}, Wins={wins}, Roles={roles_played}")
+
+            return {
+                'total_games': total_games,
+                'wins': wins,
+                'champion_stats': champion_stats,
+                'total_kills': total_kills,
+                'total_deaths': total_deaths,
+                'total_assists': total_assists,
+                'total_cs': total_cs,
+                'roles_played': roles_played
+            }
+
 
     def _get_response(self, url, default=None):
         response = requests.get(url)
@@ -129,14 +191,19 @@ class UserDisplay:
             return None
 
         ranked_data = self.user_data.get_ranked_data(summoner_id)
+        info ={}
         for entry in ranked_data:
             if entry.get('queueType') == 'RANKED_SOLO_5x5':
                 tier = entry['tier']
                 rank = entry['rank']
                 league_points = entry['leaguePoints']
-                return f"{tier} {rank} - {league_points} LP"
-        logging.info("No ranked data found for the summoner.")
-        return "No ranked data found."
+                info['ranked'] = f'{tier} {rank} - {league_points} LP'
+            elif entry.get('queueType') == 'RANKED_FLEX_SR':
+                tier = entry['tier']
+                rank = entry['rank']
+                league_points = entry['leaguePoints']
+                info['flex'] = f'{tier} {rank} - {league_points} LP'
+        return info
 
     def display_match_info(self, match_id):
         general_info, participant_info = self.user_data.get_match_info(match_id)
@@ -152,30 +219,106 @@ class UserDisplay:
             "Game Type": general_info['type'],
             "Teams": participant_info
         }
+    
+    def format_player_statistics(self, stats):
+        formatted_stats = {
+            'total_games': stats['total_games'],
+            'wins': stats['wins'],
+            'losses': stats['total_games'] - stats['wins'],
+            'win_rate': round(stats['wins'] / stats['total_games'] * 100, 2) if stats['total_games'] > 0 else 0,
+            'kda_ratio': ((stats['total_kills'] + stats['total_assists']) / stats['total_deaths']) if stats['total_deaths'] > 0 else (stats['total_kills'] + stats['total_assists']),
+            'avg_cs': stats['total_cs'] / stats['total_games'] if stats['total_games'] > 0 else 0,
+            'most_played_roles': max(stats['roles_played'], key=stats['roles_played'].get) if stats['roles_played'] else 'N/A',
+            'champion_stats': {}
+        }
+        
+        for champ, champ_stats in stats['champion_stats'].items():
+            formatted_stats['champion_stats'][champ] = {
+                'games': champ_stats['games'],
+                'wins': champ_stats['wins'],
+                'winrate': champ_stats['wins'] / champ_stats['games'] * 100 if champ_stats['games'] > 0 else 0,
+                'kda_ratio': ((champ_stats['kills'] + champ_stats['assists']) / champ_stats['deaths']) if champ_stats['deaths'] > 0 else (champ_stats['kills'] + champ_stats['assists']),
+                'avg_cs': champ_stats['cs'] / champ_stats['games'] if champ_stats['games'] > 0 else 0
+            }
+        return formatted_stats
 
-def save_match_data(user_data, match_ids, file_path="../datasets/match_data.json"):
-    all_participants_info = {}
-
-    try:
-        with open(file_path, "r") as in_file:
-            all_participants_info = json.load(in_file)
-    except FileNotFoundError:
-        all_participants_info = {}
-
-    match_number = len(all_participants_info) + 1
+def save_match_data(user_data, match_ids, session):
+    added_matches = 0
+    skipped_matches = 0
 
     for match_id in match_ids:
-        general_info, participant_info = user_data.get_match_info(match_id)
-        if general_info is None and participant_info is None:
+        match_info = user_data.get_match_info(match_id)
+        if match_info is None:
+            print(f"Could not retrieve info for match {match_id}")
             continue
-        game_id = general_info.get('game_id')
-        if game_id is None or any(match["general_info"]["game_id"] == game_id for match in all_participants_info.values()):
-            continue
-        all_participants_info[f"Match_{match_number}"] = {
-            "general_info": general_info,
-            "participant_info": participant_info
-        }
-        match_number += 1
 
-    with open(file_path, "w") as out_file:
-        json.dump(all_participants_info, out_file, indent=4)
+        general_info, participant_info = match_info
+
+        existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
+        if existing_match:
+            print(f"Match {general_info['game_id']} already exists in the database. Skipping.")
+            skipped_matches += 1
+            continue
+
+        match = Match(
+            game_id=general_info['game_id'],
+            game_duration=general_info['game_duration'],
+            patch=general_info['patch'],
+            timestamp=general_info['timestamp'],
+            mode=general_info['mode'],
+            queue_id=general_info['queue_id'],
+            platform="EUW1"  # Assuming EUW1 platform, adjust if needed
+        )
+        session.add(match)
+        session.flush()
+
+        for team_name, participants in participant_info.items():
+            team = Team(
+                match_id=match.match_id,
+                team_name=team_name,
+                win=next(iter(participants.values()))['win']
+            )
+            session.add(team)
+            session.flush()
+
+            for summoner, details in participants.items():
+                participant = Participant(
+                    team_id=team.team_id,
+                    summoner_id=details['summoner_id'],
+                    summoner_name=details['summoner_name'],
+                    champion_name=details['champ_name'],
+                    champion_id=details['champ_id'],
+                    champ_level=details['champ_level'],
+                    role=details['role'],
+                    lane=details['lane'],
+                    position=details['position'],
+                    kills=details['kills'],
+                    deaths=details['deaths'],
+                    assists=details['assists'],
+                    kda=str(details['kda']),
+                    gold_earned=details['gold_earned'],
+                    total_damage_dealt=details['total_damage_dealt'],
+                    cs=details['cs']
+                )
+                session.add(participant)
+
+        session.commit()
+        added_matches += 1
+        print(f"Added match {general_info['game_id']} to database.")
+    return added_matches, skipped_matches
+"""if __name__ == "__main__":
+    username = "YourUsername"
+    tag = "YourTag"
+    region = "euw1" 
+
+    user_data = UserData(username, tag, region)
+    match_ids = user_data.get_matches(match_type="ranked", match_count=10)
+
+    session = Session()
+
+    try:
+        save_match_data(user_data, match_ids, session)
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+    finally:
+        session.close()"""
