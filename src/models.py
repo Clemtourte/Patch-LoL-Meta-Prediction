@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 Base = declarative_base()
@@ -45,8 +45,35 @@ class Participant(Base):
     gold_earned = Column(Integer, nullable=False)
     total_damage_dealt = Column(Integer, nullable=False)
     cs = Column(Integer, nullable=False)
+    total_heal = Column(Integer, nullable=True)
+    damage_taken = Column(Integer, nullable=True)
+    wards_placed = Column(Integer, nullable=True)
+    wards_killed = Column(Integer, nullable=True)
+    time_ccing_others = Column(Integer, nullable=True) 
 
     team = relationship("Team", back_populates="participants")
+    performance_features = relationship("PerformanceFeatures", back_populates="participant", uselist=False)
+
+class PerformanceFeatures(Base):
+    __tablename__ = 'performance_features'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    participant_id = Column(Integer, ForeignKey('participants.participant_id'), nullable=False)
+    kill_participation = Column(Float, nullable=False)
+    death_share = Column(Float, nullable=False)
+    damage_share = Column(Float, nullable=False)
+    damage_taken_share = Column(Float, nullable=False)
+    gold_share = Column(Float, nullable=False)
+    heal_share = Column(Float, nullable=False)
+    damage_mitigated_share = Column(Float, nullable=False)
+    cs_share = Column(Float, nullable=False)
+    vision_share = Column(Float, nullable=False)
+    vision_denial_share = Column(Float, nullable=False)
+    xp_share = Column(Float, nullable=False)
+    cc_share = Column(Float, nullable=False)
+
+    participant = relationship("Participant", back_populates="performance_features")
+
+
 
 def init_db(uri="sqlite:///matches.db"):
     engine = create_engine(uri)

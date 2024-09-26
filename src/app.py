@@ -92,8 +92,8 @@ if st.button("Process Games"):
                 for i, match_id in enumerate(match_ids[:number_of_games]):
                     match_info = user_data.get_match_info(match_id)
 
-                    if match_info:
-                        general_info, participant_info = match_info
+                    if match_info[0] is not None:
+                        general_info, participant_info, team_stats = match_info
                         processed_matches += 1
                         if population_mode in ["Display Only", "Both"]:
                             with st.expander(f"{selected_mode} Match {i+1}"):
