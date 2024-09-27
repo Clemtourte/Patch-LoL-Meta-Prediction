@@ -1,7 +1,5 @@
 import streamlit as st
 from main import UserData, UserDisplay, save_match_data, Session
-from models import Match, Team, Participant
-import time
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +10,6 @@ region = st.selectbox("Select your region:", ["EUW1"])  # Add more regions as ne
 username = st.text_input("Enter your username:")
 tag = st.text_input("Enter your tag (without #):")
 
-# Game mode selection
 game_modes = {
     "Ranked Solo/Duo": "420",
     "Ranked Flex": "440",
@@ -33,15 +30,12 @@ if st.button("Process Games"):
     else:
         user_data = UserData(username, tag, region)
         user_display = UserDisplay(user_data)
-        session = Session()
+        session = Session()  # Create a new session here
 
         try:
             queue_id = game_modes[selected_mode]
             
-            # Display player statistics first
-
             st.subheader("Player Statistics")
-            queue_id = game_modes[selected_mode]
             st.text(f"Retrieving statistics for {selected_mode}")
 
             raw_stats = user_data.get_player_statistics(session, queue_id)
@@ -87,14 +81,11 @@ if st.button("Process Games"):
                 st.subheader(f"Processing {len(match_ids)} Recent {selected_mode} Matches")
                 progress_bar = st.progress(0)
                 
-                processed_matches = 0
-                
                 for i, match_id in enumerate(match_ids[:number_of_games]):
                     match_info = user_data.get_match_info(match_id)
 
                     if match_info[0] is not None:
                         general_info, participant_info, team_stats = match_info
-                        processed_matches += 1
                         if population_mode in ["Display Only", "Both"]:
                             with st.expander(f"{selected_mode} Match {i+1}"):
                                 st.write(f"**Duration**: {general_info['game_duration']}")
@@ -116,16 +107,12 @@ if st.button("Process Games"):
                     else:
                         st.error(f"Match {i+1} information could not be retrieved.")
 
-                    time.sleep(1.2)
-
-                if processed_matches > 0:
-                    st.success(f"Successfully processed {processed_matches} {selected_mode} matches.")
-                else:
-                    st.warning(f"No {selected_mode} matches could be processed.")
+                st.success(f"Successfully processed {len(match_ids)} {selected_mode} matches.")
             else:
                 st.warning(f"No recent {selected_mode} matches found.")
 
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            st.error(f"An error occurred: {str(e)}")
+            logging.error(f"Error processing games: {str(e)}", exc_info=True)
         finally:
-            session.close()
+            session.close()  # Make sure to close the session
