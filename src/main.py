@@ -33,9 +33,17 @@ class UserData:
         url = f"https://{self.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={self.API_key}"
         return self._get_response(url, default=[])
 
-    def get_matches(self, queue_id, match_count):
-        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&start=0&count={match_count}&api_key={self.API_key}"
-        return self._get_response(url, default=[])
+def get_matches(self, queue_id, start_time, end_time, count=100):
+    matches = []
+    start_index = 0
+    while len(matches) < count:
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&startTime={start_time}&endTime={end_time}&start={start_index}&count=100&api_key={self.API_key}"
+        batch = self._get_response(url, default=[])
+        if not batch:
+            break
+        matches.extend(batch)
+        start_index += 100
+    return matches[:count]
 
     def get_match_data(self, match_id):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={self.API_key}"
@@ -344,6 +352,7 @@ class UserData:
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={self.API_key}"
         return self._get_response(url, default={})
 
+
     def get_match_info(self, match_id):
         match_data = self.get_match_data(match_id)
         if not match_data:
@@ -528,6 +537,24 @@ class UserData:
                 features[feature] = 0
         
         return features
+    
+    def get_matches_by_date(self, queue_id, start_time, end_time):
+        matches = []
+        start_index = 0
+        while True:
+            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&startTime={start_time}&endTime={end_time}&start={start_index}&count=100&api_key={self.API_key}"
+            batch = self._get_response(url, default=[])
+            if not batch:
+                break
+            matches.extend(batch)
+            if len(batch) < 100:
+                break
+            start_index += 100
+        return matches
+
+    def get_recent_matches(self, queue_id, count):
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&start=0&count={count}&api_key={self.API_key}"
+        return self._get_response(url, default=[])
 
     def _get_response(self, url, default=None):
         response = requests.get(url)

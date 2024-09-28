@@ -1,12 +1,13 @@
 import streamlit as st
 from main import UserData, UserDisplay, save_match_data, Session
 import logging
+import datetime
 
 logging.basicConfig(level=logging.INFO)
 
 st.title("League of Legends User Information")
 
-region = st.selectbox("Select your region:", ["EUW1"])  # Add more regions as needed
+region = st.selectbox("Select your region:", ["EUW1"])
 username = st.text_input("Enter your username:")
 tag = st.text_input("Enter your tag (without #):")
 
@@ -18,8 +19,15 @@ game_modes = {
     "ARAM": "450"
 }
 selected_mode = st.selectbox("Select game mode:", list(game_modes.keys()))
+search_option = st.radio("Choose search option:", ["Date Range", "Number of Recent Games"])
+start_date = end_date = None
+number_of_games = 0
+if search_option == "Date Range":
+    start_date = st.date_input("Start date")
+    end_date = st.date_input("End date")
 
-number_of_games = st.number_input("Number of recent games to process:", min_value=1, max_value=100, value=10)
+else:
+    number_of_games = st.number_input("Number of recent games to process:", min_value=1, max_value=100, value=10)
 
 st.header("Database Population")
 population_mode = st.radio("Choose population mode:", ["Display Only", "Add to Database", "Both"])
@@ -30,10 +38,19 @@ if st.button("Process Games"):
     else:
         user_data = UserData(username, tag, region)
         user_display = UserDisplay(user_data)
-        session = Session()  # Create a new session here
+        session = Session()
 
         try:
             queue_id = game_modes[selected_mode]
+            
+            if search_option == "Date Range":
+                start_time = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
+                end_time = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
+                match_ids = user_data.get_matches_by_date(queue_id, start_time, end_time)
+                st.write(f"Total matches found in date range: {len(match_ids)}")
+            else:
+                match_ids = user_data.get_recent_matches(queue_id, number_of_games)
+                st.write(f"Fetching {number_of_games} recent matches")
             
             st.subheader("Player Statistics")
             st.text(f"Retrieving statistics for {selected_mode}")
@@ -74,14 +91,11 @@ if st.button("Process Games"):
             else:
                 st.warning(f"No statistics found for {selected_mode} mode. Make sure you have played games in this mode and they are saved in the database.")
 
-            # Process matches
-            match_ids = user_data.get_matches(queue_id, number_of_games)
-
             if match_ids:
-                st.subheader(f"Processing {len(match_ids)} Recent {selected_mode} Matches")
+                st.subheader(f"Processing {len(match_ids)} {selected_mode} Matches")
                 progress_bar = st.progress(0)
                 
-                for i, match_id in enumerate(match_ids[:number_of_games]):
+                for i, match_id in enumerate(match_ids):
                     match_info = user_data.get_match_info(match_id)
 
                     if match_info[0] is not None:
@@ -103,16 +117,19 @@ if st.button("Process Games"):
                         if population_mode in ["Add to Database", "Both"]:
                             save_match_data(user_data, [match_id], session)
 
-                        progress_bar.progress((i + 1) / number_of_games)
+                        progress_bar.progress((i + 1) / len(match_ids))
                     else:
                         st.error(f"Match {i+1} information could not be retrieved.")
 
                 st.success(f"Successfully processed {len(match_ids)} {selected_mode} matches.")
             else:
-                st.warning(f"No recent {selected_mode} matches found.")
+                if search_option == "Date Range":
+                    st.warning(f"No {selected_mode} matches found in the specified date range.")
+                else:
+                    st.warning(f"No recent {selected_mode} matches found.")
 
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
             logging.error(f"Error processing games: {str(e)}", exc_info=True)
         finally:
-            session.close()  # Make sure to close the session
+            session.close()
