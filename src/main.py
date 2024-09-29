@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 from models import Match, Team, Participant, PerformanceFeatures, init_db
 from sqlalchemy.orm.exc import NoResultFound
+import time
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -17,7 +18,7 @@ class UserData:
         self.username = username
         self.tag = tag
         self.region = region
-        self.api_call_count = 0  # Initialize the api_call_count here
+        self.api_call_count = 0
         self.puuid = self.get_puuid()
 
     def reset_api_call_count(self):
@@ -327,19 +328,42 @@ class UserDisplay:
             }
         return formatted_stats
 
+import time
+
 def save_match_data(user_data, match_ids, session):
     added_matches = 0
     updated_matches = 0
     total_api_calls = 0
+    start_time = time.time()
 
-    for match_id in match_ids:
+    for i, match_id in enumerate(match_ids, 1):
+        logging.info(f"Processing match {i} of {len(match_ids)}: {match_id}")
+        
+        # Check if we need to pause for rate limiting
+        current_time = time.time()
+        if current_time - start_time >= 120 or total_api_calls >= 95:
+            pause_time = max(120 - (current_time - start_time), 0)
+            logging.info(f"Pausing for {pause_time:.2f} seconds to avoid rate limit...")
+            time.sleep(pause_time)
+            start_time = time.time()
+            total_api_calls = 0
+
+        # Process the match
+        before_calls = user_data.api_call_count
         general_info, participant_info, team_stats, api_calls = user_data.get_match_info(match_id)
-        total_api_calls += api_calls
+        after_calls = user_data.api_call_count
+        
+        actual_calls = after_calls - before_calls
+        total_api_calls += actual_calls
+
+        logging.info(f"API calls for this match: reported {api_calls}, actual {actual_calls}")
+        logging.info(f"Total API calls in this period: {total_api_calls}")
+
         if general_info is None or participant_info is None or team_stats is None:
             logging.warning(f"Could not retrieve info for match {match_id}")
             continue
 
-        logging.info(f"Processing match {general_info['game_id']}")
+        logging.info(f"Processing match {i} of {len(match_ids)}: {general_info['game_id']}")
         existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
         if existing_match:
             logging.info(f"Match {general_info['game_id']} already exists. Updating all data.")
@@ -388,7 +412,6 @@ def save_match_data(user_data, match_ids, session):
                     participant = Participant(team_id=team.team_id)
                     session.add(participant)
 
-                # Explicitly set each attribute
                 participant.summoner_id = str(details['summoner_id'])
                 participant.summoner_name = str(summoner)
                 participant.champion_name = str(details['champ_name'])
@@ -423,9 +446,25 @@ def save_match_data(user_data, match_ids, session):
 
         try:
             session.commit()
-            logging.info(f"Processed match {general_info['game_id']}.")
+            if existing_match:
+                updated_matches += 1
+            else:
+                added_matches += 1
+            logging.info(f"Processed match {general_info['game_id']}. Total matches: {i}")
         except Exception as e:
             logging.error(f"Error committing session: {str(e)}")
             session.rollback()
-    
+
+        elapsed_time = time.time() - start_time
+        if elapsed_time < 120 and total_api_calls >= 70:  # More conservative limit
+            pause_time = 120 - elapsed_time
+            logging.info(f"Pausing for {pause_time:.2f} seconds to avoid rate limit...")
+            time.sleep(pause_time)
+            total_api_calls = 0
+            start_time = time.time()
+        
+        logging.info("Waiting for 3 seconds before next match...")
+        time.sleep(3)
+
+    logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
     return added_matches, updated_matches, total_api_calls

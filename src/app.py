@@ -2,8 +2,19 @@ import streamlit as st
 from main import UserData, UserDisplay, save_match_data, Session
 import logging
 import datetime
+import os
+from PIL import Image
 
 logging.basicConfig(level=logging.INFO)
+
+CHAMPION_IMAGE_PATH = "../datasets/champion/"
+
+def load_champion_image(champion_name):
+    image_path = os.path.join(CHAMPION_IMAGE_PATH, f"{champion_name}.png")
+    if os.path.exists(image_path):
+        return Image.open(image_path)
+    else:
+        return None
 
 st.title("League of Legends Meta Prediction")
 
@@ -80,9 +91,15 @@ if st.button("Process Games"):
                 top_5_champs = sorted_champs[:5]
                 
                 if top_5_champs:
-                    champ_cols = st.columns(len(top_5_champs))
-                    for i, (champ, champ_stats) in enumerate(top_5_champs):
-                        with champ_cols[i]:
+                    for champ, champ_stats in top_5_champs:
+                        col1, col2 = st.columns([1, 4])
+                        with col1:
+                            champ_image = load_champion_image(champ)
+                            if champ_image:
+                                st.image(champ_image, width=50)
+                            else:
+                                st.write("(No image)")
+                        with col2:
                             st.write(f"**{champ}**")
                             st.write(f"Games: {champ_stats['games']}")
                             st.write(f"Winrate: {champ_stats['winrate']:.2f}%")
@@ -115,10 +132,18 @@ if st.button("Process Games"):
                                     team_win_status = "Win" if next(iter(participants.values()))['win'] else "Lose"
                                     st.write(f"**{team} - {team_win_status}**")
                                     for summoner, details in participants.items():
-                                        st.write(f"- **{details['summoner_name']}** ({details['champ_name']}) - "
-                                                f"KDA: {details['kills']}/{details['deaths']}/{details['assists']} ({details['kda']:.2f}), "
-                                                f"Role: {details['position']}, "
-                                                f"{'CS: ' + str(details['cs']) if selected_mode != 'ARAM' else 'Damage: ' + str(details['total_damage_dealt'])}")
+                                        col1, col2 = st.columns([1, 4])
+                                        with col1:
+                                            champ_image = load_champion_image(details['champ_name'])
+                                            if champ_image:
+                                                st.image(champ_image, width=50)
+                                            else:
+                                                st.write("(No image)")
+                                        with col2:
+                                            st.write(f"**{summoner}** ({details['champ_name']}) - "
+                                                    f"KDA: {details['kills']}/{details['deaths']}/{details['assists']} ({details['kda']}), "
+                                                    f"Role: {details['position']}, "
+                                                    f"{'CS: ' + str(details['cs']) if selected_mode != 'ARAM' else 'Damage: ' + str(details['total_damage_dealt'])}")
 
                         if population_mode in ["Add to Database", "Both"]:
                             save_match_data(user_data, [match_id], session)
