@@ -167,3 +167,5 @@ cython_debug/
 
 # Exclude datafile
 match_data.json
+datasets/champion/
+datasets/item/
