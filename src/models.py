@@ -50,6 +50,8 @@ class Participant(Base):
     wards_placed = Column(Integer, nullable=True)
     wards_killed = Column(Integer, nullable=True)
     time_ccing_others = Column(Integer, nullable=True) 
+    performance_score = Column(Float, nullable=True)
+    standardized_performance_score = Column(Float, nullable=True)
 
     team = relationship("Team", back_populates="participants")
     performance_features = relationship("PerformanceFeatures", back_populates="participant", uselist=False)
