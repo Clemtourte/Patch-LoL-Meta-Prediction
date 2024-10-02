@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import logging
 from datetime import datetime
 from models import Match, Team, Participant, PerformanceFeatures, init_db
+from perf_rating import calculate_performance_ratings
 from sqlalchemy.orm.exc import NoResultFound
 import time
 
@@ -88,6 +89,7 @@ class UserData:
                     'wards_placed': 0,
                     'wards_killed': 0,
                     'total_level': 0,
+                    'total_xp': 0,
                     'damage_taken': 0,
                     'heal': 0,
                     'damage_mitigated': 0,
@@ -96,31 +98,25 @@ class UserData:
 
             for participant in match_data['info']['participants']:
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
-                kills = participant['kills']
-                deaths = participant['deaths']
-                assists = participant['assists']
-                win = participant['win']
-                kda = (kills + assists) / deaths if deaths > 0 else kills + assists
                 
                 participant_info[team][participant['summonerName']] = {
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
                     'team': 'Blue' if participant['teamId'] == 100 else 'Red',
-                    'win': win,
+                    'win': participant['win'],
                     'champ_level': participant['champLevel'],
                     'champ_name': participant['championName'],
                     'champ_id': participant['championId'],
                     'role': participant.get('role', 'N/A'),
                     'lane': participant.get('lane', 'N/A'),
                     'position': participant.get('teamPosition', 'N/A'),
-                    'kills': kills,
-                    'deaths': deaths,
-                    'assists': assists,
-                    'kda': round(kda, 2),
+                    'kills': participant['kills'],
+                    'deaths': participant['deaths'],
+                    'assists': participant['assists'],
+                    'kda': (participant['kills'] + participant['assists']) / max(1, participant['deaths']),
                     'gold_earned': participant['goldEarned'],
                     'total_damage_dealt': participant['totalDamageDealtToChampions'],
                     'cs': participant['totalMinionsKilled'] + participant['neutralMinionsKilled'],
-                    'total_heal': participant.get('totalHeal', 'N/A'),
                     'damage_taken': participant['totalDamageTaken'],
                     'heal': participant['totalHeal'],
                     'damage_mitigated': participant['damageSelfMitigated'],
@@ -130,9 +126,23 @@ class UserData:
                     'time_ccing_others': participant['timeCCingOthers']
                 }
 
-                for stat in team_stats[team]:
-                    if stat in participant_info[team][participant['summonerName']]:
-                        team_stats[team][stat] += participant_info[team][participant['summonerName']][stat]
+                team_stats[team]['total_kills'] += participant['kills']
+                team_stats[team]['total_deaths'] += participant['deaths']
+                team_stats[team]['total_assists'] += participant['assists']
+                team_stats[team]['total_damage_dealt'] += participant['totalDamageDealtToChampions']
+                team_stats[team]['total_gold_earned'] += participant['goldEarned']
+                team_stats[team]['total_cs'] += participant['totalMinionsKilled'] + participant['neutralMinionsKilled']
+                team_stats[team]['wards_placed'] += participant['wardsPlaced']
+                team_stats[team]['wards_killed'] += participant['wardsKilled']
+                team_stats[team]['total_level'] += participant['champLevel']
+                team_stats[team]['total_xp'] += participant['champExperience']
+                team_stats[team]['damage_taken'] += participant['totalDamageTaken']
+                team_stats[team]['heal'] += participant['totalHeal']
+                team_stats[team]['damage_mitigated'] += participant['damageSelfMitigated']
+                team_stats[team]['time_ccing_others'] += participant['timeCCingOthers']
+
+            logging.info(f"Team stats: {team_stats}")
+            logging.info(f"Participant info: {participant_info}")
 
             return general_info, participant_info, team_stats, self.api_call_count
 
@@ -205,29 +215,32 @@ class UserData:
             logging.warning(f"Could not find team for {summoner_name}")
             return None
         
+        enemy_team = 'Blue Side' if user_team == 'Red Side' else 'Red Side'
         user_stats = participant_info[user_team][summoner_name]
         
         features = {}
         feature_calculations = [
-            ('kill_participation', lambda: (user_stats['kills'] + user_stats['assists']) / team_stats[user_team]['total_kills'] if team_stats[user_team]['total_kills'] > 0 else 0),
-            ('death_share', lambda: user_stats['deaths'] / team_stats[user_team]['total_deaths'] if team_stats[user_team]['total_deaths'] > 0 else 0),
-            ('damage_share', lambda: user_stats['total_damage_dealt'] / team_stats[user_team]['total_damage_dealt'] if team_stats[user_team]['total_damage_dealt'] > 0 else 0),
-            ('damage_taken_share', lambda: user_stats['damage_taken'] / team_stats[user_team]['damage_taken'] if team_stats[user_team]['damage_taken'] > 0 else 0),
-            ('gold_share', lambda: user_stats['gold_earned'] / team_stats[user_team]['total_gold_earned'] if team_stats[user_team]['total_gold_earned'] > 0 else 0),
-            ('heal_share', lambda: user_stats['heal'] / team_stats[user_team]['heal'] if team_stats[user_team]['heal'] > 0 else 0),
-            ('damage_mitigated_share', lambda: user_stats['damage_mitigated'] / team_stats[user_team]['damage_mitigated'] if team_stats[user_team]['damage_mitigated'] > 0 else 0),
-            ('cs_share', lambda: user_stats['cs'] / team_stats[user_team]['total_cs'] if team_stats[user_team]['total_cs'] > 0 else 0),
-            ('vision_share', lambda: user_stats['wards_placed'] / team_stats[user_team]['wards_placed'] if team_stats[user_team]['wards_placed'] > 0 else 0),
-            ('vision_denial_share', lambda: user_stats['wards_killed'] / team_stats[user_team]['wards_killed'] if team_stats[user_team]['wards_killed'] > 0 else 0),
-            ('xp_share', lambda: user_stats['xp'] / team_stats[user_team]['total_level'] if team_stats[user_team]['total_level'] > 0 else 0),
-            ('cc_share', lambda: user_stats['time_ccing_others'] / team_stats[user_team]['time_ccing_others'] if team_stats[user_team]['time_ccing_others'] > 0 else 0)
+            ('kill_participation', lambda: (user_stats['kills'] + user_stats['assists']) / (team_stats[enemy_team]['total_kills'] + user_stats['kills'] + user_stats['assists']) if (team_stats[enemy_team]['total_kills'] + user_stats['kills'] + user_stats['assists']) > 0 else 0),
+            ('death_share', lambda: user_stats['deaths'] / team_stats[enemy_team]['total_deaths'] if team_stats[enemy_team]['total_deaths'] > 0 else 0),
+            ('damage_share', lambda: user_stats['total_damage_dealt'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
+            ('damage_taken_share', lambda: user_stats['damage_taken'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
+            ('gold_share', lambda: user_stats['gold_earned'] / team_stats[enemy_team]['total_gold_earned'] if team_stats[enemy_team]['total_gold_earned'] > 0 else 0),
+            ('heal_share', lambda: user_stats['heal'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
+            ('damage_mitigated_share', lambda: user_stats['damage_mitigated'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
+            ('cs_share', lambda: user_stats['cs'] / team_stats[enemy_team]['total_gold_earned'] if team_stats[enemy_team]['total_gold_earned'] > 0 else 0),
+            ('vision_share', lambda: user_stats['wards_placed'] / team_stats[enemy_team]['wards_placed'] if team_stats[enemy_team]['wards_placed'] > 0 else 0),
+            ('vision_denial_share', lambda: user_stats['wards_killed'] / team_stats[enemy_team]['wards_placed'] if team_stats[enemy_team]['wards_placed'] > 0 else 0),
+            ('xp_share', lambda: user_stats['xp'] / team_stats[enemy_team]['total_xp'] if team_stats[enemy_team]['total_xp'] > 0 else 0),
+            ('cc_share', lambda: user_stats['time_ccing_others'] / team_stats[enemy_team]['total_deaths'] if team_stats[enemy_team]['total_deaths'] > 0 else 0)
         ]
         
         for feature, calculation in feature_calculations:
             try:
-                features[feature] = calculation()
-            except KeyError as e:
-                logging.warning(f"Missing key for {feature}: {e}")
+                value = calculation()
+                features[feature] = value
+                logging.info(f"Calculated {feature}: {value}")
+            except Exception as e:
+                logging.error(f"Error calculating {feature}: {str(e)}")
                 features[feature] = 0
         
         return features
@@ -427,7 +440,7 @@ def save_match_data(user_data, match_ids, session):
                 participant.gold_earned = int(details['gold_earned'])
                 participant.total_damage_dealt = int(details['total_damage_dealt'])
                 participant.cs = int(details['cs'])
-                participant.total_heal = int(details['total_heal']) if details['total_heal'] != 'N/A' else 0
+                participant.total_heal = int(details['heal'])
                 participant.damage_taken = int(details['damage_taken'])
                 participant.wards_placed = int(details['wards_placed'])
                 participant.wards_killed = int(details['wards_killed'])
@@ -436,13 +449,16 @@ def save_match_data(user_data, match_ids, session):
 
                 features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
                 if features:
+                    logging.info(f"Calculated features for {summoner}: {features}")
                     performance_features = session.query(PerformanceFeatures).filter_by(participant_id=participant.participant_id).first()
                     if not performance_features:
                         performance_features = PerformanceFeatures(participant_id=participant.participant_id)
                         session.add(performance_features)
                     
                     for key, value in features.items():
-                        setattr(performance_features, key, float(value))
+                        setattr(performance_features, key, value)
+                        logging.info(f"Setting {key} to {value} for {summoner}")
+
 
         try:
             session.commit()
@@ -464,7 +480,10 @@ def save_match_data(user_data, match_ids, session):
             start_time = time.time()
         
         logging.info("Waiting for 3 seconds before next match...")
-        time.sleep(3)
+        time.sleep(2.5)
 
     logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
+    
+    if added_matches + updated_matches > 10:
+        calculate_performance_ratings()
     return added_matches, updated_matches, total_api_calls
