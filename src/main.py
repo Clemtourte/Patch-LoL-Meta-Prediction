@@ -402,14 +402,24 @@ def save_match_data(user_data, match_ids, session):
         session.flush()
 
         for team_name, participants in participant_info.items():
+            if not participants:
+                logging.warning(f"No participants found for {team_name}")
+                continue
+            try:
+                first_participant = next(iter(participants.values()))
+                team_win_status = first_participant['win']
+            except StopIteration:
+                logging.warning(f"Could not get win status for {team_name} in match {match_id}")
+                continue
+
             team = session.query(Team).filter_by(match_id=match.match_id, team_name=team_name).first()
             if team:
-                team.win = next(iter(participants.values()))['win']
+                team.win =team_win_status
             else:
                 team = Team(
                     match_id=match.match_id,
                     team_name=team_name,
-                    win=next(iter(participants.values()))['win']
+                    win=team_win_status
                 )
                 session.add(team)
 
@@ -479,8 +489,8 @@ def save_match_data(user_data, match_ids, session):
             total_api_calls = 0
             start_time = time.time()
         
-        logging.info("Waiting for 3 seconds before next match...")
-        time.sleep(2.5)
+        logging.info("Waiting for 2.2 seconds before next match...")
+        time.sleep(2.1)
 
     logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
     
