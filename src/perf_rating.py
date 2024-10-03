@@ -71,13 +71,13 @@ def plot_score_distribution(df):
     plt.title('Distribution of Standardized Performance Scores')
     plt.xlabel('Score')
     plt.ylabel('Frequency')
-    plt.savefig('score_distribution.png')
+    plt.savefig('../graphs/score_distribution.png')
     plt.close()
 
     fig, ax = plt.subplots(figsize=(10,6))
     stats.probplot(df['standardized_performance_score'], dist="norm", plot=ax)
     ax.set_title("Q-Q plot of Standardized Performance Scores")
-    plt.savefig('score_qq_plot.png')
+    plt.savefig('../graphs/score_qq_plot.png')
     plt.close()
 
 def create_performance_score_columns():
