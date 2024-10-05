@@ -3,7 +3,10 @@ from main import UserData, UserDisplay, save_match_data, Session
 import logging
 import datetime
 import os
+from perf_rating import analyze_champion_performance
 from PIL import Image
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.INFO)
 
@@ -165,3 +168,30 @@ if st.button("Process Games"):
             logging.error(f"Error processing games: {str(e)}", exc_info=True)
         finally:
             session.close()
+
+st.header("Champion Performance Analysis")
+summoner_name = st.text_input("Enter summoner name for analysis (leave blank for all summoners):")
+if st.button("Analyze Champion Performances"):
+    session = Session()
+    try:
+        analysis_df = analyze_champion_performance(session, summoner_name if summoner_name else None)
+        
+        if analysis_df.empty:
+            st.warning("Not enough data to perform analysis. Make sure you have processed games for multiple champions.")
+        else:
+            st.write(analysis_df)
+            
+            # Optionally, display a heatmap of the results
+            pivot_df = analysis_df.pivot(index='champion_x', columns='champion_y', values='average_performance')
+            if not pivot_df.empty:
+                plt.figure(figsize=(12, 10))
+                sns.heatmap(pivot_df, annot=True, cmap='coolwarm', center=0)
+                plt.title("Champion Performance Comparison")
+                st.pyplot(plt)
+            else:
+                st.warning("Not enough data to create a heatmap.")
+    except Exception as e:
+        st.error(f"An error occurred during analysis: {str(e)}")
+        logging.error(f"Error in champion performance analysis: {str(e)}", exc_info=True)
+    finally:
+        session.close()
