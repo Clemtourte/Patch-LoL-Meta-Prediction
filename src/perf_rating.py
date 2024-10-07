@@ -74,116 +74,103 @@ def calculate_performance_ratings():
     finally:
         session.close()
 
-def calculate_champion_stats(session, summoner_name=None):
-    try:
-        metrics = [
-            'kill_participation', 'death_share', 'damage_share', 'damage_taken_share',
-            'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
-            'vision_share', 'vision_denial_share', 'xp_share', 'cc_share'
-        ]
-        
-        query = session.query(Participant.champion_name)
-        
-        for metric in metrics:
-            query = query.add_columns(
-                func.avg(getattr(PerformanceFeatures, metric)).label(f'avg_{metric}'),
-                (func.avg(func.pow(getattr(PerformanceFeatures, metric), 2)) - 
-                 func.pow(func.avg(getattr(PerformanceFeatures, metric)), 2)).label(f'var_{metric}')
-            )
-        
-        query = query.join(PerformanceFeatures)
-        
-        if summoner_name:
-            query = query.filter(Participant.summoner_name == summoner_name)
-        
-        query = query.group_by(Participant.champion_name)
-
-        df = pd.read_sql(query.statement, session.bind)
-        
-        # Calculate standard deviation from variance
-        for metric in metrics:
-            df[f'std_{metric}'] = np.sqrt(df[f'var_{metric}'])
-            df = df.drop(f'var_{metric}', axis=1)
-        
-        if df.empty:
-            logging.warning(f"No champion stats data retrieved for {'summoner ' + summoner_name if summoner_name else 'all summoners'}.")
-        else:
-            logging.info(f"Retrieved stats for {len(df)} champions for {'summoner ' + summoner_name if summoner_name else 'all summoners'}.")
-        return df
-    except Exception as e:
-        logging.error(f"Error in calculate_champion_stats: {str(e)}")
-        return pd.DataFrame()
-
-def compare_champions(session, champion_x, champion_y, summoner_name=None):
-    stats_df = calculate_champion_stats(session, summoner_name)
-    
-    if stats_df.empty:
-        logging.warning("No champion stats available for comparison.")
-        return None
-
-    x_stats = stats_df[stats_df['champion_name'] == champion_x]
-    if x_stats.empty:
-        logging.warning(f"No stats available for champion {champion_x}")
-        return None
-
-    x_stats = x_stats.iloc[0]
-    
+def calculate_champion_stats(session, position=None):
     metrics = [
         'kill_participation', 'death_share', 'damage_share', 'damage_taken_share',
         'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
         'vision_share', 'vision_denial_share', 'xp_share', 'cc_share'
     ]
     
-    query = session.query(PerformanceFeatures).join(Participant)
-    if summoner_name:
-        query = query.filter(Participant.summoner_name == summoner_name)
-    y_data = query.filter(Participant.champion_name == champion_y).all()
+    query = session.query(
+        Participant.champion_name,
+        Participant.position,
+        func.count(Participant.participant_id).label('games'),
+        func.avg(Team.win).label('win_rate')
+    )
     
-    if not y_data:
-        logging.warning(f"No performance data available for champion {champion_y}")
-        return None
-
-    y_df = pd.DataFrame([{metric: getattr(pf, metric) for metric in metrics} for pf in y_data])
-    
-    standardized_performance = pd.DataFrame()
     for metric in metrics:
-        avg_col = f'avg_{metric}'
-        std_col = f'std_{metric}'
-        if x_stats[std_col] == 0:
-            standardized_performance[metric] = 0
-        else:
-            standardized_performance[metric] = (y_df[metric] - x_stats[avg_col]) / x_stats[std_col]
+        query = query.add_columns(
+            func.avg(getattr(PerformanceFeatures, metric)).label(f'avg_{metric}'),
+            func.avg(func.pow(getattr(PerformanceFeatures, metric), 2)).label(f'avg_sq_{metric}'),
+            func.group_concat(getattr(PerformanceFeatures, metric)).label(f'values_{metric}'),
+            func.group_concat(Team.win).label(f'wins_{metric}')
+        )
     
-    return standardized_performance.mean()
+    query = query.join(Team).join(PerformanceFeatures)
+    
+    if position:
+        query = query.filter(Participant.position == position)
+    
+    query = query.group_by(Participant.champion_name, Participant.position)
+    
+    df = pd.read_sql(query.statement, session.bind)
+    
+    # Calculate standard deviation and correlation
+    for metric in metrics:
+        df[f'std_{metric}'] = np.sqrt(df[f'avg_sq_{metric}'] - df[f'avg_{metric}']**2)
+        
+        def calc_corr(row):
+            values = np.array([float(x) for x in row[f'values_{metric}'].split(',')])
+            wins = np.array([float(x) for x in row[f'wins_{metric}'].split(',')])
+            return np.corrcoef(values, wins)[0, 1]
+        
+        df[f'corr_{metric}'] = df.apply(calc_corr, axis=1)
+        
+        # Drop intermediate columns
+        df = df.drop(columns=[f'avg_sq_{metric}', f'values_{metric}', f'wins_{metric}'])
+    
+    return df
 
-def analyze_champion_performance(session, summoner_name=None):
-    if summoner_name:
-        champions = session.query(Participant.champion_name).filter(Participant.summoner_name == summoner_name).distinct().all()
-    else:
-        champions = session.query(Participant.champion_name).distinct().all()
+def compare_champions_advanced(champion_stats):
+    champions = champion_stats['champion_name'].unique()
+    metrics = ['kill_participation', 'death_share', 'damage_share', 'damage_taken_share',
+               'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
+               'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']
     
-    champions = [c[0] for c in champions]
-    
-    logging.info(f"Analyzing performance for {len(champions)} champions for {'summoner ' + summoner_name if summoner_name else 'all summoners'}")
-    
-    if len(champions) < 2:
-        logging.warning(f"Not enough champions ({len(champions)}) to perform analysis")
-        return pd.DataFrame()
-
     results = []
-    for champion_x in champions:
-        for champion_y in champions:
-            if champion_x != champion_y:
-                performance = compare_champions(session, champion_x, champion_y, summoner_name)
-                if performance is not None:
-                    results.append({
-                        'champion_x': champion_x,
-                        'champion_y': champion_y,
-                        'average_performance': performance.mean()
-                    })
-    
-    logging.info(f"Generated {len(results)} comparison results")
+    for champ_x in champions:
+        x_stats = champion_stats[champion_stats['champion_name'] == champ_x].iloc[0]
+        for champ_y in champions:
+            if champ_x != champ_y:
+                y_stats = champion_stats[champion_stats['champion_name'] == champ_y].iloc[0]
+                performance = []
+                for metric in metrics:
+                    if x_stats[f'std_{metric}'] != 0:
+                        perf = (y_stats[f'avg_{metric}'] - x_stats[f'avg_{metric}']) / x_stats[f'std_{metric}']
+                        perf *= x_stats[f'corr_{metric}']
+                        performance.append(perf)
+                avg_performance = np.mean(performance) if performance else 0
+                results.append({
+                    'champion_x': champ_x,
+                    'champion_y': champ_y,
+                    'performance': avg_performance
+                })
     return pd.DataFrame(results)
+
+def analyze_champion_performance(session, min_games=10):
+    positions = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"]
+    all_results = []
+
+    for position in positions:
+        champion_stats = calculate_champion_stats(session, position)
+        
+        # Filter champions with at least min_games
+        champion_stats = champion_stats[champion_stats['games'] >= min_games]
+        
+        if not champion_stats.empty:
+            comparisons = compare_champions_advanced(champion_stats)
+            
+            ratings = comparisons.groupby('champion_x')['performance'].mean().reset_index()
+            ratings = ratings.rename(columns={'performance': 'rating'})
+            
+            final_stats = champion_stats.merge(ratings, left_on='champion_name', right_on='champion_x')
+            final_stats = final_stats[['champion_name', 'games', 'win_rate', 'rating', 'position']]
+            final_stats['win_rate'] = final_stats['win_rate'] * 100  # Convert to percentage
+            final_stats = final_stats.sort_values('rating', ascending=False)
+            
+            all_results.append(final_stats)
+    
+    return pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
 
 def plot_score_distribution(df):
     if df.empty:

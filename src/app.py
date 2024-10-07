@@ -170,26 +170,40 @@ if st.button("Process Games"):
             session.close()
 
 st.header("Champion Performance Analysis")
-summoner_name = st.text_input("Enter summoner name for analysis (leave blank for all summoners):")
+
 if st.button("Analyze Champion Performances"):
     session = Session()
     try:
-        analysis_df = analyze_champion_performance(session, summoner_name if summoner_name else None)
+        analysis_df = analyze_champion_performance(session)
         
         if analysis_df.empty:
             st.warning("Not enough data to perform analysis. Make sure you have processed games for multiple champions.")
         else:
-            st.write(analysis_df)
+            positions = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"]
             
-            # Optionally, display a heatmap of the results
-            pivot_df = analysis_df.pivot(index='champion_x', columns='champion_y', values='average_performance')
-            if not pivot_df.empty:
-                plt.figure(figsize=(12, 10))
-                sns.heatmap(pivot_df, annot=True, cmap='coolwarm', center=0)
-                plt.title("Champion Performance Comparison")
-                st.pyplot(plt)
-            else:
-                st.warning("Not enough data to create a heatmap.")
+            for position in positions:
+                st.subheader(f"Champion Performance - {position}")
+                position_df = analysis_df[analysis_df['position'] == position].sort_values('rating', ascending=False)
+                
+                # Create a grid layout
+                cols = st.columns(5)  # 5 columns for layout
+                for i, (_, row) in enumerate(position_df.iterrows()):
+                    with cols[i % 5]:
+                        champion_name = row['champion_name']
+                        games = row['games']
+                        win_rate = row['win_rate']
+                        rating = row['rating']
+                        
+                        icon = load_champion_image(champion_name)
+                        st.image(icon, width=50)
+                        
+                        st.write(f"**{champion_name}**")
+                        st.write(f"Games: {games}")
+                        st.write(f"WR: {win_rate:.0f}%")
+                        st.write(f"Rating: {rating:.2f}")
+                        st.write("---")  # Separator
+                
+                st.write("")  # Add some space between positions
     except Exception as e:
         st.error(f"An error occurred during analysis: {str(e)}")
         logging.error(f"Error in champion performance analysis: {str(e)}", exc_info=True)
