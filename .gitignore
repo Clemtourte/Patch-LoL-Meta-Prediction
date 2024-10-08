@@ -169,3 +169,4 @@ cython_debug/
 match_data.json
 datasets/champion/
 datasets/item/
+API_setup.py
