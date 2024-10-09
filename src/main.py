@@ -21,9 +21,22 @@ class UserData:
         self.region = region
         self.api_call_count = 0
         self.puuid = self.get_puuid()
+        self.logger = logging.getLogger(__name__)
+        logging.basicConfig(level=logging.INFO)
 
     def reset_api_call_count(self):
         self.api_call_count = 0
+
+    def get_safe_summoner_name(self, participant):
+        """Safely extract summoner name from participant data."""
+        name = participant.get('summonerName', '')
+        if not name:
+            name = participant.get('riotIdGameName', '')  # For newer accounts using Riot ID
+        if not name:
+            puuid = participant.get('puuid', '')
+            summoner_id = participant.get('summonerId', '')
+            name = f"Unknown-{puuid[:8] if puuid else summoner_id}"
+        return name
 
     def get_puuid(self):
         url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{self.username}/{self.tag}?api_key={self.API_key}"
@@ -51,6 +64,7 @@ class UserData:
         self.reset_api_call_count()
         match_data = self.get_match_data(match_id)
         if not match_data:
+            self.logger.error(f"invalid match data for match id:{match_id}")
             return None, None, None, self.api_call_count
         
         try:
@@ -98,6 +112,9 @@ class UserData:
 
             for participant in match_data['info']['participants']:
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
+
+                if participant['summonerName'] == "":
+                    participant['summonerName'] = participant['riotIdGameName']
                 
                 participant_info[team][participant['summonerName']] = {
                     'summoner_id': participant['summonerId'],
