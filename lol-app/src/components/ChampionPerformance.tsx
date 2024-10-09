@@ -3,11 +3,13 @@ import axios from "axios";
 
 interface ChampionData {
   champion_name: string;
-  win_rate: number;
-  games: number;
-  rating: number;
   position: string;
+  games: number;
+  win_rate: number;
+  rating: number;
 }
+
+const positions = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
 
 const ChampionPerformance: React.FC = () => {
   const [performanceData, setPerformanceData] = useState<ChampionData[]>([]);
@@ -31,21 +33,43 @@ const ChampionPerformance: React.FC = () => {
     fetchPerformanceData();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading champion performance data...</div>;
   if (error) return <div>{error}</div>;
 
+  // Group champions by position
+  const groupedData = performanceData.reduce((acc, champion) => {
+    if (!acc[champion.position]) {
+      acc[champion.position] = [];
+    }
+    acc[champion.position].push(champion);
+    return acc;
+  }, {} as Record<string, ChampionData[]>);
+
+  // Sort champions within each role by rating
+  Object.keys(groupedData).forEach((position) => {
+    groupedData[position].sort((a, b) => b.rating - a.rating);
+  });
+
   return (
-    <div>
-      <h2>Champion Performance</h2>
-      <ul>
-        {performanceData.map((champ, index) => (
-          <li key={index}>
-            {champ.champion_name}: Win Rate - {champ.win_rate.toFixed(2)}%,
-            Games Played - {champ.games}, Position - {champ.position}, Rating -{" "}
-            {champ.rating.toFixed(2)}
-          </li>
+    <div className="champion-performance">
+      <h2>Champion Performance by Role</h2>
+      <div className="role-columns">
+        {positions.map((position) => (
+          <div key={position} className="role-column">
+            <h3>{position}</h3>
+            <div className="champions-list">
+              {groupedData[position]?.map((champ) => (
+                <div key={champ.champion_name} className="champion-card">
+                  <h4>{champ.champion_name}</h4>
+                  <p>Games: {champ.games}</p>
+                  <p>Win Rate: {champ.win_rate.toFixed(2)}%</p>
+                  <p>Rating: {champ.rating.toFixed(2)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
