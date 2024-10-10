@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from models import Match, Team, Participant, PerformanceFeatures, Base
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def calculate_performance_ratings():
     engine = create_engine('sqlite:///matches.db')
@@ -41,11 +41,30 @@ def calculate_performance_ratings():
                     'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
                     'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']
 
+        # Calculate and log correlations
         correlations = df[features].corrwith(df['win'])
+        logging.info("Feature correlations with win:")
+        for feature, corr in correlations.items():
+            logging.info(f"{feature}: {corr}")
+
+        # Standardize features
         df_standardized = (df[features] - df[features].mean()) / df[features].std()
+        
+        # Log standardized feature stats
+        logging.info("Standardized features stats:")
+        for feature in features:
+            logging.info(f"{feature}: Mean = {df_standardized[feature].mean():.4f}, Std = {df_standardized[feature].std():.4f}")
+
+        # Calculate performance score
         df['performance_score'] = (df_standardized * correlations).sum(axis=1) / correlations.sum()
+
+        # Log performance score stats
+        logging.info(f"Performance score stats: Mean = {df['performance_score'].mean():.4f}, Std = {df['performance_score'].std():.4f}")
+        logging.info(f"Performance score range: Min = {df['performance_score'].min():.4f}, Max = {df['performance_score'].max():.4f}")
+
         df['standardized_performance_score'] = stats.zscore(df['performance_score'])
 
+        # Update database with new scores
         for index, row in df.iterrows():
             participant = session.get(Participant, row['participant_id'])
             if participant:
@@ -214,7 +233,8 @@ if __name__ == "__main__":
     df, summary_stats = calculate_performance_ratings()
     if not df.empty:
         print("Summary statistics of standardized performance scores:")
-        print(summary_stats)
+        for key, value in summary_stats.items():
+            print(f"{key}: {value}")
         plot_score_distribution(df)
         print("Plots saved as 'score_distribution.png' and 'score_qq_plot.png'")
     else:
