@@ -376,10 +376,17 @@ def save_match_data(user_data, match_ids, session):
     total_api_calls = 0
     start_time = time.time()
 
+    # Prepare lists for bulk insert/update
+    matches_to_add = []
+    teams_to_add = []
+    participants_to_add = []
+    performance_features_to_add = []
+
     for i, match_id in enumerate(match_ids, 1):
         logging.info(f"Processing match {i} of {len(match_ids)}: {match_id}")
         
         general_info, participant_info, team_stats, api_calls = user_data.get_match_info(match_id)
+        total_api_calls += api_calls
 
         if general_info is None or participant_info is None or team_stats is None:
             logging.warning(f"Could not retrieve info for match {match_id}")
@@ -389,11 +396,11 @@ def save_match_data(user_data, match_ids, session):
         existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
         if existing_match:
             logging.info(f"Match {general_info['game_id']} already exists. Updating all data.")
-            match = existing_match
             for key, value in general_info.items():
-                if hasattr(match, key):
-                    setattr(match, key, value)
+                if hasattr(existing_match, key):
+                    setattr(existing_match, key, value)
             updated_matches += 1
+            match = existing_match
         else:
             logging.info(f"Creating new match {general_info['game_id']}")
             match = Match(
@@ -405,11 +412,8 @@ def save_match_data(user_data, match_ids, session):
                 queue_id=general_info['queue_id'],
                 platform="EUW1"
             )
-            session.add(match)
+            matches_to_add.append(match)
             added_matches += 1
-
-        session.flush()
-
 
         for team_name, participants in participant_info.items():
             if not participants:
@@ -430,36 +434,20 @@ def save_match_data(user_data, match_ids, session):
                 logging.warning(f"Could not get win status for {team_name} in match {match_id}")
                 continue
 
-            team = session.query(Team).filter_by(match_id=match.match_id, team_name=team_name).first()
-            if team:
-                team.win = team_win_status
-            else:
-                team = Team(
-                    match_id=match.match_id,
-                    team_name=team_name,
-                    win=team_win_status
-                )
-                session.add(team)
-
-            session.flush()
+            team = Team(
+                match_id=match.match_id,
+                team_name=team_name,
+                win=team_win_status
+            )
+            teams_to_add.append(team)
 
             for summoner, details in participants.items():
-                participant = session.query(Participant).filter_by(team_id=team.team_id, summoner_name=summoner).first()
+                participant = Participant(team_id=team.team_id)
                 
-                if participant:
-                    logging.info(f"Updating existing participant: {summoner}")
-                else:
-                    logging.info(f"Creating new participant: {summoner}")
-                    participant = Participant(team_id=team.team_id)
-                    session.add(participant)
-
-                # Log the details for debugging
                 logging.info(f"Participant details for {summoner}: {details}")
 
-                # Update participant details
                 for attr, value in details.items():
                     if attr == 'team':
-                        # Skip the 'team' attribute as it's a relationship
                         continue
                     if hasattr(participant, attr):
                         if isinstance(value, (int, float, bool, str)):
@@ -469,25 +457,17 @@ def save_match_data(user_data, match_ids, session):
                     else:
                         logging.warning(f"Participant model does not have attribute: {attr}")
 
-                # Check if required fields are set
                 required_fields = ['champion_name', 'champion_id', 'champ_level', 'role', 'lane', 'position']
                 for field in required_fields:
                     if getattr(participant, field, None) is None:
                         logging.error(f"Required field {field} is None for participant {summoner}")
 
-                try:
-                    session.flush()
-                except Exception as e:
-                    logging.error(f"Error flushing participant {summoner}: {str(e)}")
-                    session.rollback()
-                    continue
-
+                participants_to_add.append(participant)
 
                 features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
                 if features:
                     logging.info(f"Calculated features for {summoner}: {features}")
                     performance_features = PerformanceFeatures(participant_id=participant.participant_id)
-                    session.add(performance_features)
                     
                     for key, value in features.items():
                         if hasattr(performance_features, key):
@@ -495,17 +475,8 @@ def save_match_data(user_data, match_ids, session):
                             logging.info(f"Setting {key} to {value} for {summoner}")
                         else:
                             logging.warning(f"PerformanceFeatures does not have attribute: {key}")
-
-        try:
-            session.commit()
-            if existing_match:
-                updated_matches += 1
-            else:
-                added_matches += 1
-            logging.info(f"Processed match {general_info['game_id']}. Total matches: {i}")
-        except Exception as e:
-            logging.error(f"Error committing session: {str(e)}")
-            session.rollback()
+                    
+                    performance_features_to_add.append(performance_features)
 
         elapsed_time = time.time() - start_time
         if elapsed_time < 120 and total_api_calls >= 70:  # More conservative limit
@@ -518,9 +489,20 @@ def save_match_data(user_data, match_ids, session):
         logging.info("Waiting for 2.2 seconds before next match...")
         time.sleep(2.1)
 
+    # Bulk insert/update
+    try:
+        session.add_all(matches_to_add)
+        session.add_all(teams_to_add)
+        session.add_all(participants_to_add)
+        session.add_all(performance_features_to_add)
+        session.commit()
+        logging.info(f"Bulk insert/update successful. Added matches: {added_matches}, Updated matches: {updated_matches}")
+    except Exception as e:
+        logging.error(f"Error during bulk insert/update: {str(e)}")
+        session.rollback()
+
     logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
     
     if added_matches + updated_matches > 0:
         calculate_performance_ratings()
     return added_matches, updated_matches, total_api_calls
-

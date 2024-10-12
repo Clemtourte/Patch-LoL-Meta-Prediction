@@ -7,6 +7,7 @@ from perf_rating import analyze_champion_performance
 from PIL import Image
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -118,15 +119,19 @@ if st.button("Process Games"):
                 progress_bar = st.progress(0)
                 total_api_calls = 0
                 
-                for i, match_id in enumerate(match_ids):
-                    match_info = user_data.get_match_info(match_id)
+                start_time = time.time()
 
-                    if match_info[0] is not None:
-                        general_info, participant_info, team_stats, api_calls = match_info
-                        total_api_calls += api_calls
-                        
-                        if population_mode in ["Display Only", "Both"]:
-                            display_info = user_display.display_match_info(match_id)
+                # Batch process all matches
+                if population_mode in ["Add to Database", "Both"]:
+                    with st.spinner('Processing matches in batch...'):
+                        added_matches, updated_matches, total_api_calls = save_match_data(user_data, match_ids, session)
+                    st.success(f"Batch processing complete. Added: {added_matches}, Updated: {updated_matches}")
+                
+                # Display match info if needed
+                if population_mode in ["Display Only", "Both"]:
+                    for i, match_id in enumerate(match_ids):
+                        display_info = user_display.display_match_info(match_id)
+                        if display_info:
                             with st.expander(f"{selected_mode} Match {i+1} (API calls: {display_info['API Calls']})"):
                                 st.write(f"**Duration**: {display_info['Duration']}")
                                 st.write(f"**Date**: {display_info['Date']}")
@@ -154,9 +159,14 @@ if st.button("Process Games"):
                         progress_bar.progress((i + 1) / len(match_ids))
                     else:
                         st.error(f"Match {i+1} information could not be retrieved.")
+                    progress_bar.progress((i + 1) / len(match_ids))
+
+                end_time = time.time()
+                processing_time = end_time - start_time
 
                 st.success(f"Successfully processed {len(match_ids)} {selected_mode} matches.")
                 st.info(f"Total API calls made: {total_api_calls}")
+                st.info(f"Total processing time: {processing_time:.2f} seconds")
             else:
                 if search_option == "Date Range":
                     st.warning(f"No {selected_mode} matches found in the specified date range.")
