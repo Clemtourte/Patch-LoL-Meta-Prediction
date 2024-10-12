@@ -7,6 +7,8 @@ from models import Match, Team, Participant, PerformanceFeatures, init_db
 from perf_rating import calculate_performance_ratings
 from sqlalchemy.orm.exc import NoResultFound
 import time
+import json
+import traceback
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -28,10 +30,9 @@ class UserData:
         self.api_call_count = 0
 
     def get_safe_summoner_name(self, participant):
-        """Safely extract summoner name from participant data."""
         name = participant.get('summonerName', '')
         if not name:
-            name = participant.get('riotIdGameName', '')  # For newer accounts using Riot ID
+            name = participant.get('riotIdGameName', '')
         if not name:
             puuid = participant.get('puuid', '')
             summoner_id = participant.get('summonerId', '')
@@ -119,11 +120,9 @@ class UserData:
                 participant_info[team][participant['summonerName']] = {
                     'summoner_id': participant['summonerId'],
                     'summoner_name': participant['summonerName'],
-                    'team': 'Blue' if participant['teamId'] == 100 else 'Red',
-                    'win': participant['win'],
+                    'champion_name': participant['championName'],
+                    'champion_id': participant['championId'],
                     'champ_level': participant['champLevel'],
-                    'champ_name': participant['championName'],
-                    'champ_id': participant['championId'],
                     'role': participant.get('role', 'N/A'),
                     'lane': participant.get('lane', 'N/A'),
                     'position': participant.get('teamPosition', 'N/A'),
@@ -134,14 +133,16 @@ class UserData:
                     'gold_earned': participant['goldEarned'],
                     'total_damage_dealt': participant['totalDamageDealtToChampions'],
                     'cs': participant['totalMinionsKilled'] + participant['neutralMinionsKilled'],
+                    'total_heal': participant['totalHeal'],
                     'damage_taken': participant['totalDamageTaken'],
-                    'heal': participant['totalHeal'],
                     'damage_mitigated': participant['damageSelfMitigated'],
                     'wards_placed': participant['wardsPlaced'],
                     'wards_killed': participant['wardsKilled'],
+                    'time_ccing_others': participant['timeCCingOthers'],
                     'xp': participant['champExperience'],
-                    'time_ccing_others': participant['timeCCingOthers']
+                    'win': participant['win']
                 }
+
 
                 team_stats[team]['total_kills'] += participant['kills']
                 team_stats[team]['total_deaths'] += participant['deaths']
@@ -160,6 +161,18 @@ class UserData:
 
             logging.info(f"Team stats: {team_stats}")
             logging.info(f"Participant info: {participant_info}")
+
+            for team in ['Blue Side', 'Red Side']:
+                if not all(key in team_stats[team] for key in ['total_kills', 'total_deaths', 'total_damage_dealt', 'total_gold_earned', 'total_cs', 'wards_placed', 'wards_killed', 'total_xp']):
+                    self.logger.error(f"Missing required team stats for {team}")
+                    return None, None, None, self.api_call_count
+
+            for team, players in participant_info.items():
+                for player, stats in players.items():
+                    required_keys = ['kills', 'deaths', 'assists', 'total_damage_dealt', 'gold_earned', 'cs', 'wards_placed', 'wards_killed', 'xp', 'time_ccing_others']
+                    if not all(key in stats for key in required_keys):
+                        self.logger.error(f"Missing required player stats for {player}")
+                        return None, None, None, self.api_call_count
 
             return general_info, participant_info, team_stats, self.api_call_count
 
@@ -237,18 +250,18 @@ class UserData:
         
         features = {}
         feature_calculations = [
-            ('kill_participation', lambda: (user_stats['kills'] + user_stats['assists']) / (team_stats[enemy_team]['total_kills'] + user_stats['kills'] + user_stats['assists']) if (team_stats[enemy_team]['total_kills'] + user_stats['kills'] + user_stats['assists']) > 0 else 0),
-            ('death_share', lambda: user_stats['deaths'] / team_stats[enemy_team]['total_deaths'] if team_stats[enemy_team]['total_deaths'] > 0 else 0),
-            ('damage_share', lambda: user_stats['total_damage_dealt'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
-            ('damage_taken_share', lambda: user_stats['damage_taken'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
-            ('gold_share', lambda: user_stats['gold_earned'] / team_stats[enemy_team]['total_gold_earned'] if team_stats[enemy_team]['total_gold_earned'] > 0 else 0),
-            ('heal_share', lambda: user_stats['heal'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
-            ('damage_mitigated_share', lambda: user_stats['damage_mitigated'] / team_stats[enemy_team]['total_damage_dealt'] if team_stats[enemy_team]['total_damage_dealt'] > 0 else 0),
-            ('cs_share', lambda: user_stats['cs'] / team_stats[enemy_team]['total_gold_earned'] if team_stats[enemy_team]['total_gold_earned'] > 0 else 0),
-            ('vision_share', lambda: user_stats['wards_placed'] / team_stats[enemy_team]['wards_placed'] if team_stats[enemy_team]['wards_placed'] > 0 else 0),
-            ('vision_denial_share', lambda: user_stats['wards_killed'] / team_stats[enemy_team]['wards_placed'] if team_stats[enemy_team]['wards_placed'] > 0 else 0),
-            ('xp_share', lambda: user_stats['xp'] / team_stats[enemy_team]['total_xp'] if team_stats[enemy_team]['total_xp'] > 0 else 0),
-            ('cc_share', lambda: user_stats['time_ccing_others'] / team_stats[enemy_team]['total_deaths'] if team_stats[enemy_team]['total_deaths'] > 0 else 0)
+            ('kill_participation', lambda: (user_stats['kills'] + user_stats['assists']) / max(1, team_stats[user_team]['total_kills'])),
+            ('death_share', lambda: user_stats['deaths'] / max(1, team_stats[user_team]['total_deaths'])),
+            ('damage_share', lambda: user_stats['total_damage_dealt'] / max(1, team_stats[user_team]['total_damage_dealt'])),
+            ('damage_taken_share', lambda: user_stats['damage_taken'] / max(1, team_stats[user_team]['damage_taken'])),
+            ('gold_share', lambda: user_stats['gold_earned'] / max(1, team_stats[user_team]['total_gold_earned'])),
+            ('heal_share', lambda: user_stats['heal'] / max(1, team_stats[user_team]['heal'])),
+            ('damage_mitigated_share', lambda: user_stats['damage_mitigated'] / max(1, team_stats[user_team]['damage_mitigated'])),
+            ('cs_share', lambda: user_stats['cs'] / max(1, team_stats[user_team]['total_cs'])),
+            ('vision_share', lambda: user_stats['wards_placed'] / max(1, team_stats[user_team]['wards_placed'])),
+            ('vision_denial_share', lambda: user_stats['wards_killed'] / max(1, team_stats[user_team]['wards_killed'])),
+            ('xp_share', lambda: user_stats['xp'] / max(1, team_stats[user_team]['total_xp'])),
+            ('cc_share', lambda: user_stats['time_ccing_others'] / max(1, team_stats[user_team]['time_ccing_others']))
         ]
         
         for feature, calculation in feature_calculations:
@@ -261,7 +274,7 @@ class UserData:
                 features[feature] = 0
         
         return features
-    
+
     def get_matches_by_date(self, queue_id, start_time, end_time):
         matches = []
         start_index = 0
@@ -279,7 +292,6 @@ class UserData:
     def get_recent_matches(self, queue_id, count):
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{self.puuid}/ids?queue={queue_id}&start=0&count={count}&api_key={self.API_key}"
         return self._get_response(url, default=[])
-
 
     def _get_response(self, url, default=None):
         self.api_call_count += 1
@@ -358,8 +370,6 @@ class UserDisplay:
             }
         return formatted_stats
 
-import time
-
 def save_match_data(user_data, match_ids, session):
     added_matches = 0
     updated_matches = 0
@@ -369,25 +379,7 @@ def save_match_data(user_data, match_ids, session):
     for i, match_id in enumerate(match_ids, 1):
         logging.info(f"Processing match {i} of {len(match_ids)}: {match_id}")
         
-        # Check if we need to pause for rate limiting
-        current_time = time.time()
-        if current_time - start_time >= 120 or total_api_calls >= 95:
-            pause_time = max(120 - (current_time - start_time), 0)
-            logging.info(f"Pausing for {pause_time:.2f} seconds to avoid rate limit...")
-            time.sleep(pause_time)
-            start_time = time.time()
-            total_api_calls = 0
-
-        # Process the match
-        before_calls = user_data.api_call_count
         general_info, participant_info, team_stats, api_calls = user_data.get_match_info(match_id)
-        after_calls = user_data.api_call_count
-        
-        actual_calls = after_calls - before_calls
-        total_api_calls += actual_calls
-
-        logging.info(f"API calls for this match: reported {api_calls}, actual {actual_calls}")
-        logging.info(f"Total API calls in this period: {total_api_calls}")
 
         if general_info is None or participant_info is None or team_stats is None:
             logging.warning(f"Could not retrieve info for match {match_id}")
@@ -418,20 +410,29 @@ def save_match_data(user_data, match_ids, session):
 
         session.flush()
 
+
         for team_name, participants in participant_info.items():
             if not participants:
                 logging.warning(f"No participants found for {team_name}")
                 continue
+            
+            logging.info(f"Participants for {team_name}: {participants}")
+            
             try:
                 first_participant = next(iter(participants.values()))
-                team_win_status = first_participant['win']
+                logging.info(f"First participant data: {first_participant}")
+                
+                team_win_status = first_participant.get('win')
+                if team_win_status is None:
+                    logging.warning(f"Win status not found for {team_name}. Defaulting to False.")
+                    team_win_status = False
             except StopIteration:
                 logging.warning(f"Could not get win status for {team_name} in match {match_id}")
                 continue
 
             team = session.query(Team).filter_by(match_id=match.match_id, team_name=team_name).first()
             if team:
-                team.win =team_win_status
+                team.win = team_win_status
             else:
                 team = Team(
                     match_id=match.match_id,
@@ -452,40 +453,48 @@ def save_match_data(user_data, match_ids, session):
                     participant = Participant(team_id=team.team_id)
                     session.add(participant)
 
-                participant.summoner_id = str(details['summoner_id'])
-                participant.summoner_name = str(summoner)
-                participant.champion_name = str(details['champ_name'])
-                participant.champion_id = int(details['champ_id'])
-                participant.champ_level = int(details['champ_level'])
-                participant.role = str(details['role'])
-                participant.lane = str(details['lane'])
-                participant.position = str(details['position'])
-                participant.kills = int(details['kills'])
-                participant.deaths = int(details['deaths'])
-                participant.assists = int(details['assists'])
-                participant.kda = str(details['kda'])
-                participant.gold_earned = int(details['gold_earned'])
-                participant.total_damage_dealt = int(details['total_damage_dealt'])
-                participant.cs = int(details['cs'])
-                participant.total_heal = int(details['heal'])
-                participant.damage_taken = int(details['damage_taken'])
-                participant.wards_placed = int(details['wards_placed'])
-                participant.wards_killed = int(details['wards_killed'])
+                # Log the details for debugging
+                logging.info(f"Participant details for {summoner}: {details}")
 
-                session.flush()
+                # Update participant details
+                for attr, value in details.items():
+                    if attr == 'team':
+                        # Skip the 'team' attribute as it's a relationship
+                        continue
+                    if hasattr(participant, attr):
+                        if isinstance(value, (int, float, bool, str)):
+                            setattr(participant, attr, value)
+                        else:
+                            logging.warning(f"Skipping attribute {attr} with unexpected value type: {type(value)}")
+                    else:
+                        logging.warning(f"Participant model does not have attribute: {attr}")
+
+                # Check if required fields are set
+                required_fields = ['champion_name', 'champion_id', 'champ_level', 'role', 'lane', 'position']
+                for field in required_fields:
+                    if getattr(participant, field, None) is None:
+                        logging.error(f"Required field {field} is None for participant {summoner}")
+
+                try:
+                    session.flush()
+                except Exception as e:
+                    logging.error(f"Error flushing participant {summoner}: {str(e)}")
+                    session.rollback()
+                    continue
+
 
                 features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
                 if features:
                     logging.info(f"Calculated features for {summoner}: {features}")
-                    performance_features = session.query(PerformanceFeatures).filter_by(participant_id=participant.participant_id).first()
-                    if not performance_features:
-                        performance_features = PerformanceFeatures(participant_id=participant.participant_id)
-                        session.add(performance_features)
+                    performance_features = PerformanceFeatures(participant_id=participant.participant_id)
+                    session.add(performance_features)
                     
                     for key, value in features.items():
-                        setattr(performance_features, key, value)
-                        logging.info(f"Setting {key} to {value} for {summoner}")
-
+                        if hasattr(performance_features, key):
+                            setattr(performance_features, key, value)
+                            logging.info(f"Setting {key} to {value} for {summoner}")
+                        else:
+                            logging.warning(f"PerformanceFeatures does not have attribute: {key}")
 
         try:
             session.commit()
@@ -511,6 +520,7 @@ def save_match_data(user_data, match_ids, session):
 
     logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
     
-    if added_matches + updated_matches > 10:
+    if added_matches + updated_matches > 0:
         calculate_performance_ratings()
     return added_matches, updated_matches, total_api_calls
+

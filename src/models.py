@@ -41,15 +41,17 @@ class Participant(Base):
     kills = Column(Integer, nullable=False)
     deaths = Column(Integer, nullable=False)
     assists = Column(Integer, nullable=False)
-    kda = Column(String, nullable=False)
+    kda = Column(Float, nullable=False)
     gold_earned = Column(Integer, nullable=False)
     total_damage_dealt = Column(Integer, nullable=False)
     cs = Column(Integer, nullable=False)
     total_heal = Column(Integer, nullable=True)
     damage_taken = Column(Integer, nullable=True)
+    damage_mitigated = Column(Integer, nullable=True)
     wards_placed = Column(Integer, nullable=True)
     wards_killed = Column(Integer, nullable=True)
-    time_ccing_others = Column(Integer, nullable=True) 
+    time_ccing_others = Column(Integer, nullable=True)
+    xp = Column(Integer, nullable=True)
     performance_score = Column(Float, nullable=True)
     standardized_performance_score = Column(Float, nullable=True)
 
@@ -58,24 +60,22 @@ class Participant(Base):
 
 class PerformanceFeatures(Base):
     __tablename__ = 'performance_features'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     participant_id = Column(Integer, ForeignKey('participants.participant_id'), nullable=False)
-    kill_participation = Column(Float, nullable=False)
-    death_share = Column(Float, nullable=False)
-    damage_share = Column(Float, nullable=False)
-    damage_taken_share = Column(Float, nullable=False)
-    gold_share = Column(Float, nullable=False)
-    heal_share = Column(Float, nullable=False)
-    damage_mitigated_share = Column(Float, nullable=False)
-    cs_share = Column(Float, nullable=False)
-    vision_share = Column(Float, nullable=False)
-    vision_denial_share = Column(Float, nullable=False)
-    xp_share = Column(Float, nullable=False)
-    cc_share = Column(Float, nullable=False)
+    kill_participation = Column(Float, nullable=True)
+    death_share = Column(Float, nullable=True)
+    damage_share = Column(Float, nullable=True)
+    damage_taken_share = Column(Float, nullable=True)
+    gold_share = Column(Float, nullable=True)
+    heal_share = Column(Float, nullable=True)
+    damage_mitigated_share = Column(Float, nullable=True)
+    cs_share = Column(Float, nullable=True)
+    vision_share = Column(Float, nullable=True)
+    vision_denial_share = Column(Float, nullable=True)
+    xp_share = Column(Float, nullable=True)
+    cc_share = Column(Float, nullable=True)
 
     participant = relationship("Participant", back_populates="performance_features")
-
-
 
 def init_db(uri="sqlite:///matches.db"):
     engine = create_engine(uri)

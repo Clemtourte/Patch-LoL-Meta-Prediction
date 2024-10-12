@@ -16,6 +16,8 @@ def calculate_performance_ratings():
     try:
         query = select(
             Participant.participant_id,
+            Participant.champion_name,
+            Participant.position,
             Team.win,
             PerformanceFeatures.kill_participation,
             PerformanceFeatures.death_share,
