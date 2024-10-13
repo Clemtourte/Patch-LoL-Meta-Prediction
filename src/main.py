@@ -412,7 +412,7 @@ def save_match_data(user_data, match_ids, session):
                 platform="EUW1"
             )
             session.add(match)
-            session.flush()  # This will assign an ID to the match
+            session.flush()
             added_matches += 1
 
         logging.info(f"Match ID after flush: {match.match_id}")
@@ -442,7 +442,7 @@ def save_match_data(user_data, match_ids, session):
                 win=team_win_status
             )
             session.add(team)
-            session.flush()  # This will assign an ID to the team
+            session.flush()
             logging.info(f"Added team: {team_name}, ID: {team.team_id}, Match ID: {team.match_id}")
 
             for summoner, details in participants.items():
@@ -467,7 +467,7 @@ def save_match_data(user_data, match_ids, session):
                         logging.error(f"Required field {field} is None for participant {summoner}")
 
                 session.add(participant)
-                session.flush()  # This will assign an ID to the participant
+                session.flush()
                 logging.info(f"Added participant: {summoner}, ID: {participant.participant_id}, Team ID: {participant.team_id}")
 
                 features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
@@ -498,7 +498,7 @@ def save_match_data(user_data, match_ids, session):
             session.rollback()
 
         elapsed_time = time.time() - start_time
-        if elapsed_time < 120 and total_api_calls >= 70:  # More conservative limit
+        if elapsed_time < 120 and total_api_calls >= 70:
             pause_time = 120 - elapsed_time
             logging.info(f"Pausing for {pause_time:.2f} seconds to avoid rate limit...")
             time.sleep(pause_time)

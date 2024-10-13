@@ -121,18 +121,16 @@ if st.button("Process Games"):
                 
                 start_time = time.time()
 
-                # Batch process all matches
                 if population_mode in ["Add to Database", "Both"]:
                     with st.spinner('Processing matches in batch...'):
                         try:
                             added_matches, updated_matches, total_api_calls = save_match_data(user_data, match_ids, session)
                             st.success(f"Batch processing complete. Added: {added_matches}, Updated: {updated_matches}")
-                            progress_bar.progress(1.0)  # Set progress to 100%
+                            progress_bar.progress(1.0)
                         except Exception as e:
                             st.error(f"Error during batch processing: {str(e)}")
                             logging.error(f"Batch processing error: {str(e)}", exc_info=True)
                 
-                # Display match info if needed
                 if population_mode in ["Display Only", "Both"]:
                     for i, match_id in enumerate(match_ids):
                         display_info = user_display.display_match_info(match_id)
@@ -197,8 +195,7 @@ if st.button("Analyze Champion Performances"):
                 st.subheader(f"Champion Performance - {position}")
                 position_df = analysis_df[analysis_df['position'] == position].sort_values('rating', ascending=False)
                 
-                # Create a grid layout
-                cols = st.columns(5)  # 5 columns for layout
+                cols = st.columns(5)
                 for i, (_, row) in enumerate(position_df.iterrows()):
                     with cols[i % 5]:
                         champion_name = row['champion_name']
@@ -213,9 +210,8 @@ if st.button("Analyze Champion Performances"):
                         st.write(f"Games: {games}")
                         st.write(f"WR: {win_rate:.0f}%")
                         st.write(f"Rating: {rating:.2f}")
-                        st.write("---")  # Separator
-                
-                st.write("")  # Add some space between positions
+                        st.write("---")
+                st.write("") 
     except Exception as e:
         st.error(f"An error occurred during analysis: {str(e)}")
         logging.error(f"Error in champion performance analysis: {str(e)}", exc_info=True)
