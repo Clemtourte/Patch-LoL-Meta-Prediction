@@ -255,7 +255,7 @@ class UserData:
             ('damage_share', lambda: user_stats['total_damage_dealt'] / max(1, team_stats[user_team]['total_damage_dealt'])),
             ('damage_taken_share', lambda: user_stats['damage_taken'] / max(1, team_stats[user_team]['damage_taken'])),
             ('gold_share', lambda: user_stats['gold_earned'] / max(1, team_stats[user_team]['total_gold_earned'])),
-            ('heal_share', lambda: user_stats['heal'] / max(1, team_stats[user_team]['heal'])),
+            ('heal_share', lambda: user_stats['total_heal'] / max(1, team_stats[user_team]['heal'])),
             ('damage_mitigated_share', lambda: user_stats['damage_mitigated'] / max(1, team_stats[user_team]['damage_mitigated'])),
             ('cs_share', lambda: user_stats['cs'] / max(1, team_stats[user_team]['total_cs'])),
             ('vision_share', lambda: user_stats['wards_placed'] / max(1, team_stats[user_team]['wards_placed'])),
@@ -376,12 +376,6 @@ def save_match_data(user_data, match_ids, session):
     total_api_calls = 0
     start_time = time.time()
 
-    # Prepare lists for bulk insert/update
-    matches_to_add = []
-    teams_to_add = []
-    participants_to_add = []
-    performance_features_to_add = []
-
     for i, match_id in enumerate(match_ids, 1):
         logging.info(f"Processing match {i} of {len(match_ids)}: {match_id}")
         
@@ -390,6 +384,11 @@ def save_match_data(user_data, match_ids, session):
 
         if general_info is None or participant_info is None or team_stats is None:
             logging.warning(f"Could not retrieve info for match {match_id}")
+            continue
+
+        game_duration_minutes = int(general_info['game_duration'].split('m')[0])
+        if game_duration_minutes < 5:
+            logging.info(f"Skipping remake match {match_id}")
             continue
 
         logging.info(f"Processing match {i} of {len(match_ids)}: {general_info['game_id']}")
@@ -412,8 +411,11 @@ def save_match_data(user_data, match_ids, session):
                 queue_id=general_info['queue_id'],
                 platform="EUW1"
             )
-            matches_to_add.append(match)
+            session.add(match)
+            session.flush()  # This will assign an ID to the match
             added_matches += 1
+
+        logging.info(f"Match ID after flush: {match.match_id}")
 
         for team_name, participants in participant_info.items():
             if not participants:
@@ -439,7 +441,9 @@ def save_match_data(user_data, match_ids, session):
                 team_name=team_name,
                 win=team_win_status
             )
-            teams_to_add.append(team)
+            session.add(team)
+            session.flush()  # This will assign an ID to the team
+            logging.info(f"Added team: {team_name}, ID: {team.team_id}, Match ID: {team.match_id}")
 
             for summoner, details in participants.items():
                 participant = Participant(team_id=team.team_id)
@@ -462,21 +466,36 @@ def save_match_data(user_data, match_ids, session):
                     if getattr(participant, field, None) is None:
                         logging.error(f"Required field {field} is None for participant {summoner}")
 
-                participants_to_add.append(participant)
+                session.add(participant)
+                session.flush()  # This will assign an ID to the participant
+                logging.info(f"Added participant: {summoner}, ID: {participant.participant_id}, Team ID: {participant.team_id}")
 
                 features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
                 if features:
                     logging.info(f"Calculated features for {summoner}: {features}")
-                    performance_features = PerformanceFeatures(participant_id=participant.participant_id)
-                    
-                    for key, value in features.items():
-                        if hasattr(performance_features, key):
-                            setattr(performance_features, key, value)
-                            logging.info(f"Setting {key} to {value} for {summoner}")
-                        else:
-                            logging.warning(f"PerformanceFeatures does not have attribute: {key}")
-                    
-                    performance_features_to_add.append(performance_features)
+                    existing_features = session.query(PerformanceFeatures).filter_by(participant_id=participant.participant_id).first()
+                    if existing_features:
+                        for key, value in features.items():
+                            if hasattr(existing_features, key):
+                                setattr(existing_features, key, value)
+                                logging.info(f"Updating {key} to {value} for {summoner}")
+                    else:
+                        performance_features = PerformanceFeatures(participant_id=participant.participant_id)
+                        for key, value in features.items():
+                            if hasattr(performance_features, key):
+                                setattr(performance_features, key, value)
+                                logging.info(f"Setting {key} to {value} for {summoner}")
+                            else:
+                                logging.warning(f"PerformanceFeatures does not have attribute: {key}")
+                        session.add(performance_features)
+                        logging.info(f"Added performance features for participant: {summoner}, ID: {performance_features.id}")
+
+        try:
+            session.commit()
+            logging.info(f"Committed data for match {general_info['game_id']}")
+        except Exception as e:
+            logging.error(f"Error committing data for match {general_info['game_id']}: {str(e)}")
+            session.rollback()
 
         elapsed_time = time.time() - start_time
         if elapsed_time < 120 and total_api_calls >= 70:  # More conservative limit
@@ -488,18 +507,6 @@ def save_match_data(user_data, match_ids, session):
         
         logging.info("Waiting for 2.2 seconds before next match...")
         time.sleep(2.1)
-
-    # Bulk insert/update
-    try:
-        session.add_all(matches_to_add)
-        session.add_all(teams_to_add)
-        session.add_all(participants_to_add)
-        session.add_all(performance_features_to_add)
-        session.commit()
-        logging.info(f"Bulk insert/update successful. Added matches: {added_matches}, Updated matches: {updated_matches}")
-    except Exception as e:
-        logging.error(f"Error during bulk insert/update: {str(e)}")
-        session.rollback()
 
     logging.info(f"Total games added: {added_matches}, updated: {updated_matches}, API calls: {total_api_calls}")
     

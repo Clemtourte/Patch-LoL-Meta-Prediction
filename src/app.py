@@ -124,8 +124,13 @@ if st.button("Process Games"):
                 # Batch process all matches
                 if population_mode in ["Add to Database", "Both"]:
                     with st.spinner('Processing matches in batch...'):
-                        added_matches, updated_matches, total_api_calls = save_match_data(user_data, match_ids, session)
-                    st.success(f"Batch processing complete. Added: {added_matches}, Updated: {updated_matches}")
+                        try:
+                            added_matches, updated_matches, total_api_calls = save_match_data(user_data, match_ids, session)
+                            st.success(f"Batch processing complete. Added: {added_matches}, Updated: {updated_matches}")
+                            progress_bar.progress(1.0)  # Set progress to 100%
+                        except Exception as e:
+                            st.error(f"Error during batch processing: {str(e)}")
+                            logging.error(f"Batch processing error: {str(e)}", exc_info=True)
                 
                 # Display match info if needed
                 if population_mode in ["Display Only", "Both"]:
@@ -152,14 +157,11 @@ if st.button("Process Games"):
                                                     f"KDA: {details['kills']}/{details['deaths']}/{details['assists']} ({details['kda']}), "
                                                     f"Role: {details['position']}, "
                                                     f"{'CS: ' + str(details['cs']) if selected_mode != 'ARAM' else 'Damage: ' + str(details['total_damage_dealt'])}")
-
-                        if population_mode in ["Add to Database", "Both"]:
-                            save_match_data(user_data, [match_id], session)
-
-                        progress_bar.progress((i + 1) / len(match_ids))
-                    else:
-                        st.error(f"Match {i+1} information could not be retrieved.")
-                    progress_bar.progress((i + 1) / len(match_ids))
+                        else:
+                            st.error(f"Match {i+1} information could not be retrieved.")
+                        
+                        if population_mode == "Display Only":
+                            progress_bar.progress((i + 1) / len(match_ids))
 
                 end_time = time.time()
                 processing_time = end_time - start_time
