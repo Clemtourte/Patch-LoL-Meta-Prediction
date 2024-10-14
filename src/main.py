@@ -387,7 +387,7 @@ def save_match_data(user_data, match_ids, session):
             continue
 
         game_duration_minutes = int(general_info['game_duration'].split('m')[0])
-        if game_duration_minutes < 5:
+        if game_duration_minutes < 14:
             logging.info(f"Skipping remake match {match_id}")
             continue
 
