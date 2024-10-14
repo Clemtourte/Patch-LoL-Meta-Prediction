@@ -20,7 +20,7 @@ def extract_data(tar_file, version, file_name):
     return data['data']
 
 def create_database():
-    conn = sqlite3.connect('league_patches.db')
+    conn = sqlite3.connect("sqlite:///../datasets/league_patches.db")
     c = conn.cursor()
     
     # Champion stats table

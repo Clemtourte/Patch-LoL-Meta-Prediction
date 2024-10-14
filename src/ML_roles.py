@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report
 import sqlite3
 import pandas as pd
 
-conn = sqlite3.connect('matches.db')
+conn = sqlite3.connect('"sqlite:///../datasets/matches.db"')
 
 query = "SELECT champion_name, champ_level, role, position, kills, deaths, assists, kda, gold_earned, total_damage_dealt, cs FROM participants;"
 df = pd.read_sql_query(query, conn)

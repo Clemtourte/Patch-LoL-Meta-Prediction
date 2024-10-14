@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 import re
 
-engine = create_engine('sqlite:///matches.db')
+engine = create_engine("sqlite:///../datasets/matches.db")
 
 def extract_minutes(duration):
     match = re.search(r'(\d+)m', duration)

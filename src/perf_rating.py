@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def calculate_performance_ratings():
-    engine = create_engine('sqlite:///matches.db')
+    engine = create_engine("sqlite:///../datasets/matches.db")
     Session = sessionmaker(bind=engine)
     session = Session()
     try:
@@ -213,7 +213,7 @@ def plot_score_distribution(df):
     plt.close()
 
 def create_performance_score_columns():
-    engine = create_engine('sqlite:///matches.db')
+    engine = create_engine("sqlite:///../datasets/matches.db")
     inspector = inspect(engine)
     
     if not inspector.has_table('participants'):

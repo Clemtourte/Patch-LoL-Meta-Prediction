@@ -77,7 +77,7 @@ class PerformanceFeatures(Base):
 
     participant = relationship("Participant", back_populates="performance_features")
 
-def init_db(uri="sqlite:///matches.db"):
+def init_db(uri="sqlite:///../datasets/matches.db"):
     engine = create_engine(uri)
     Base.metadata.create_all(engine)
     return sessionmaker(bind=engine)
