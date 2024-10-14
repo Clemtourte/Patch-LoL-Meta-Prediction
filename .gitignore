@@ -166,7 +166,6 @@ cython_debug/
 #.idea/
 
 # Exclude datafile
-match_data.json
 datasets/champion/
 datasets/item/
 API_setup.py
