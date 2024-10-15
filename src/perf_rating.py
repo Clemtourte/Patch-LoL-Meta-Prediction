@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def calculate_performance_ratings():
-    engine = create_engine("sqlite:///../datasets/matches.db")
+    engine = create_engine("sqlite:///../datasets/league_data.db")
     Session = sessionmaker(bind=engine)
     session = Session()
     try:
@@ -43,30 +43,24 @@ def calculate_performance_ratings():
                     'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
                     'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']
 
-        # Calculate and log correlations
         correlations = df[features].corrwith(df['win'])
         logging.info("Feature correlations with win:")
         for feature, corr in correlations.items():
             logging.info(f"{feature}: {corr}")
 
-        # Standardize features
         df_standardized = (df[features] - df[features].mean()) / df[features].std()
         
-        # Log standardized feature stats
         logging.info("Standardized features stats:")
         for feature in features:
             logging.info(f"{feature}: Mean = {df_standardized[feature].mean():.4f}, Std = {df_standardized[feature].std():.4f}")
 
-        # Calculate performance score
         df['performance_score'] = (df_standardized * correlations).sum(axis=1) / correlations.sum()
 
-        # Log performance score stats
         logging.info(f"Performance score stats: Mean = {df['performance_score'].mean():.4f}, Std = {df['performance_score'].std():.4f}")
         logging.info(f"Performance score range: Min = {df['performance_score'].min():.4f}, Max = {df['performance_score'].max():.4f}")
 
         df['standardized_performance_score'] = stats.zscore(df['performance_score'])
 
-        # Update database with new scores
         for index, row in df.iterrows():
             participant = session.get(Participant, row['participant_id'])
             if participant:
@@ -126,7 +120,6 @@ def calculate_champion_stats(session, position=None):
     
     df = pd.read_sql(query.statement, session.bind)
     
-    # Calculate standard deviation and correlation
     for metric in metrics:
         df[f'std_{metric}'] = np.sqrt(df[f'avg_sq_{metric}'] - df[f'avg_{metric}']**2)
         
@@ -137,7 +130,6 @@ def calculate_champion_stats(session, position=None):
         
         df[f'corr_{metric}'] = df.apply(calc_corr, axis=1)
         
-        # Drop intermediate columns
         df = df.drop(columns=[f'avg_sq_{metric}', f'values_{metric}', f'wins_{metric}'])
     
     return df
@@ -175,7 +167,6 @@ def analyze_champion_performance(session, min_games=10):
     for position in positions:
         champion_stats = calculate_champion_stats(session, position)
         
-        # Filter champions with at least min_games
         champion_stats = champion_stats[champion_stats['games'] >= min_games]
         
         if not champion_stats.empty:
@@ -186,7 +177,7 @@ def analyze_champion_performance(session, min_games=10):
             
             final_stats = champion_stats.merge(ratings, left_on='champion_name', right_on='champion_x')
             final_stats = final_stats[['champion_name', 'games', 'win_rate', 'rating', 'position']]
-            final_stats['win_rate'] = final_stats['win_rate'] * 100  # Convert to percentage
+            final_stats['win_rate'] = final_stats['win_rate'] * 100 
             final_stats = final_stats.sort_values('rating', ascending=False)
             
             all_results.append(final_stats)
