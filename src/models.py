@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 Base = declarative_base()
@@ -11,7 +11,7 @@ class Match(Base):
     patch = Column(String, nullable=False)
     timestamp = Column(String, nullable=False)
     mode = Column(String, nullable=False)
-    queue_id = Column(Integer, nullable=False,default=0)
+    queue_id = Column(Integer, nullable=False, default=0)
     platform = Column(String, nullable=False)
 
     teams = relationship("Team", back_populates="match")
@@ -77,7 +77,59 @@ class PerformanceFeatures(Base):
 
     participant = relationship("Participant", back_populates="performance_features")
 
-def init_db(uri="sqlite:///../datasets/matches.db"):
+class ChampionStats(Base):
+    __tablename__ = 'champion_stats'
+    version = Column(String, primary_key=True)
+    champion = Column(String, primary_key=True)
+    hp = Column(Float)
+    mp = Column(Float)
+    armor = Column(Float)
+    spellblock = Column(Float)
+    attackdamage = Column(Float)
+    attackspeed = Column(Float)
+    hpperlevel = Column(Float)
+    mpperlevel = Column(Float)
+    armorperlevel = Column(Float)
+    spellblockperlevel = Column(Float)
+    attackdamageperlevel = Column(Float)
+    attackspeedperlevel = Column(Float)
+    attackrange = Column(Float)
+    movespeed = Column(Float)
+    crit = Column(Float)
+    critperlevel = Column(Float)
+
+class SpellStats(Base):
+    __tablename__ = 'spell_stats'
+    id = Column(Integer, primary_key=True)
+    version = Column(String, nullable=False)
+    champion = Column(String, nullable=False)
+    spell_id = Column(String, nullable=False)
+    spell_name = Column(String, nullable=False)
+    damage_type = Column(String)
+    damage_values = Column(JSON)
+    damage_ratios = Column(JSON)
+    max_rank = Column(Integer)
+    cooldown = Column(JSON)
+    cost = Column(JSON)
+    effect = Column(JSON)
+    range = Column(JSON)
+    resource = Column(String)
+    is_passive = Column(Boolean, default=False)
+
+class ItemStats(Base):
+    __tablename__ = 'item_stats'
+    version = Column(String, primary_key=True)
+    item_id = Column(Integer, primary_key=True)
+    name = Column(String)
+    description = Column(String)
+    plaintext = Column(String)
+    total_gold = Column(Integer)
+    base_gold = Column(Integer)
+    sell_gold = Column(Integer)
+    purchasable = Column(Boolean)
+    tags = Column(String)
+
+def init_db(uri="sqlite:///../datasets/league_data.db"):
     engine = create_engine(uri)
     Base.metadata.create_all(engine)
     return sessionmaker(bind=engine)
