@@ -6,6 +6,8 @@ from io import BytesIO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, ChampionStats, SpellStats, ItemStats
+from packaging import version
+import re
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -56,7 +58,6 @@ def store_champion_data(session, version, champion_data):
 
 def store_spell_data(session, version, champion_data):
     for champion, data in champion_data.items():
-        # Store active spells
         for spell in data['spells']:
             spell_stats = SpellStats(
                 version=version,
@@ -64,19 +65,17 @@ def store_spell_data(session, version, champion_data):
                 spell_id=spell['id'],
                 spell_name=spell['name'],
                 damage_type=get_damage_type(spell),
-                damage_values=json.dumps(spell.get('effect', [])),
-                damage_ratios=json.dumps({}),
+                damage_values=json.dumps(spell.get('effect', [])[1] if spell.get('effect') else []),
                 max_rank=spell.get('maxrank', 5),
                 cooldown=json.dumps(spell.get('cooldown', [])),
                 cost=json.dumps(spell.get('cost', [])),
-                effect=json.dumps(spell.get('effect', [])),
                 range=json.dumps(spell.get('range', [])),
                 resource=spell.get('resource', ''),
+                description=spell.get('description', ''),
                 is_passive=False
             )
             session.merge(spell_stats)
         
-        # Store passive ability
         passive = data['passive']
         passive_stats = SpellStats(
             version=version,
@@ -85,13 +84,12 @@ def store_spell_data(session, version, champion_data):
             spell_name=passive['name'],
             damage_type='unknown',
             damage_values=json.dumps([]),
-            damage_ratios=json.dumps({}),
             max_rank=1,
             cooldown=json.dumps([]),
             cost=json.dumps([]),
-            effect=json.dumps([]),
             range=json.dumps([]),
             resource='',
+            description=passive.get('description', ''),
             is_passive=True
         )
         session.merge(passive_stats)
@@ -125,29 +123,47 @@ def get_damage_type(spell):
     else:
         return 'unknown'
 
+def is_valid_version(v):
+
+    return re.match(r'^\d+\.\d+\.\d+$', v) is not None
+
 def fetch_and_store_patch_data(start_version, end_version):
     Base.metadata.create_all(engine)
     session = Session()
 
     all_versions = get_available_versions()
-    versions_to_fetch = [v for v in all_versions if start_version <= v <= end_version]
     
-    for version in versions_to_fetch:
-        print(f"Processing version {version}")
+    start = version.parse(start_version)
+    end = version.parse(end_version)
+    
+    versions_to_fetch = []
+    for v in all_versions:
+        if is_valid_version(v):
+            try:
+                parsed_v = version.parse(v)
+                if start <= parsed_v <= end:
+                    versions_to_fetch.append(v)
+            except version.InvalidVersion:
+                print(f"Skipping invalid version: {v}")
+    
+    versions_to_fetch.sort(key=version.parse, reverse=True)
+    
+    for version_str in versions_to_fetch:
+        print(f"Processing version {version_str}")
         try:
-            tar_file = tarfile.open(fileobj=download_data_dragon(version))
+            tar_file = tarfile.open(fileobj=download_data_dragon(version_str))
             
-            champion_data = extract_data(tar_file, version, 'championFull')
-            store_champion_data(session, version, champion_data)
-            store_spell_data(session, version, champion_data)
-            print(f"Stored champion and spell data for version {version}")
+            champion_data = extract_data(tar_file, version_str, 'championFull')
+            store_champion_data(session, version_str, champion_data)
+            store_spell_data(session, version_str, champion_data)
+            print(f"Stored champion and spell data for version {version_str}")
             
-            item_data = extract_data(tar_file, version, 'item')
-            store_item_data(session, version, item_data)
-            print(f"Stored item data for version {version}")
+            item_data = extract_data(tar_file, version_str, 'item')
+            store_item_data(session, version_str, item_data)
+            print(f"Stored item data for version {version_str}")
             
         except Exception as e:
-            print(f"Error processing version {version}: {str(e)}")
+            print(f"Error processing version {version_str}: {str(e)}")
     
     session.close()
 

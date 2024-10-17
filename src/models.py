@@ -107,13 +107,12 @@ class SpellStats(Base):
     spell_name = Column(String, nullable=False)
     damage_type = Column(String)
     damage_values = Column(JSON)
-    damage_ratios = Column(JSON)
     max_rank = Column(Integer)
     cooldown = Column(JSON)
     cost = Column(JSON)
-    effect = Column(JSON)
     range = Column(JSON)
     resource = Column(String)
+    description = Column(String)
     is_passive = Column(Boolean, default=False)
 
 class ItemStats(Base):

@@ -344,3 +344,42 @@ button:hover {
     flex-basis: 100%;
   }
 }
+
+.role-analysis {
+  display: flex;
+  justify-content: space-between;
+}
+
+.role-column {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.patch-analysis {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.patch-analysis select {
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.patch-analysis .role-analysis {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.patch-analysis .role-column {
+  flex: 1;
+  min-width: 200px;
+  margin: 0 10px 20px;
+}
+
+@media (max-width: 768px) {
+  .patch-analysis .role-column {
+    flex-basis: 100%;
+  }
+}
