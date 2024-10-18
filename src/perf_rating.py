@@ -2,10 +2,14 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sqlalchemy import create_engine, select, text, inspect, func
 from sqlalchemy.orm import sessionmaker
 from models import Match, Team, Participant, PerformanceFeatures, Base
 import logging
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -43,24 +47,44 @@ def calculate_performance_ratings():
                     'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
                     'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']
 
-        correlations = df[features].corrwith(df['win'])
-        logging.info("Feature correlations with win:")
-        for feature, corr in correlations.items():
-            logging.info(f"{feature}: {corr}")
+        # Data verification and logging
+        log_data_info(df, features)
 
-        df_standardized = (df[features] - df[features].mean()) / df[features].std()
-        
-        logging.info("Standardized features stats:")
+        # Calculate Spearman correlations
+        spearman_correlations = df[features].apply(lambda x: x.corr(df['win'], method='spearman'))
+        log_correlations(spearman_correlations, "Spearman")
+
+        # Create non-linear transformations
         for feature in features:
-            logging.info(f"{feature}: Mean = {df_standardized[feature].mean():.4f}, Std = {df_standardized[feature].std():.4f}")
+            df[f'{feature}_squared'] = df[feature] ** 2
+            df[f'{feature}_sqrt'] = np.sqrt(df[feature])
+        
+        # Create interaction terms
+        for i, feature1 in enumerate(features):
+            for feature2 in features[i+1:]:
+                df[f'{feature1}_{feature2}_interaction'] = df[feature1] * df[feature2]
 
-        df['performance_score'] = (df_standardized * correlations).sum(axis=1) / correlations.sum()
+        # Prepare features for machine learning
+        X = df[features + [f'{f}_squared' for f in features] + 
+               [f'{f}_sqrt' for f in features] + 
+               [col for col in df.columns if 'interaction' in col]]
+        y = df['win']
+
+        # Perform feature importance analysis
+        feature_importance = perform_feature_importance(X, y)
+        log_feature_importance(feature_importance, X.columns)
+
+        # Calculate performance score using feature importance
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        df['performance_score'] = np.dot(X_scaled, feature_importance)
 
         logging.info(f"Performance score stats: Mean = {df['performance_score'].mean():.4f}, Std = {df['performance_score'].std():.4f}")
         logging.info(f"Performance score range: Min = {df['performance_score'].min():.4f}, Max = {df['performance_score'].max():.4f}")
 
         df['standardized_performance_score'] = stats.zscore(df['performance_score'])
 
+        # Update database
         for index, row in df.iterrows():
             participant = session.get(Participant, row['participant_id'])
             if participant:
@@ -82,12 +106,80 @@ def calculate_performance_ratings():
         }
 
         logging.info(f"Processed performance ratings for {len(df)} participants.")
+        
+        # Create visualizations
+        create_visualizations(df, features, spearman_correlations, feature_importance, X.columns)
+        
         return df, summary
     except Exception as e:
         logging.error(f"Error in calculate_performance_ratings: {str(e)}")
         return pd.DataFrame(), {}
     finally:
         session.close()
+
+def log_data_info(df, features):
+    logging.info("Data types:")
+    logging.info(df.dtypes)
+    logging.info("Unique values in 'win' column:")
+    logging.info(df['win'].unique())
+    logging.info("Data ranges:")
+    for column in df.columns:
+        logging.info(f"{column}: {df[column].min()} to {df[column].max()}")
+    logging.info("Mean values grouped by win:")
+    logging.info(df.groupby('win')[features].mean())
+
+def log_correlations(correlations, method):
+    logging.info(f"{method} correlations with win:")
+    for feature, corr in correlations.items():
+        logging.info(f"{feature}: {corr}")
+
+def perform_feature_importance(X, y):
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf.fit(X, y)
+    return rf.feature_importances_
+
+def log_feature_importance(feature_importance, feature_names):
+    logging.info("Feature importances:")
+    for feature, importance in zip(feature_names, feature_importance):
+        logging.info(f"{feature}: {importance}")
+
+def create_visualizations(df, features, spearman_correlations, feature_importance, feature_names):
+    # Correlation heatmap
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(df[features].corr(), annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)
+    plt.title('Feature Correlation Heatmap')
+    plt.tight_layout()
+    plt.savefig('../graphs/correlation_heatmap.png')
+    plt.close()
+
+    # Feature importance plot
+    plt.figure(figsize=(12, 10))
+    feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': feature_importance})
+    feature_importance_df = feature_importance_df.sort_values('importance', ascending=False).head(20)  # Top 20 features
+    
+    sns.barplot(x='importance', y='feature', data=feature_importance_df)
+    plt.title('Top 20 Feature Importances')
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    plt.tight_layout()
+    plt.savefig('../graphs/feature_importance.png')
+    plt.close()
+
+    # Distribution of Standardized Performance Scores
+    plt.figure(figsize=(10, 6))
+    plt.hist(df['standardized_performance_score'], bins=50, edgecolor='black')
+    plt.title('Distribution of Standardized Performance Scores')
+    plt.xlabel('Score')
+    plt.ylabel('Frequency')
+    plt.savefig('../graphs/score_distribution.png')
+    plt.close()
+
+    # Q-Q plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    stats.probplot(df['standardized_performance_score'], dist="norm", plot=ax)
+    ax.set_title("Q-Q plot of Standardized Performance Scores")
+    plt.savefig('../graphs/score_qq_plot.png')
+    plt.close()
 
 def calculate_champion_stats(session, position=None):
     metrics = [
@@ -204,7 +296,7 @@ def plot_score_distribution(df):
     plt.close()
 
 def create_performance_score_columns():
-    engine = create_engine("sqlite:///../datasets/matches.db")
+    engine = create_engine("sqlite:///../datasets/league_data.db")
     inspector = inspect(engine)
     
     if not inspector.has_table('participants'):
@@ -219,7 +311,6 @@ def create_performance_score_columns():
             if 'standardized_performance_score' not in column_names:
                 conn.execute(text("ALTER TABLE participants ADD COLUMN standardized_performance_score FLOAT"))
             conn.commit()
-        conn.close()
 
 if __name__ == "__main__":
     create_performance_score_columns()
@@ -229,6 +320,6 @@ if __name__ == "__main__":
         for key, value in summary_stats.items():
             print(f"{key}: {value}")
         plot_score_distribution(df)
-        print("Plots saved as 'score_distribution.png' and 'score_qq_plot.png'")
+        print("Plots saved as 'score_distribution.png', 'score_qq_plot.png', 'correlation_heatmap.png', and 'feature_importance.png'")
     else:
         print("No data available for analysis.")
