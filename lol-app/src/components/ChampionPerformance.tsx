@@ -7,6 +7,10 @@ interface ChampionData {
   games: number;
   win_rate: number;
   rating: number;
+  avg_score: number;
+  median_score: number;
+  min_score: number;
+  max_score: number;
 }
 
 const positions = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
@@ -36,7 +40,6 @@ const ChampionPerformance: React.FC = () => {
   if (loading) return <div>Loading champion performance data...</div>;
   if (error) return <div>{error}</div>;
 
-  // Group champions by position
   const groupedData = performanceData.reduce((acc, champion) => {
     if (!acc[champion.position]) {
       acc[champion.position] = [];
@@ -45,9 +48,8 @@ const ChampionPerformance: React.FC = () => {
     return acc;
   }, {} as Record<string, ChampionData[]>);
 
-  // Sort champions within each role by rating
   Object.keys(groupedData).forEach((position) => {
-    groupedData[position].sort((a, b) => b.rating - a.rating);
+    groupedData[position].sort((a, b) => b.avg_score - a.avg_score);
   });
 
   return (
@@ -63,7 +65,13 @@ const ChampionPerformance: React.FC = () => {
                   <h4>{champ.champion_name}</h4>
                   <p>Games: {champ.games}</p>
                   <p>Win Rate: {champ.win_rate.toFixed(2)}%</p>
-                  <p>Rating: {champ.rating.toFixed(2)}</p>
+                  <p>Avg Score: {champ.avg_score.toFixed(2)}</p>
+                  <p>Median Score: {champ.median_score.toFixed(2)}</p>
+                  <p>
+                    Score Range: {champ.min_score.toFixed(2)} to{" "}
+                    {champ.max_score.toFixed(2)}
+                  </p>
+                  <p>Original Rating: {champ.rating.toFixed(2)}</p>
                 </div>
               ))}
             </div>

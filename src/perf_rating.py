@@ -47,34 +47,27 @@ def calculate_performance_ratings():
                     'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share',
                     'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']
 
-        # Data verification and logging
         log_data_info(df, features)
 
-        # Calculate Spearman correlations
         spearman_correlations = df[features].apply(lambda x: x.corr(df['win'], method='spearman'))
         log_correlations(spearman_correlations, "Spearman")
 
-        # Create non-linear transformations
         for feature in features:
             df[f'{feature}_squared'] = df[feature] ** 2
             df[f'{feature}_sqrt'] = np.sqrt(df[feature])
         
-        # Create interaction terms
         for i, feature1 in enumerate(features):
             for feature2 in features[i+1:]:
                 df[f'{feature1}_{feature2}_interaction'] = df[feature1] * df[feature2]
 
-        # Prepare features for machine learning
         X = df[features + [f'{f}_squared' for f in features] + 
                [f'{f}_sqrt' for f in features] + 
                [col for col in df.columns if 'interaction' in col]]
         y = df['win']
 
-        # Perform feature importance analysis
         feature_importance = perform_feature_importance(X, y)
         log_feature_importance(feature_importance, X.columns)
 
-        # Calculate performance score using feature importance
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
         df['performance_score'] = np.dot(X_scaled, feature_importance)
@@ -84,7 +77,6 @@ def calculate_performance_ratings():
 
         df['standardized_performance_score'] = stats.zscore(df['performance_score'])
 
-        # Update database
         for index, row in df.iterrows():
             participant = session.get(Participant, row['participant_id'])
             if participant:
@@ -106,8 +98,7 @@ def calculate_performance_ratings():
         }
 
         logging.info(f"Processed performance ratings for {len(df)} participants.")
-        
-        # Create visualizations
+
         create_visualizations(df, features, spearman_correlations, feature_importance, X.columns)
         
         return df, summary
@@ -144,7 +135,6 @@ def log_feature_importance(feature_importance, feature_names):
         logging.info(f"{feature}: {importance}")
 
 def create_visualizations(df, features, spearman_correlations, feature_importance, feature_names):
-    # Correlation heatmap
     plt.figure(figsize=(12, 10))
     sns.heatmap(df[features].corr(), annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)
     plt.title('Feature Correlation Heatmap')
@@ -152,10 +142,9 @@ def create_visualizations(df, features, spearman_correlations, feature_importanc
     plt.savefig('../graphs/correlation_heatmap.png')
     plt.close()
 
-    # Feature importance plot
     plt.figure(figsize=(12, 10))
     feature_importance_df = pd.DataFrame({'feature': feature_names, 'importance': feature_importance})
-    feature_importance_df = feature_importance_df.sort_values('importance', ascending=False).head(20)  # Top 20 features
+    feature_importance_df = feature_importance_df.sort_values('importance', ascending=False).head(20)
     
     sns.barplot(x='importance', y='feature', data=feature_importance_df)
     plt.title('Top 20 Feature Importances')
@@ -165,7 +154,6 @@ def create_visualizations(df, features, spearman_correlations, feature_importanc
     plt.savefig('../graphs/feature_importance.png')
     plt.close()
 
-    # Distribution of Standardized Performance Scores
     plt.figure(figsize=(10, 6))
     plt.hist(df['standardized_performance_score'], bins=50, edgecolor='black')
     plt.title('Distribution of Standardized Performance Scores')
@@ -174,7 +162,6 @@ def create_visualizations(df, features, spearman_correlations, feature_importanc
     plt.savefig('../graphs/score_distribution.png')
     plt.close()
 
-    # Q-Q plot
     fig, ax = plt.subplots(figsize=(10, 6))
     stats.probplot(df['standardized_performance_score'], dist="norm", plot=ax)
     ax.set_title("Q-Q plot of Standardized Performance Scores")
@@ -270,7 +257,36 @@ def analyze_champion_performance(session, min_games=10):
             final_stats = champion_stats.merge(ratings, left_on='champion_name', right_on='champion_x')
             final_stats = final_stats[['champion_name', 'games', 'win_rate', 'rating', 'position']]
             final_stats['win_rate'] = final_stats['win_rate'] * 100 
-            final_stats = final_stats.sort_values('rating', ascending=False)
+            
+            # Fetch all performance scores for each champion
+            performance_scores = session.query(
+                Participant.champion_name,
+                Participant.position,
+                Participant.standardized_performance_score
+            ).filter(Participant.position == position).all()
+            
+            # Calculate statistics
+            performance_stats = {}
+            for champ, pos, score in performance_scores:
+                if (champ, pos) not in performance_stats:
+                    performance_stats[(champ, pos)] = []
+                performance_stats[(champ, pos)].append(score)
+            
+            performance_df = []
+            for (champ, pos), scores in performance_stats.items():
+                performance_df.append({
+                    'champion_name': champ,
+                    'position': pos,
+                    'avg_score': np.mean(scores),
+                    'median_score': np.median(scores),
+                    'min_score': np.min(scores),
+                    'max_score': np.max(scores)
+                })
+            
+            performance_df = pd.DataFrame(performance_df)
+            
+            final_stats = final_stats.merge(performance_df, on=['champion_name', 'position'], how='left')
+            final_stats = final_stats.sort_values('avg_score', ascending=False)
             
             all_results.append(final_stats)
     
