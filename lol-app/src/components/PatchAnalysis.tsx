@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from "react";
 
-const PatchAnalysis = () => {
-  const [selectedPatch, setSelectedPatch] = useState("");
-  const [patchData, setPatchData] = useState(null);
-  const [patches, setPatches] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+interface PatchData {
+  match_count: number;
+  match_stats: {
+    avg_duration: number;
+  };
+  champion_stats: {
+    [champion: string]: {
+      games_played: number;
+      win_rate: number;
+      pick_rate: number;
+    };
+  };
+  role_analysis: {
+    [role: string]: {
+      [champion: string]: {
+        games_played: number;
+        win_rate: number;
+        pick_rate: number;
+      };
+    };
+  };
+}
+
+const PatchAnalysis: React.FC = () => {
+  const [selectedPatch, setSelectedPatch] = useState<string>("");
+  const [patchData, setPatchData] = useState<PatchData | null>(null);
+  const [patches, setPatches] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/patches")
