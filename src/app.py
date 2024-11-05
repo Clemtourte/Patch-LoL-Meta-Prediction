@@ -59,11 +59,42 @@ if st.button("Process Games"):
             queue_id = game_modes[selected_mode]
             
             if search_option == "Date Range":
-                start_time = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
-                end_time = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
-                with st.spinner('Fetching matches... This may take a while due to API rate limits.'):
-                    match_ids = user_data.get_matches_by_date(queue_id, start_time, end_time)
-                st.write(f"Total matches found in date range: {len(match_ids)}")
+                if start_date is None or end_date is None:
+                    st.error("Please select both start and end dates")
+                else:
+                    start_time = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
+                    end_time = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
+                    
+                    # Debug logging
+                    st.info(f"Debug Info:")
+                    st.write(f"Start Date: {start_date}")
+                    st.write(f"End Date: {end_date}")
+                    st.write(f"Start Timestamp: {start_time}")
+                    st.write(f"End Timestamp: {end_time}")
+                    st.write(f"Queue ID: {queue_id}")
+                    st.write(f"Region: {region}")
+                    st.write(f"Username: {username}")
+                    st.write(f"Tag: {tag}")
+                    
+                    with st.spinner('Fetching matches... This may take a while due to API rate limits.'):
+                        # Get PUUID for debugging
+                        puuid = user_data.puuid
+                        st.write(f"PUUID: {puuid}")
+                        
+                        # Debug the API URL
+                        api_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue_id}&startTime={start_time}&endTime={end_time}&start=0&count=100"
+                        st.write(f"API URL being called: {api_url}")
+                        
+                        match_ids = user_data.get_matches_by_date(queue_id, start_time, end_time)
+                        
+                    st.write(f"Total matches found in date range: {len(match_ids)}")
+                    if len(match_ids) == 0:
+                        st.warning("No matches found. Debug information:")
+                        st.write("1. Check if dates are correct")
+                        st.write("2. Verify queue type is correct")
+                        st.write("3. Confirm account has games in this period")
+                        st.write("4. Verify region is correct")
+                        st.write("5. Confirm summoner name and tag are correct")
             else:
                 with st.spinner('Fetching recent matches...'):
                     match_ids = user_data.get_recent_matches(queue_id, number_of_games)
