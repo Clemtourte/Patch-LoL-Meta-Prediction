@@ -65,7 +65,6 @@ if st.button("Process Games"):
                     start_time = int(datetime.datetime.combine(start_date, datetime.time.min).timestamp())
                     end_time = int(datetime.datetime.combine(end_date, datetime.time.max).timestamp())
                     
-                    # Debug logging
                     st.info(f"Debug Info:")
                     st.write(f"Start Date: {start_date}")
                     st.write(f"End Date: {end_date}")
@@ -77,11 +76,9 @@ if st.button("Process Games"):
                     st.write(f"Tag: {tag}")
                     
                     with st.spinner('Fetching matches... This may take a while due to API rate limits.'):
-                        # Get PUUID for debugging
                         puuid = user_data.puuid
                         st.write(f"PUUID: {puuid}")
                         
-                        # Debug the API URL
                         api_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue_id}&startTime={start_time}&endTime={end_time}&start=0&count=100"
                         st.write(f"API URL being called: {api_url}")
                         
