@@ -38,7 +38,12 @@ const ChampionPerformance: React.FC = () => {
   }, []);
 
   if (loading) return <div>Loading champion performance data...</div>;
-  if (error) return <div>{error}</div>;
+  if (error) return <div className="error">Error: {error}</div>;
+  if (!performanceData || performanceData.length === 0) {
+    return (
+      <div>No performance data available. Try playing more games first.</div>
+    );
+  }
 
   const groupedData = performanceData.reduce((acc, champion) => {
     if (!acc[champion.position]) {
