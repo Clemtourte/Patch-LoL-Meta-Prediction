@@ -74,6 +74,7 @@ class PerformanceFeatures(Base):
     vision_denial_share = Column(Float, nullable=True)
     xp_share = Column(Float, nullable=True)
     cc_share = Column(Float, nullable=True)
+    champion_role_patch = Column(String, nullable=True)
 
     participant = relationship("Participant", back_populates="performance_features")
 
