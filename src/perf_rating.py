@@ -265,8 +265,7 @@ def analyze_champion_performance(session, min_games=10):
                 Participant.position,
                 func.count(Participant.participant_id).label('games'),
                 func.avg(Team.win).label('win_rate'),
-                func.avg(Participant.standardized_performance_score).label('avg_score'),
-                func.stddev(Participant.standardized_performance_score).label('score_std')
+                func.avg(Participant.standardized_performance_score).label('avg_score')
             )
             .join(Team)
             .filter(Participant.position == position)
@@ -279,6 +278,8 @@ def analyze_champion_performance(session, min_games=10):
         
         if not df.empty:
             df['win_rate'] = df['win_rate'] * 100
+            df['score_std'] = df.groupby(['champion_name', 'position'])['avg_score'].transform('std')
+            df['rating'] = df['avg_score']  # Add the 'rating' column
             df = df.sort_values('avg_score', ascending=False)
             all_results.append(df)
     
