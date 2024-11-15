@@ -10,6 +10,7 @@ interface PatchData {
       games_played: number;
       win_rate: number;
       pick_rate: number;
+      wins: number;
     };
   };
   role_analysis: {
@@ -18,6 +19,7 @@ interface PatchData {
         games_played: number;
         win_rate: number;
         pick_rate: number;
+        wins: number;
       };
     };
   };
@@ -58,6 +60,7 @@ const PatchAnalysis: React.FC = () => {
       fetch(`/api/patch_analysis/${selectedPatch}`)
         .then((response) => response.json())
         .then((data) => {
+          console.log("Patch Data:", data); // Add this line
           setPatchData(data);
           setLoading(false);
         })
@@ -105,18 +108,16 @@ const PatchAnalysis: React.FC = () => {
               .filter(([_, stats]) => stats.games_played >= 5)
               .sort((a, b) => b[1].games_played - a[1].games_played)
               .slice(0, 5)
-              .map(([champion, stats]) => {
-                const wins = Math.round(
-                  (stats.games_played * stats.win_rate) / 100
-                );
-                return (
-                  <li key={champion}>
-                    {champion}: {wins} wins / {stats.games_played} games (Win
-                    Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
+              .map(([champion, stats]) => (
+                <li key={champion} className="champion-stat-item">
+                  <span className="champion-name">{champion}</span>
+                  <span className="stat-details">
+                    {stats.wins} wins / {stats.games_played} games (Win Rate:{" "}
+                    {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
                     {stats.pick_rate.toFixed(2)}%
-                  </li>
-                );
-              })}
+                  </span>
+                </li>
+              ))}
           </ul>
 
           <h4>Role Analysis</h4>
@@ -129,18 +130,16 @@ const PatchAnalysis: React.FC = () => {
                     .filter(([_, stats]) => stats.games_played >= 5)
                     .sort((a, b) => b[1].games_played - a[1].games_played)
                     .slice(0, 5)
-                    .map(([champion, stats]) => {
-                      const wins = Math.round(
-                        (stats.games_played * stats.win_rate) / 100
-                      );
-                      return (
-                        <li key={champion}>
-                          {champion}: {wins} wins / {stats.games_played} games
-                          (Win Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
+                    .map(([champion, stats]) => (
+                      <li key={champion} className="champion-stat-item">
+                        <span className="champion-name">{champion}</span>
+                        <span className="stat-details">
+                          {stats.wins} wins / {stats.games_played} games (Win
+                          Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
                           {stats.pick_rate.toFixed(2)}%
-                        </li>
-                      );
-                    })}
+                        </span>
+                      </li>
+                    ))}
                 </ul>
               </div>
             ))}
