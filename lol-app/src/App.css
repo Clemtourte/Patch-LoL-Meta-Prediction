@@ -1,19 +1,13 @@
-/* CSS Reset */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Variables */
 :root {
-  --primary-color: #45a049;
-  --secondary-color: #3d8b41;
-  --background-color: #1e1e1e;
-  --card-background: #2c2c2c;
-  --text-color: #ffffff;
-  --error-color: #ff6b6b;
-  
+  --primary: #45a049;
+  --primary-hover: #3d8b41;
+  --bg: #1e1e1e;
+  --card: #2c2c2c;
+  --card-hover: #3c3c3c;
+  --text: #fff;
+  --error: #ff6b6b;
+  --blue-win: rgba(0, 128, 255, 0.2);
+  --red-loss: rgba(255, 0, 0, 0.2);
   --spacing-xs: 5px;
   --spacing-sm: 10px;
   --spacing-md: 15px;
@@ -21,28 +15,28 @@
   --spacing-xl: 30px;
 }
 
-/* Base Styles */
-html {
-  scroll-behavior: smooth;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
 }
 
 body {
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--bg);
+  color: var(--text);
   font-family: Arial, sans-serif;
   line-height: 1.5;
   min-height: 100vh;
 }
 
-/* Layout */
+/* Core Layout - DO NOT MODIFY */
 .container {
   min-height: 100vh;
   display: flex;
@@ -59,9 +53,17 @@ main {
   align-items: center;
 }
 
+.user-info-container,
+.champion-performance,
+.patch-analysis {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 var(--spacing-md);
+}
+
 /* Navigation */
 nav {
-  background-color: #333333;
+  background-color: #333;
   padding: var(--spacing-sm) 0;
   width: 100%;
 }
@@ -69,24 +71,24 @@ nav {
 nav ul {
   display: flex;
   justify-content: center;
-  list-style-type: none;
+  list-style: none;
 }
 
 nav button {
   margin: 0 var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-lg);
-  background-color: var(--primary-color);
-  color: var(--text-color);
+  background-color: var(--primary);
+  color: var(--text);
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: 0.3s;
 }
 
 nav button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-hover);
 }
 
-/* Forms */
+/* Form Elements */
 .input-group {
   display: flex;
   justify-content: center;
@@ -103,109 +105,61 @@ nav button:hover {
 }
 
 input, select, button {
-  margin: var(--spacing-xs) 0;
   padding: var(--spacing-sm);
   border-radius: 5px;
-  border: 1px solid var(--primary-color);
-  width: 100%;
-  background-color: var(--card-background);
-  color: var(--text-color);
-  transition: all 0.3s ease;
+  border: 1px solid var(--primary);
+  background-color: var(--card);
+  color: var(--text);
+  transition: 0.3s;
 }
 
 input:focus, select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--primary-color);
-}
-
-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white'%3E%3Cpath d='M1.5 4.5l4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px;
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 button {
-  background-color: var(--primary-color);
-  color: var(--text-color);
+  background-color: var(--primary);
   border: none;
   cursor: pointer;
   height: 40px;
-  margin-top: 24px;
 }
 
 button:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-hover);
 }
 
-button#fetchUserInfo {
+#fetchUserInfo {
   white-space: nowrap;
-  padding: var(--spacing-sm) var(--spacing-md);
   width: auto;
   min-width: 120px;
   max-width: 150px;
   margin-left: var(--spacing-sm);
 }
 
-/* User Info Container */
-.user-info-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 var(--spacing-md);
+/* Cards */
+.card-base,
+.champion-stats ul,
+.recent-matches .match,
+.champion-card {
+  background-color: var(--card);
+  border-radius: 5px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
-.user-info-container h2 {
-  margin-bottom: var(--spacing-lg);
-  text-align: center;
-}
-
-/* User Data */
-.user-data {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
+/* Stats and Matches */
 .stats-and-matches {
   display: flex;
   gap: var(--spacing-lg);
   margin-top: var(--spacing-lg);
 }
 
-/* Champion Stats */
 .champion-stats {
   flex: 1;
   max-width: 300px;
 }
 
-.champion-stats h3, .recent-matches h3 {
-  margin-bottom: var(--spacing-sm);
-}
-
-.champion-stats ul, .recent-matches .match {
-  background-color: var(--card-background);
-  padding: var(--spacing-md);
-  border-radius: 5px;
-  margin-bottom: var(--spacing-md);
-  list-style-type: none;
-}
-
-.champion-stats li, .recent-matches .player {
-  margin-bottom: var(--spacing-sm);
-  padding: var(--spacing-xs);
-  border-radius: 3px;
-  transition: background-color 0.3s ease;
-}
-
-.champion-stats li:hover, .recent-matches .player:hover {
-  background-color: #3c3c3c;
-}
-
-/* Recent Matches */
 .recent-matches {
   flex: 2;
 }
@@ -213,27 +167,7 @@ button#fetchUserInfo {
 .matches-grid {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 100%;
-}
-
-.match-header {
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  background-color: #3c3c3c;
-  border-radius: 5px;
-  margin-bottom: var(--spacing-xs);
-  transition: background-color 0.3s ease;
-}
-
-.match-header:hover {
-  background-color: #4c4c4c;
-}
-
-.teams {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-lg);
 }
 
 .team {
@@ -241,43 +175,15 @@ button#fetchUserInfo {
   border-radius: 5px;
 }
 
-.team.winning-team {
-  background-color: rgba(0, 128, 255, 0.2);
+.winning-team {
+  background-color: var(--blue-win);
 }
 
-.team.losing-team {
-  background-color: rgba(255, 0, 0, 0.2);
-}
-
-.player {
-  padding: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
-  border-radius: 3px;
-  transition: background-color 0.3s ease;
-}
-
-.player.highlight {
-  font-weight: bold;
-  background-color: #4c4c4c;
-}
-
-.load-more-button {
-  display: block;
-  margin: var(--spacing-lg) auto;
-  padding: var(--spacing-sm) var(--spacing-lg);
+.losing-team {
+  background-color: var(--red-loss);
 }
 
 /* Champion Performance */
-.champion-performance {
-  padding: var(--spacing-lg);
-}
-
-.champion-performance h2 {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-  color: var(--primary-color);
-}
-
 .role-columns {
   display: flex;
   justify-content: space-between;
@@ -290,122 +196,176 @@ button#fetchUserInfo {
 }
 
 .role-column h3 {
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
   padding-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
 }
 
-.champions-list {
+/* Enhanced Patch Analysis */
+.patch-analysis {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  align-items: center;
 }
 
-.champion-card {
-  background-color: var(--card-background);
-  border-radius: 5px;
-  padding: var(--spacing-md);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.champion-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.champion-card h4 {
-  margin-top: 0;
-  margin-bottom: var(--spacing-sm);
-  color: var(--primary-color);
-}
-
-.champion-card p {
-  margin: var(--spacing-xs) 0;
-  font-size: 0.9em;
-}
-
-/* Patch Analysis */
-.patch-analysis {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--spacing-lg);
+.patch-analysis h2 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-xl);
+  font-size: 2rem;
 }
 
 .patch-analysis select {
   width: 200px;
+  margin-bottom: var(--spacing-xl);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.patch-data {
+  width: 100%;
+  background-color: var(--card);
+  border-radius: 10px;
+  padding: var(--spacing-xl);
+}
+
+.patch-data h3 {
+  color: var(--primary);
+  font-size: 1.5rem;
   margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 
-.patch-analysis .role-analysis {
+.patch-data h4 {
+  color: var(--primary);
+  margin: var(--spacing-lg) 0 var(--spacing-sm);
+  font-size: 1.2rem;
+}
+
+.patch-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+  background-color: var(--card-hover);
+  padding: var(--spacing-md);
+  border-radius: 5px;
+  text-align: center;
+}
+
+.stat-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin: var(--spacing-xs) 0;
+}
+
+.role-analysis {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.champion-list {
+  list-style: none;
+}
+
+.champion-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.champion-list li:hover {
+  background-color: var(--card-hover);
+}
+
+.champion-name {
+  font-weight: bold;
+  margin-right: var(--spacing-sm);
+}
+
+.champion-stats-group {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.patch-analysis .role-column {
-  flex: 1;
-  min-width: 200px;
-  margin: 0 var(--spacing-sm) var(--spacing-lg);
+.games-played {
+  font-weight: bold;
+  color: var(--primary);
 }
 
-/* Utility Classes */
+.win-rate {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.win-rate-fraction {
+  color: var(--primary);
+}
+
+/* Utility */
 .error {
-  color: var(--error-color);
+  color: var(--error);
   margin-top: var(--spacing-sm);
 }
 
-/* Responsive Design */
+/* Media Queries */
 @media (min-width: 1200px) {
   .user-data {
-    width: 100%;
-    max-width: 1600px; /* Increased for larger screens */
+    max-width: 1600px;
   }
-
-  .stats-and-matches {
-    flex-direction: row;
-  }
-
+  
   .champion-stats {
-    flex: 1;
-    max-width: 400px; /* Increased from 300px */
+    max-width: 400px;
   }
+}
 
-  .recent-matches {
-    flex: 2;
+@media (max-width: 1024px) {
+  .role-analysis {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .input-group {
-    flex-direction: column;
-    width: 100%;
-  }
-
+  .input-group,
   .input-field {
+    flex-direction: column;
     width: 100%;
     margin: var(--spacing-xs) 0;
   }
-
-  button#fetchUserInfo {
+  
+  #fetchUserInfo {
     width: 100%;
     max-width: none;
     margin-left: 0;
+  }
+  
+  .stats-and-matches {
+    flex-direction: column;
+  }
+  
+  .champion-stats {
+    max-width: none;
+  }
+  
+  .patch-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .role-analysis {
+    grid-template-columns: 1fr;
   }
 }
-
-@media (max-width: 600px) {
-  .input-group {
-    flex-direction: column;
-  }
-  
-  .input-field {
-    margin: var(--spacing-xs) 0;
-  }
-  
-  button#fetchUserInfo {
-    margin-left: 0;
-    max-width: none;
-  }
-} 

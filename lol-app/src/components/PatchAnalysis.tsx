@@ -105,13 +105,18 @@ const PatchAnalysis: React.FC = () => {
               .filter(([_, stats]) => stats.games_played >= 5)
               .sort((a, b) => b[1].games_played - a[1].games_played)
               .slice(0, 5)
-              .map(([champion, stats]) => (
-                <li key={champion}>
-                  {champion}: Win Rate {stats.win_rate.toFixed(2)}%, Pick Rate{" "}
-                  {stats.pick_rate.toFixed(2)}%, Games Played{" "}
-                  {stats.games_played}
-                </li>
-              ))}
+              .map(([champion, stats]) => {
+                const wins = Math.round(
+                  (stats.games_played * stats.win_rate) / 100
+                );
+                return (
+                  <li key={champion}>
+                    {champion}: {wins} wins / {stats.games_played} games (Win
+                    Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
+                    {stats.pick_rate.toFixed(2)}%
+                  </li>
+                );
+              })}
           </ul>
 
           <h4>Role Analysis</h4>
@@ -124,13 +129,18 @@ const PatchAnalysis: React.FC = () => {
                     .filter(([_, stats]) => stats.games_played >= 5)
                     .sort((a, b) => b[1].games_played - a[1].games_played)
                     .slice(0, 5)
-                    .map(([champion, stats]) => (
-                      <li key={champion}>
-                        {champion}: Win Rate {stats.win_rate.toFixed(2)}%, Pick
-                        Rate {stats.pick_rate.toFixed(2)}%, Games Played{" "}
-                        {stats.games_played}
-                      </li>
-                    ))}
+                    .map(([champion, stats]) => {
+                      const wins = Math.round(
+                        (stats.games_played * stats.win_rate) / 100
+                      );
+                      return (
+                        <li key={champion}>
+                          {champion}: {wins} wins / {stats.games_played} games
+                          (Win Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
+                          {stats.pick_rate.toFixed(2)}%
+                        </li>
+                      );
+                    })}
                 </ul>
               </div>
             ))}
