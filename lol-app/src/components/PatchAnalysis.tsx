@@ -36,7 +36,7 @@ const PatchAnalysis: React.FC = () => {
     fetch("/api/patches")
       .then((response) => response.json())
       .then((data) => {
-        const sortedPatches = data.sort((a, b) => {
+        const sortedPatches = data.sort((a: string, b: string) => {
           const [aMajor, aMinor] = a.split(".").map(Number);
           const [bMajor, bMinor] = b.split(".").map(Number);
           return bMajor - aMajor || bMinor - aMinor;
@@ -49,7 +49,7 @@ const PatchAnalysis: React.FC = () => {
       });
   }, []);
 
-  const handlePatchChange = (event) => {
+  const handlePatchChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPatch(event.target.value);
   };
 
@@ -60,7 +60,6 @@ const PatchAnalysis: React.FC = () => {
       fetch(`/api/patch_analysis/${selectedPatch}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log("Patch Data:", data); // Add this line
           setPatchData(data);
           setLoading(false);
         })
@@ -134,8 +133,11 @@ const PatchAnalysis: React.FC = () => {
                       <li key={champion} className="champion-stat-item">
                         <span className="champion-name">{champion}</span>
                         <span className="stat-details">
-                          {stats.wins} wins / {stats.games_played} games (Win
-                          Rate: {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
+                          {Math.round(
+                            (stats.win_rate * stats.games_played) / 100
+                          )}{" "}
+                          wins / {stats.games_played} games (Win Rate:{" "}
+                          {stats.win_rate.toFixed(1)}%), Pick Rate{" "}
                           {stats.pick_rate.toFixed(2)}%
                         </span>
                       </li>
