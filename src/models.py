@@ -60,8 +60,8 @@ class Participant(Base):
 
 class PerformanceFeatures(Base):
     __tablename__ = 'performance_features'
-    id = Column(Integer, primary_key=True)
-    participant_id = Column(Integer, ForeignKey('participants.participant_id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    participant_id = Column(Integer, ForeignKey('participants.participant_id'), nullable=False, unique=True)
     kill_participation = Column(Float, nullable=True)
     death_share = Column(Float, nullable=True)
     damage_share = Column(Float, nullable=True)
