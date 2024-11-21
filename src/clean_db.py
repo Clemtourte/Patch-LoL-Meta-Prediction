@@ -1,160 +1,112 @@
-from sqlalchemy import create_engine, text, func
-from sqlalchemy.orm import sessionmaker
-from models import Base, Match, Team, Participant, PerformanceFeatures
+# fix_missing_data.py
 import logging
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import Match, Team, Participant, PerformanceFeatures
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def clean_duplicate_entries():
-    """Clean duplicate entries and align tables"""
+def fix_missing_data():
     engine = create_engine("sqlite:///../datasets/league_data.db")
     Session = sessionmaker(bind=engine)
     session = Session()
-    
+
     try:
-        logging.info("Starting cleanup process...")
-        
-        # 1. First, let's delete completely empty performance features entries
-        logging.info("Deleting empty performance features entries...")
-        empty_query = """
-        DELETE FROM performance_features 
-        WHERE kill_participation IS NULL 
-        AND death_share IS NULL 
-        AND damage_share IS NULL 
-        AND damage_taken_share IS NULL 
-        AND gold_share IS NULL 
-        AND heal_share IS NULL 
-        AND damage_mitigated_share IS NULL 
-        AND cs_share IS NULL 
-        AND vision_share IS NULL 
-        AND vision_denial_share IS NULL 
-        AND xp_share IS NULL 
-        AND cc_share IS NULL
-        """
-        result = session.execute(text(empty_query))
-        session.commit()
-        logging.info(f"Deleted {result.rowcount} empty entries")
+        # Find participants missing performance features
+        missing_features = session.query(Participant)\
+            .outerjoin(PerformanceFeatures)\
+            .filter(PerformanceFeatures.id.is_(None))\
+            .all()
 
-        # 2. Find and handle duplicates
-        logging.info("Checking for duplicate performance features...")
-        duplicate_query = """
-        SELECT participant_id, COUNT(*) as count 
-        FROM performance_features 
-        GROUP BY participant_id 
-        HAVING COUNT(*) > 1
-        """
-        duplicates = session.execute(text(duplicate_query)).fetchall()
-        logging.info(f"Found {len(duplicates)} participants with duplicate performance features")
+        logger.info(f"Found {len(missing_features)} participants missing performance features")
 
-        # 3. For each duplicate, keep only the one with most non-null values
-        for participant_id, count in duplicates:
-            logging.info(f"Processing duplicates for participant {participant_id}")
+        # Process in batches
+        batch_size = 1000
+        for i in range(0, len(missing_features), batch_size):
+            batch = missing_features[i:i + batch_size]
+            logger.info(f"Processing batch {i//batch_size + 1} of {len(missing_features)//batch_size + 1}")
             
-            # Get all entries with non-null count
-            entries_query = """
-            SELECT id,
-                   (CASE WHEN kill_participation IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN death_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN damage_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN damage_taken_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN gold_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN heal_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN damage_mitigated_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN cs_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN vision_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN vision_denial_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN xp_share IS NOT NULL THEN 1 ELSE 0 END +
-                    CASE WHEN cc_share IS NOT NULL THEN 1 ELSE 0 END) as non_null_count
-            FROM performance_features
-            WHERE participant_id = :participant_id
-            ORDER BY non_null_count DESC
-            """
-            entries = session.execute(text(entries_query), {"participant_id": participant_id}).fetchall()
-            
-            # Keep the first one (most complete), delete others
-            if len(entries) > 1:
-                # Get IDs to delete (all except the first one)
-                ids_to_delete = [entry[0] for entry in entries[1:]]
-                if ids_to_delete:  # Check if there are IDs to delete
-                    delete_query = text("DELETE FROM performance_features WHERE id IN :ids")
-                    session.execute(delete_query, {"ids": tuple(ids_to_delete)})
-                    logging.info(f"Deleted {len(ids_to_delete)} duplicate entries for participant {participant_id}")
+            for participant in batch:
+                try:
+                    # Check for valid relationships
+                    if not participant.team:
+                        logger.warning(f"Participant {participant.participant_id} has no team relationship")
+                        continue
+                        
+                    if not participant.team.match:
+                        logger.warning(f"Team {participant.team.team_id} has no match relationship")
+                        continue
 
-        session.commit()
+                    team = participant.team
+                    match = team.match
+                    
+                    # Calculate team totals
+                    team_totals = {
+                        'kills': sum(p.kills for p in team.participants if p.kills is not None),
+                        'deaths': sum(p.deaths for p in team.participants if p.deaths is not None),
+                        'damage': sum(p.total_damage_dealt for p in team.participants if p.total_damage_dealt is not None),
+                        'gold': sum(p.gold_earned for p in team.participants if p.gold_earned is not None),
+                        'wards': sum(p.wards_placed for p in team.participants if p.wards_placed is not None),
+                        'wards_killed': sum(p.wards_killed for p in team.participants if p.wards_killed is not None),
+                        'cs': sum(p.cs for p in team.participants if p.cs is not None),
+                        'xp': sum(p.xp for p in team.participants if p.xp is not None),
+                        'heal': sum(p.total_heal for p in team.participants if p.total_heal is not None),
+                        'damage_taken': sum(p.damage_taken for p in team.participants if p.damage_taken is not None),
+                        'damage_mitigated': sum(p.damage_mitigated for p in team.participants if p.damage_mitigated is not None),
+                        'cc': sum(p.time_ccing_others for p in team.participants if p.time_ccing_others is not None)
+                    }
 
-        # 4. Find and delete orphaned entries
-        logging.info("Checking for orphaned performance features...")
-        orphaned_query = """
-        DELETE FROM performance_features 
-        WHERE participant_id NOT IN (SELECT participant_id FROM participants)
-        """
-        result = session.execute(text(orphaned_query))
-        session.commit()
-        logging.info(f"Deleted {result.rowcount} orphaned entries")
+                    # Create new performance features with null checks
+                    perf_features = PerformanceFeatures(
+                        participant_id=participant.participant_id,
+                        champion_role_patch=f"{participant.champion_name}-{participant.position}-{match.patch}",
+                        kill_participation=(participant.kills + participant.assists) / max(1, team_totals['kills']) if participant.kills is not None and participant.assists is not None else 0,
+                        death_share=participant.deaths / max(1, team_totals['deaths']) if participant.deaths is not None else 0,
+                        damage_share=participant.total_damage_dealt / max(1, team_totals['damage']) if participant.total_damage_dealt is not None else 0,
+                        damage_taken_share=participant.damage_taken / max(1, team_totals['damage_taken']) if participant.damage_taken is not None else 0,
+                        gold_share=participant.gold_earned / max(1, team_totals['gold']) if participant.gold_earned is not None else 0,
+                        heal_share=participant.total_heal / max(1, team_totals['heal']) if participant.total_heal is not None else 0,
+                        damage_mitigated_share=participant.damage_mitigated / max(1, team_totals['damage_mitigated']) if participant.damage_mitigated is not None else 0,
+                        cs_share=participant.cs / max(1, team_totals['cs']) if participant.cs is not None else 0,
+                        vision_share=participant.wards_placed / max(1, team_totals['wards']) if participant.wards_placed is not None else 0,
+                        vision_denial_share=participant.wards_killed / max(1, team_totals['wards_killed']) if participant.wards_killed is not None else 0,
+                        xp_share=participant.xp / max(1, team_totals['xp']) if participant.xp is not None else 0,
+                        cc_share=participant.time_ccing_others / max(1, team_totals['cc']) if participant.time_ccing_others is not None else 0
+                    )
 
-        # 5. Create missing performance features with proper IDs
-        logging.info("Checking for missing performance features...")
-        
-        # First get the current max ID
-  # Additional step: Fix any remaining NULL IDs
-        logging.info("Fixing remaining NULL IDs...")
-        
-        # Get current max ID
-        max_id_query = """
-        SELECT COALESCE(MAX(id), 0) from performance_features WHERE id IS NOT NULL
-        """
-        current_max_id = session.execute(text(max_id_query)).scalar() or 0
-        
-        # Get entries with NULL IDs
-        null_ids_query = """
-        SELECT participant_id FROM performance_features WHERE id IS NULL ORDER BY participant_id
-        """
-        null_entries = session.execute(text(null_ids_query)).fetchall()
-        
-        # Update each NULL entry with a new sequential ID
-        for i, (participant_id,) in enumerate(null_entries, 1):
-            new_id = current_max_id + i
-            update_query = """
-            UPDATE performance_features 
-            SET id = :new_id 
-            WHERE participant_id = :participant_id AND id IS NULL
-            """
-            session.execute(text(update_query), {
-                "new_id": new_id,
-                "participant_id": participant_id
-            })
-            
-        session.commit()
-        logging.info(f"Fixed {len(null_entries)} NULL IDs")
+                    # Ensure all shares are between 0 and 1
+                    for attr in ['kill_participation', 'death_share', 'damage_share', 'damage_taken_share', 
+                               'gold_share', 'heal_share', 'damage_mitigated_share', 'cs_share', 
+                               'vision_share', 'vision_denial_share', 'xp_share', 'cc_share']:
+                        value = getattr(perf_features, attr)
+                        setattr(perf_features, attr, min(1.0, max(0.0, float(value if value is not None else 0))))
 
+                    session.add(perf_features)
 
-        # 6. Final verification
-        null_check_query = """
-        SELECT COUNT(*) FROM performance_features WHERE id IS NULL
-        """
-        remaining_nulls = session.execute(text(null_check_query)).scalar()
-        
-        participant_count = session.query(Participant).count()
-        perf_features_count = session.query(PerformanceFeatures).count()
-        
-        logging.info("Cleanup completed!")
-        logging.info(f"Final counts:")
-        logging.info(f"- Participants: {participant_count}")
-        logging.info(f"- Performance Features: {perf_features_count}")
-        logging.info(f"- Remaining NULL IDs: {remaining_nulls}")
-        
-        return True
+                except Exception as e:
+                    logger.error(f"Error processing participant {participant.participant_id}: {str(e)}")
+                    continue
+
+            # Commit each batch
+            try:
+                session.commit()
+                logger.info(f"Committed batch {i//batch_size + 1}")
+            except Exception as e:
+                logger.error(f"Error committing batch: {str(e)}")
+                session.rollback()
+                continue
+
+        # Now recalculate all performance ratings
+        logger.info("Recalculating performance ratings...")
+        from perf_rating import calculate_performance_ratings
+        calculate_performance_ratings()
         
     except Exception as e:
-        logging.error(f"Error during cleanup: {str(e)}")
+        logger.error(f"Error fixing data: {str(e)}")
         session.rollback()
-        return False
     finally:
         session.close()
 
 if __name__ == "__main__":
-    print("Starting database cleanup process...")
-    if clean_duplicate_entries():
-        print("Database cleanup completed successfully!")
-    else:
-        print("Error occurred during database cleanup")
+    fix_missing_data()
