@@ -200,30 +200,30 @@ class UserData:
         user_stats = participant_info[user_team][summoner_name]
         team_totals = team_stats[user_team]
         
+        def safe_divide(a, b, min_denominator=1):
+            return a / max(b, min_denominator)
+        
         try:
             features = {
-                'kill_participation': (user_stats['kills'] + user_stats['assists']) / max(1, team_totals['total_kills']),
-                'death_share': user_stats['deaths'] / max(1, team_totals['total_deaths']),
-                'damage_share': user_stats['total_damage_dealt'] / max(1, team_totals['total_damage_dealt']),
-                'damage_taken_share': user_stats['damage_taken'] / max(1, team_totals['damage_taken']),
-                'gold_share': user_stats['gold_earned'] / max(1, team_totals['total_gold_earned']),
-                'heal_share': user_stats['total_heal'] / max(1, team_totals['heal']),
-                'damage_mitigated_share': user_stats['damage_mitigated'] / max(1, team_totals['damage_mitigated']),
-                'cs_share': user_stats['cs'] / max(1, team_totals['total_cs']),
-                'vision_share': user_stats['wards_placed'] / max(1, team_totals['wards_placed']),
-                'vision_denial_share': user_stats['wards_killed'] / max(1, team_totals['wards_killed']),
-                'xp_share': user_stats['xp'] / max(1, team_totals['total_xp']),
-                'cc_share': user_stats['time_ccing_others'] / max(1, team_totals['time_ccing_others'])
+                'kill_participation': safe_divide(user_stats['kills'] + user_stats['assists'], team_totals['total_kills'], 5),
+                'death_share': safe_divide(user_stats['deaths'], team_totals['total_deaths'], 5),
+                'damage_share': safe_divide(user_stats['total_damage_dealt'], team_totals['total_damage_dealt'], 100),
+                'damage_taken_share': safe_divide(user_stats['damage_taken'], team_totals['damage_taken'], 100),
+                'gold_share': safe_divide(user_stats['gold_earned'], team_totals['total_gold_earned'], 100),
+                'heal_share': safe_divide(user_stats['total_heal'], team_totals['heal'], 100),
+                'damage_mitigated_share': safe_divide(user_stats['damage_mitigated'], team_totals['damage_mitigated'], 100),
+                'cs_share': safe_divide(user_stats['cs'], team_totals['total_cs'], 100),
+                'vision_share': safe_divide(user_stats['wards_placed'], team_totals['wards_placed'], 5),
+                'vision_denial_share': safe_divide(user_stats['wards_killed'], team_totals['wards_killed'], 5),
+                'xp_share': safe_divide(user_stats['xp'], team_totals['total_xp'], 100),
+                'cc_share': safe_divide(user_stats['time_ccing_others'], team_totals['time_ccing_others'], 10)
             }
             
-            # Ensure all values are between 0 and 1
             features = {k: min(1.0, max(0.0, v)) for k, v in features.items()}
-            
-            # Add champion_role_patch
             features['champion_role_patch'] = f"{user_stats['champion_name']}-{user_stats['position']}"
             
             return features
-            
+                
         except Exception as e:
             self.logger.error(f"Error calculating features for {summoner_name}: {str(e)}")
             return None
