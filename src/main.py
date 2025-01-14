@@ -6,14 +6,13 @@ import traceback
 from datetime import datetime
 from dotenv import load_dotenv
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import SQLAlchemyError
 from models import Match, Team, Participant, PerformanceFeatures, init_db
 from perf_rating import calculate_performance_ratings
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Initialize database session
 Session = init_db()
 
 class UserData:
@@ -48,11 +47,10 @@ class UserData:
             response = requests.get(url)
             if response.status_code == 200:
                 return response.json()
-            elif response.status_code == 429:  # Rate limit exceeded
+            elif response.status_code == 429: 
                 retry_after = int(response.headers.get('Retry-After', 120))
                 self.logger.warning(f"Rate limit exceeded. Retry after {retry_after} seconds")
-                time.sleep(retry_after + 1)  # Add 1 second buffer
-                # Retry the request
+                time.sleep(retry_after + 1)
                 return self._get_response(url, default)
             else:
                 self.logger.error(f"API request failed with status code {response.status_code}. Response: {response.text}")
@@ -118,7 +116,6 @@ class UserData:
             return None, None, None, self.api_call_count
 
         try:
-            # Extract basic match info
             game_id = match_data['metadata']['matchId']
             game_duration = match_data['info']['gameDuration']
             game_version = match_data['info']['gameVersion']
@@ -134,7 +131,6 @@ class UserData:
                 'queue_id': match_data['info']['queueId']
             }
 
-            # Initialize team stats
             participant_info = {'Blue Side': {}, 'Red Side': {}}
             team_stats = {'Blue Side': {}, 'Red Side': {}}
             for team in team_stats:
@@ -146,12 +142,10 @@ class UserData:
                     'time_ccing_others': 0
                 }
 
-            # Process participant data
             for participant in match_data['info']['participants']:
                 team = 'Blue Side' if participant['teamId'] == 100 else 'Red Side'
                 summoner_name = participant['riotIdGameName'] if participant['summonerName'] == "" else participant['summonerName']
                 
-                # Calculate participant stats
                 participant_info[team][summoner_name] = {
                     'summoner_id': participant['summonerId'],
                     'summoner_name': summoner_name,
@@ -178,7 +172,6 @@ class UserData:
                     'win': participant['win']
                 }
 
-                # Update team totals
                 for stat, value in participant_info[team][summoner_name].items():
                     if stat in ['kills', 'deaths', 'assists', 'total_damage_dealt', 'gold_earned', 
                               'cs', 'wards_placed', 'wards_killed', 'xp', 'damage_taken', 
@@ -191,7 +184,7 @@ class UserData:
             self.logger.error(f"Error processing match {match_id}: {str(e)}")
             return None, None, None, self.api_call_count
 
-    def calculate_performance_features(self, participant_info, team_stats, summoner_name):
+    def calculate_performance_features(self, participant_info, team_stats, summoner_name, patch):  
         """Calculate performance features for a participant"""
         user_team = next((team for team, players in participant_info.items() if summoner_name in players), None)
         if not user_team:
@@ -199,6 +192,11 @@ class UserData:
 
         user_stats = participant_info[user_team][summoner_name]
         team_totals = team_stats[user_team]
+        
+        # Debug prints
+        print(f"Champion: {user_stats['champion_name']}")
+        print(f"Position: {user_stats['position']}")
+        print(f"Patch: {patch}")
         
         def safe_divide(a, b, min_denominator=1):
             return a / max(b, min_denominator)
@@ -220,7 +218,8 @@ class UserData:
             }
             
             features = {k: min(1.0, max(0.0, v)) for k, v in features.items()}
-            features['champion_role_patch'] = f"{user_stats['champion_name']}-{user_stats['position']}"
+            position = user_stats['position'].upper() if user_stats['position'] != 'N/A' else 'UNKNOWN'
+            features['champion_role_patch'] = f"{user_stats['champion_name']}-{position}-{patch}"
             
             return features
                 
@@ -253,7 +252,6 @@ class UserData:
                         if team.win:
                             wins += 1
                         
-                        # Update champion stats
                         if participant.champion_name not in champion_stats:
                             champion_stats[participant.champion_name] = {
                                 'games': 0, 'wins': 0, 'kills': 0, 
@@ -269,13 +267,11 @@ class UserData:
                         stats['assists'] += participant.assists
                         stats['cs'] += participant.cs
                         
-                        # Update totals
                         total_kills += participant.kills
                         total_deaths += participant.deaths
                         total_assists += participant.assists
                         total_cs += participant.cs
-                        
-                        # Track roles
+
                         roles_played[participant.position] = roles_played.get(participant.position, 0) + 1
 
         return {
@@ -355,59 +351,37 @@ class UserDisplay:
         
         return formatted_stats
 
+
 def save_match_data(user_data, match_ids, session):
-    """Save match data to database with improved rate limiting"""
+    """
+    Save match data to database with proper relationship handling
+    """
     added_matches = 0
     updated_matches = 0
     total_api_calls = 0
-    start_time = time.time()
-    retry_after = 0
-
-    try:
-        for i, match_id in enumerate(match_ids, 1):
-            logger.info(f"Processing match {i} of {len(match_ids)}: {match_id}")
+    
+    for match_id in match_ids:
+        try:
+            logger.info(f"Processing match {match_id}")
             
-            # Handle rate limits
-            elapsed_time = time.time() - start_time
-            if total_api_calls >= 70:  # Near rate limit
-                sleep_time = max(120 - elapsed_time + 5, 5)  # At least 5 seconds
-                logger.info(f"Rate limit approaching. Sleeping for {sleep_time:.2f} seconds")
-                time.sleep(sleep_time)
-                total_api_calls = 0
-                start_time = time.time()
-            
-            # If we got a retry-after response, honor it
-            if retry_after > 0:
-                logger.info(f"Waiting {retry_after} seconds due to rate limit")
-                time.sleep(retry_after)
-                retry_after = 0
-
             # Get match info
             match_info = user_data.get_match_info(match_id)
-            
-            # Check for rate limit in response
-            if match_info[0] is None and user_data.api_call_count == 0:
-                retry_after = 120  # Default to 2 minutes if we hit rate limit
-                continue
-
-            if not all(match_info[:3]):  # Check if general_info, participant_info, and team_stats exist
+            if not all(match_info[:3]):
+                logger.warning(f"Skipping match {match_id}: Incomplete data")
                 continue
 
             general_info, participant_info, team_stats, api_calls = match_info
             total_api_calls += api_calls
 
-            # Skip remakes
-            if int(general_info['game_duration'].split('m')[0]) < 14:
-                logger.info(f"Skipping remake match {match_id}")
+            # Check for existing match
+            existing_match = session.query(Match).filter_by(game_id=general_info['game_id']).first()
+            if existing_match:
+                logger.info(f"Match {general_info['game_id']} already exists")
+                updated_matches += 1
                 continue
 
-            # Check if match exists
-            if session.query(Match).filter_by(game_id=general_info['game_id']).first():
-                logger.info(f"Match {general_info['game_id']} already exists. Skipping.")
-                continue
-
-            # Create match
-            match = Match(
+            # Create new match
+            new_match = Match(
                 game_id=general_info['game_id'],
                 game_duration=general_info['game_duration'],
                 patch=general_info['patch'],
@@ -416,70 +390,76 @@ def save_match_data(user_data, match_ids, session):
                 queue_id=general_info['queue_id'],
                 platform="EUW1"
             )
-            session.add(match)
-            session.flush()
-
-            # Process teams
+            
+            # Create teams and add them to match
             for team_name, participants in participant_info.items():
                 if not participants:
                     continue
 
                 # Create team
                 team = Team(
-                    match_id=match.match_id,
                     team_name=team_name,
                     win=next(iter(participants.values()))['win']
                 )
-                session.add(team)
-                session.flush()
+                
+                # Add team to match
+                new_match.teams.append(team)
 
                 # Process participants
                 for summoner, details in participants.items():
-                    participant = Participant(team_id=team.team_id)
+                    # Create participant
+                    participant = Participant(
+                        summoner_id=details['summoner_id'],
+                        summoner_name=details['summoner_name'],
+                        champion_name=details['champion_name'],
+                        champion_id=details['champion_id'],
+                        position=details['position'],
+                        role=details['role'],
+                        lane=details['lane'],
+                        champ_level=details['champ_level'],
+                        kills=details['kills'],
+                        deaths=details['deaths'],
+                        assists=details['assists'],
+                        kda=details['kda'],
+                        gold_earned=details['gold_earned'],
+                        total_damage_dealt=details['total_damage_dealt'],
+                        cs=details['cs'],
+                        total_heal=details['total_heal'],
+                        damage_taken=details['damage_taken'],
+                        damage_mitigated=details['damage_mitigated'],
+                        wards_placed=details['wards_placed'],
+                        wards_killed=details['wards_killed'],
+                        time_ccing_others=details['time_ccing_others'],
+                        xp=details['xp']
+                    )
                     
-                    # Set participant attributes
-                    for attr, value in details.items():
-                        if attr != 'team' and hasattr(participant, attr):
-                            if isinstance(value, (int, float, bool, str)):
-                                setattr(participant, attr, value)
-                    
-                    session.add(participant)
-                    session.flush()
+                    # Add participant to team
+                    team.participants.append(participant)
 
-                    # Calculate and save performance features
-                    features = user_data.calculate_performance_features(participant_info, team_stats, summoner)
+                    # Calculate and add performance features
+                    features = user_data.calculate_performance_features(
+                        participant_info, team_stats, summoner, general_info['patch'] 
+                    )
                     if features:
                         perf_features = PerformanceFeatures(
-                            participant_id=participant.participant_id,
-                            champion_role_patch=f"{details['champion_name']}-{details['position']}-{general_info['patch']}"
+                            **{k: v for k, v in features.items() 
+                               if hasattr(PerformanceFeatures, k)}
                         )
-                        
-                        for key, value in features.items():
-                            if hasattr(perf_features, key) and key != 'champion_role_patch':
-                                setattr(perf_features, key, value)
-                        
-                        session.add(perf_features)
+                        print(f"About to save performance features:")
+                        print(f"Champion role patch: {perf_features.champion_role_patch}")
+                        participant.performance_features = perf_features
 
-            try:
-                session.commit()
-                added_matches += 1
-                logger.info(f"Successfully saved match {general_info['game_id']}")
-            except Exception as e:
-                logger.error(f"Error saving match {match_id}: {str(e)}")
-                session.rollback()
-                continue
+            # Add match to session
+            session.add(new_match)
+            session.commit()
+            
+            added_matches += 1
+            logger.info(f"Successfully processed match {general_info['game_id']}")
 
-            # Basic rate limiting between requests
-            time.sleep(2.2)
+        except Exception as e:
+            logger.error(f"Error processing match {match_id}: {str(e)}")
+            logger.error(traceback.format_exc())  # Add this line for better error tracking
+            session.rollback()
+            continue
 
-        # Calculate performance ratings after all matches are saved
-        if added_matches > 0:
-            logger.info("Calculating performance ratings for new matches...")
-            calculate_performance_ratings()
-        
-        return added_matches, updated_matches, total_api_calls
-
-    except Exception as e:
-        logger.error(f"Error in save_match_data: {str(e)}")
-        session.rollback()
-        return 0, 0, total_api_calls
+    return added_matches, updated_matches, total_api_calls

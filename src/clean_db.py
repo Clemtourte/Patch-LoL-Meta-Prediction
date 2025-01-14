@@ -1,32 +1,65 @@
-import logging
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker
-from models import Match, Team, Participant, PerformanceFeatures
+from sqlalchemy import create_engine, text
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-def verify_database():
-    engine = create_engine("sqlite:///../datasets/league_data.db")
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def clean_wrong_format_matches():
+    engine = create_engine('sqlite:///../datasets/league_data.db')
     
     try:
-        # Count participants without performance features
-        orphaned_participants = session.query(Participant)\
-            .outerjoin(PerformanceFeatures)\
-            .filter(PerformanceFeatures.participant_id == None)\
-            .count()
+        with engine.connect() as conn:
+            # First get just the game_ids
+            result = conn.execute(text("""
+                SELECT DISTINCT m.match_id, m.game_id
+                FROM matches m
+                JOIN teams t ON m.match_id = t.match_id
+                JOIN participants p ON t.team_id = p.team_id
+                JOIN performance_features pf ON p.participant_id = pf.participant_id
+                WHERE pf.champion_role_patch NOT LIKE '%-%-%'
+            """))
             
-        logger.info(f"Participants without performance features: {orphaned_participants}")
-        
-        # This will help us determine if we need to run the cleanup script
-        return orphaned_participants > 0
-        
+            matches = list(result)
+            print(f"Found {len(matches)} matches to delete")
+            
+            # Delete in correct order due to foreign key constraints
+            for match_id, game_id in matches:
+                # Delete performance_features first
+                conn.execute(text("""
+                    DELETE FROM performance_features 
+                    WHERE participant_id IN (
+                        SELECT p.participant_id 
+                        FROM participants p
+                        JOIN teams t ON p.team_id = t.team_id
+                        WHERE t.match_id = :match_id
+                    )
+                """), {"match_id": match_id})
+                
+                # Delete participants
+                conn.execute(text("""
+                    DELETE FROM participants 
+                    WHERE team_id IN (
+                        SELECT team_id FROM teams WHERE match_id = :match_id
+                    )
+                """), {"match_id": match_id})
+                
+                # Delete teams
+                conn.execute(text("DELETE FROM teams WHERE match_id = :match_id"), 
+                           {"match_id": match_id})
+                
+                # Finally delete match
+                conn.execute(text("DELETE FROM matches WHERE match_id = :match_id"), 
+                           {"match_id": match_id})
+                
+                conn.commit()
+                print(f"Deleted match {game_id}")
+            
+            print("\nDeletion complete!")
+
     except Exception as e:
-        logger.error(f"Error during verification: {str(e)}")
-    finally:
-        session.close()
+        print(f"An error occurred: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
 
 if __name__ == "__main__":
-    verify_database()
+    confirm = input("This will delete matches with wrong format. Are you sure? (yes/no): ")
+    if confirm.lower() == 'yes':
+        clean_wrong_format_matches()
+    else:
+        print("Operation cancelled.")

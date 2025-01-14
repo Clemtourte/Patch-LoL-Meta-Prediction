@@ -14,17 +14,19 @@ class Match(Base):
     queue_id = Column(Integer, nullable=False, default=0)
     platform = Column(String, nullable=False)
 
-    teams = relationship("Team", back_populates="match")
+    # Add cascade
+    teams = relationship("Team", back_populates="match", cascade="all, delete-orphan")
 
 class Team(Base):
     __tablename__ = 'teams'
     team_id = Column(Integer, primary_key=True, autoincrement=True)
-    match_id = Column(Integer, ForeignKey('matches.match_id'), nullable=False)
+    match_id = Column(Integer, ForeignKey('matches.match_id', ondelete='CASCADE'), nullable=False)
     team_name = Column(String, nullable=False)
     win = Column(Boolean, nullable=False)
 
     match = relationship("Match", back_populates="teams")
-    participants = relationship("Participant", back_populates="team")
+    # Add cascade
+    participants = relationship("Participant", back_populates="team", cascade="all, delete-orphan")
 
 class Participant(Base):
     __tablename__ = 'participants'
@@ -74,7 +76,7 @@ class PerformanceFeatures(Base):
     vision_denial_share = Column(Float, nullable=True)
     xp_share = Column(Float, nullable=True)
     cc_share = Column(Float, nullable=True)
-    champion_role_patch = Column(String, nullable=True)
+    champion_role_patch = Column(String(100), nullable=True) 
 
     participant = relationship("Participant", back_populates="performance_features")
 
