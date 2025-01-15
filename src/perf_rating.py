@@ -101,9 +101,6 @@ def calculate_performance_ratings():
                 performance_score = sum(feature_values) / len(features)
                 participant.performance_score = performance_score
 
-                # Update champion_role_patch
-                perf_features.champion_role_patch = f"{participant.champion_name}-{participant.position}"
-
         # Calculate standardized scores
         session.flush()
         for position in positions:

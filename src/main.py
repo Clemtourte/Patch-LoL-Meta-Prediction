@@ -184,7 +184,9 @@ class UserData:
             self.logger.error(f"Error processing match {match_id}: {str(e)}")
             return None, None, None, self.api_call_count
 
-    def calculate_performance_features(self, participant_info, team_stats, summoner_name, patch):  
+    def calculate_performance_features(self, participant_info, team_stats, summoner_name, patch):
+        print(f"Debug: Inside calculate_performance_features")
+        print(f"Debug: Received patch value: {patch}")
         """Calculate performance features for a participant"""
         user_team = next((team for team, players in participant_info.items() if summoner_name in players), None)
         if not user_team:
@@ -220,6 +222,7 @@ class UserData:
             features = {k: min(1.0, max(0.0, v)) for k, v in features.items()}
             position = user_stats['position'].upper() if user_stats['position'] != 'N/A' else 'UNKNOWN'
             features['champion_role_patch'] = f"{user_stats['champion_name']}-{position}-{patch}"
+            print(f"Debug: Created triplet: {features['champion_role_patch']}")
             
             return features
                 
@@ -435,6 +438,8 @@ def save_match_data(user_data, match_ids, session):
                     
                     # Add participant to team
                     team.participants.append(participant)
+                    print(f"Debug: About to calculate features for match {general_info['game_id']}")
+                    print(f"Debug: Patch value being passed: {general_info['patch']}")
 
                     # Calculate and add performance features
                     features = user_data.calculate_performance_features(
@@ -443,13 +448,14 @@ def save_match_data(user_data, match_ids, session):
                     if features:
                         perf_features = PerformanceFeatures(
                             **{k: v for k, v in features.items() 
-                               if hasattr(PerformanceFeatures, k)}
+                            if hasattr(PerformanceFeatures, k)}
                         )
-                        print(f"About to save performance features:")
-                        print(f"Champion role patch: {perf_features.champion_role_patch}")
+                        print(f"Debug: PerformanceFeatures object created with triplet: {perf_features.champion_role_patch}")
                         participant.performance_features = perf_features
+                        print(f"Debug: After assigning to participant: {participant.performance_features.champion_role_patch}")
 
             # Add match to session
+            print(f"Debug: Final check before commit - triplet: {participant.performance_features.champion_role_patch}")
             session.add(new_match)
             session.commit()
             
