@@ -44,6 +44,11 @@ Develop a deep learning model to predict how meta shifts will evolve in League o
    ```
 
 ### Viewing Results / Usage
+#### View the database schema
+https://dbdiagram.io/d/league_datadb-67879ea86b7fa355c3f52325
+
+
+#### View in streamlit
 To view the results and predictions using the Streamlit app:
 ```
 streamlit run app.py
