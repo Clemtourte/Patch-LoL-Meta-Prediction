@@ -168,4 +168,4 @@ def fetch_and_store_patch_data(start_version, end_version):
     session.close()
 
 if __name__ == "__main__":
-    fetch_and_store_patch_data("14.1.1", "14.20.1")
+    fetch_and_store_patch_data("13.1.1", "13.24.1")

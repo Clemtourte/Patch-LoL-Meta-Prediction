@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey, JSON
+from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey, JSON, Index
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 Base = declarative_base()
@@ -130,6 +130,34 @@ class ItemStats(Base):
     sell_gold = Column(Integer)
     purchasable = Column(Boolean)
     tags = Column(String)
+
+class PatchChanges(Base):
+    __tablename__ = 'patch_changes'
+    id = Column(Integer, primary_key=True)
+    from_patch = Column(String, nullable=False)
+    to_patch = Column(String, nullable=False)
+    champion_name = Column(String, nullable=False)
+    stat_type = Column(String, nullable=False)
+    stat_name = Column(String, nullable=False)
+    change_value = Column(Float, nullable=False)
+
+    __table_args__ = (
+        Index('patch_champion_idx', 'from_patch', 'to_patch', 'champion_name'),
+    )
+
+class ChampionWinrates(Base):
+    __tablename__ = 'champion_winrates'
+    id = Column(Integer, primary_key=True)
+    patch = Column(String, nullable=False)
+    champion_name = Column(String, nullable=False)
+    winrate = Column(Float, nullable=False)
+    pickrate = Column(Float, nullable=False)
+    banrate = Column(Float, nullable=False)
+    total_games = Column(Integer, nullable=True)
+    
+    __table_args__ = (
+        Index('winrate_patch_champion_idx', 'patch', 'champion_name'),
+    )
 
 def init_db(uri="sqlite:///../datasets/league_data.db"):
     engine = create_engine(uri)
