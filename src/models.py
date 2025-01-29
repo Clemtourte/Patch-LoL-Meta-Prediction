@@ -107,16 +107,30 @@ class SpellStats(Base):
     version = Column(String, nullable=False)
     champion = Column(String, nullable=False)
     spell_id = Column(String, nullable=False)
+    standardized_id = Column(String(100), nullable=True)
     spell_name = Column(String, nullable=False)
     damage_type = Column(String)
     damage_values = Column(JSON)
+    base_damage = Column(JSON)
     max_rank = Column(Integer)
     cooldown = Column(JSON)
     cost = Column(JSON)
     range = Column(JSON)
-    resource = Column(String)
+    resource_type = Column(String)
     description = Column(String)
     is_passive = Column(Boolean, default=False)
+    ap_ratio = Column(JSON, nullable=True)
+    ad_ratio = Column(JSON, nullable=True)
+    bonus_ad_ratio = Column(JSON, nullable=True)
+    hp_ratio = Column(JSON, nullable=True)
+    target_hp_ratio = Column(JSON, nullable=True)
+    armor_ratio = Column(JSON, nullable=True)
+    mr_ratio = Column(JSON, nullable=True)
+    cc_effects = Column(JSON, nullable=True)
+    
+    __table_args__ = (
+        Index('idx_spell_stats_standardized_id', 'standardized_id'),
+    )
 
 class ItemStats(Base):
     __tablename__ = 'item_stats'
