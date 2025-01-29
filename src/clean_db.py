@@ -1,20 +1,30 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import ChampionWinrates
+from models import SpellStats, ChampionStats, ItemStats
 
-engine = create_engine('sqlite:///../datasets/league_data.db')
-Session = sessionmaker(bind=engine)
-session = Session()
+def clean_tables():
+    engine = create_engine('sqlite:///../datasets/league_data.db')
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    
+    try:
+        print("Deleting records from SpellStats...")
+        session.query(SpellStats).delete()
+        
+        print("Deleting records from ChampionStats...")
+        session.query(ChampionStats).delete()
+        
+        print("Deleting records from ItemStats...")
+        session.query(ItemStats).delete()
+        
+        session.commit()
+        print("All tables cleaned successfully!")
+        
+    except Exception as e:
+        print(f"Error while cleaning tables: {e}")
+        session.rollback()
+    finally:
+        session.close()
 
-try:
-    # Delete all records where patch is '13.2'
-    deleted = session.query(ChampionWinrates)\
-        .filter(ChampionWinrates.patch == '13.2')\
-        .delete()
-    session.commit()
-    print(f"Successfully deleted {deleted} records for patch 13.2")
-except Exception as e:
-    session.rollback()
-    print(f"Error deleting records: {str(e)}")
-finally:
-    session.close()
+if __name__ == "__main__":
+    clean_tables()
