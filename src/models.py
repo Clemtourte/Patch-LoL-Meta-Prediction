@@ -106,30 +106,19 @@ class SpellStats(Base):
     id = Column(Integer, primary_key=True)
     version = Column(String, nullable=False)
     champion = Column(String, nullable=False)
-    spell_id = Column(String, nullable=False)
-    standardized_id = Column(String(100), nullable=True)
+    spell_type = Column(String, nullable=False)  # "Q", "W", "E", "R", or "Passive"
     spell_name = Column(String, nullable=False)
     damage_type = Column(String)
-    damage_values = Column(JSON)
-    base_damage = Column(JSON)
     max_rank = Column(Integer)
-    cooldown = Column(JSON)
-    cost = Column(JSON)
-    range = Column(JSON)
+    cooldown = Column(JSON)  # List of cooldown values.
+    cost = Column(JSON)      # List of cost values.
+    range = Column(JSON)     # List of range values.
     resource_type = Column(String)
     description = Column(String)
-    is_passive = Column(Boolean, default=False)
-    ap_ratio = Column(JSON, nullable=True)
-    ad_ratio = Column(JSON, nullable=True)
-    bonus_ad_ratio = Column(JSON, nullable=True)
-    hp_ratio = Column(JSON, nullable=True)
-    target_hp_ratio = Column(JSON, nullable=True)
-    armor_ratio = Column(JSON, nullable=True)
-    mr_ratio = Column(JSON, nullable=True)
-    cc_effects = Column(JSON, nullable=True)
-    
+    damage_values = Column(JSON)  # New column to store damage numbers.
+
     __table_args__ = (
-        Index('idx_spell_stats_standardized_id', 'standardized_id'),
+        Index('idx_spell_stats_champ_spell', 'champion', 'spell_type', 'version'),
     )
 
 class ItemStats(Base):
