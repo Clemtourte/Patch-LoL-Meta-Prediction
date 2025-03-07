@@ -102,21 +102,54 @@ class ChampionStats(Base):
     critperlevel = Column(Float)
 
 class SpellStats(Base):
-    __tablename__ = 'spell_stats'
+    __tablename__ = "spell_stats"
+
     id = Column(Integer, primary_key=True)
     version = Column(String, nullable=False)
     champion = Column(String, nullable=False)
-    spell_type = Column(String, nullable=False)  # "Q", "W", "E", "R", or "Passive"
+    spell_type = Column(String, nullable=False)
     spell_name = Column(String, nullable=False)
-    damage_type = Column(String)
-    max_rank = Column(Integer)
-    cooldown = Column(JSON)  # List of cooldown values.
-    cost = Column(JSON)      # List of cost values.
-    range = Column(JSON)     # List of range values.
-    resource_type = Column(String)
-    description = Column(String)
-    damage_values = Column(JSON)  # New column to store damage numbers.
 
+    # Current stats
+    base_damage = Column(JSON, nullable=True)
+    ap_ratio = Column(JSON, nullable=True)
+    ad_ratio = Column(JSON, nullable=True)
+    bonus_ad_ratio = Column(JSON, nullable=True)
+    max_health_ratio = Column(JSON, nullable=True)
+    cooldown = Column(JSON, nullable=True)
+    mana_cost = Column(JSON, nullable=True)
+    range = Column(JSON, nullable=True)
+    shield_value = Column(JSON, nullable=True)
+    shield_ratio = Column(JSON, nullable=True)
+    heal_value = Column(JSON, nullable=True)
+    heal_ratio = Column(JSON, nullable=True)
+    slow_percent = Column(JSON, nullable=True)
+    stun_duration = Column(JSON, nullable=True)
+    knockup_duration = Column(JSON, nullable=True)
+    root_duration = Column(JSON, nullable=True)
+    damage_type = Column(String, nullable=True)
+    resource_type = Column(String, nullable=True)
+
+    # Previous stats (added by migration)
+    previous_base_damage = Column(JSON, nullable=True)
+    previous_ap_ratio = Column(JSON, nullable=True)
+    previous_ad_ratio = Column(JSON, nullable=True)
+    previous_bonus_ad_ratio = Column(JSON, nullable=True)
+    previous_max_health_ratio = Column(JSON, nullable=True)
+    previous_cooldown = Column(JSON, nullable=True)
+    previous_mana_cost = Column(JSON, nullable=True)
+    previous_range = Column(JSON, nullable=True)
+    previous_shield_value = Column(JSON, nullable=True)
+    previous_shield_ratio = Column(JSON, nullable=True)
+    previous_heal_value = Column(JSON, nullable=True)
+    previous_heal_ratio = Column(JSON, nullable=True)
+    previous_slow_percent = Column(JSON, nullable=True)
+    previous_stun_duration = Column(JSON, nullable=True)
+    previous_knockup_duration = Column(JSON, nullable=True)
+    previous_root_duration = Column(JSON, nullable=True)
+    previous_damage_type = Column(String, nullable=True)
+    previous_resource_type = Column(String, nullable=True)
+    
     __table_args__ = (
         Index('idx_spell_stats_champ_spell', 'champion', 'spell_type', 'version'),
     )
