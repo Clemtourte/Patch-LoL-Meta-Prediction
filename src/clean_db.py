@@ -14,13 +14,9 @@ def empty_tables():
 
     try:
         deleted_spellstats = session.query(SpellStats).delete()
-        deleted_championstats = session.query(ChampionStats).delete()
-        deleted_itemstats = session.query(ItemStats).delete()
         deleted_patchchanges = session.query(PatchChanges).delete()
         session.commit()
         logger.info(f"Emptied SpellStats table. Deleted {deleted_spellstats} rows.")
-        logger.info(f"Emptied ChampionStats table. Deleted {deleted_championstats} rows.")
-        logger.info(f"Emptied ItemStats table. Deleted {deleted_itemstats} rows.")
         logger.info(f"Emptied PatchChanges table. Deleted {deleted_patchchanges} rows.")
     except Exception as e:
         logger.error(f"Error emptying tables: {e}")
