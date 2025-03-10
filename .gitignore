@@ -169,3 +169,5 @@ cython_debug/
 datasets/champion/
 datasets/item/
 API_setup.py
+
+*.png
