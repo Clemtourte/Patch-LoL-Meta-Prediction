@@ -16,25 +16,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def format_patch_number(patch: str) -> str:
-    """Format patch number to consistent format (e.g., 13.10.1 -> 13.10)"""
     parts = patch.split('.')
     if len(parts) == 2:
         return patch
-    if len(parts) == 3:
+    if len(parts) >= 3:
         return f"{parts[0]}.{parts[1]}"
     return patch
 
 def validate_data(final_df: pd.DataFrame) -> None:
-    """Validate the merged dataset"""
     if final_df.empty:
         raise ValueError("No data after merging")
-    
-    # Check for NaN values
     if final_df.isna().any().any():
         nan_cols = final_df.columns[final_df.isna().any()].tolist()
         logger.warning(f"Dataset contains NaN values in columns: {nan_cols}")
-        
-    # Check feature distribution
     logger.info("Features distribution:")
     for col in final_df.columns:
         if col not in ['patch', 'champion_name']:
@@ -42,14 +36,9 @@ def validate_data(final_df: pd.DataFrame) -> None:
             logger.info(f"{col}: {non_zero} non-zero values")
 
 def prepare_prediction_data() -> Dict[str, Any]:
-    """Prepare data for ML model"""
     logger.info("Starting data preparation")
-    
-    # Connect to database
     engine = create_engine('sqlite:///../datasets/league_data.db')
     
-    # Get patch changes data
-    logger.info("Fetching patch changes data")
     patch_changes_query = """
     SELECT 
         to_patch as patch,
@@ -59,15 +48,12 @@ def prepare_prediction_data() -> Dict[str, Any]:
         change_value
     FROM patch_changes 
     WHERE stat_type IN ('base_stat', 'per_level', 'ability')
-    AND change_value IS NOT NULL
+      AND change_value IS NOT NULL
     """
     patch_changes = pd.read_sql(patch_changes_query, engine)
-    
     if patch_changes.empty:
         raise ValueError("No patch changes data found")
     
-    # Get win rates data
-    logger.info("Fetching winrate data")
     winrates_query = """
     SELECT 
         patch,
@@ -78,15 +64,12 @@ def prepare_prediction_data() -> Dict[str, Any]:
     FROM champion_winrates
     """
     winrates = pd.read_sql(winrates_query, engine)
-    
     if winrates.empty:
         raise ValueError("No winrate data found")
     
-    # Fix patch format
     patch_changes['patch'] = patch_changes['patch'].apply(format_patch_number)
     winrates['patch'] = winrates['patch'].apply(format_patch_number)
     
-    # Sort and compare patches
     sorted_patch_changes = sorted(patch_changes['patch'].unique())
     sorted_winrates = sorted(winrates['patch'].unique())
     matching_patches = sorted(set(sorted_patch_changes) & set(sorted_winrates))
@@ -101,8 +84,6 @@ def prepare_prediction_data() -> Dict[str, Any]:
     logger.info(f"Shape before merge - patch_changes: {patch_changes.shape}")
     logger.info(f"Shape before merge - winrates: {winrates.shape}")
     
-    # Create feature matrix
-    logger.info("Creating feature matrix")
     patch_matrix = pd.pivot_table(
         patch_changes,
         index=['patch', 'champion_name'],
@@ -110,13 +91,9 @@ def prepare_prediction_data() -> Dict[str, Any]:
         values='change_value',
         fill_value=0
     )
-    
-    # Flatten column names
     patch_matrix.columns = [f'{col[0]}_{col[1]}' for col in patch_matrix.columns]
     patch_matrix = patch_matrix.reset_index()
     
-    # Merge with winrates
-    logger.info("Merging with winrate data")
     final_df = pd.merge(
         patch_matrix,
         winrates,
@@ -127,20 +104,13 @@ def prepare_prediction_data() -> Dict[str, Any]:
     logger.info(f"Shape after merge: {final_df.shape}")
     logger.info(f"Final patches: {sorted(final_df['patch'].unique())}")
     
-    # Validate merged data
     validate_data(final_df)
     
-    # Prepare features and target
-    feature_cols = [col for col in patch_matrix.columns 
-                   if col not in ['patch', 'champion_name']]
-    
+    feature_cols = [col for col in patch_matrix.columns if col not in ['patch', 'champion_name']]
     X = final_df[feature_cols]
     y = final_df['winrate']
-    
-    # Create sample weights based on game count
     weights = final_df['total_games'] / final_df['total_games'].mean()
     
-    # Split data
     logger.info("Splitting into train/test sets")
     X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
         X, y, weights, test_size=0.2, random_state=42
@@ -160,10 +130,8 @@ def prepare_prediction_data() -> Dict[str, Any]:
     }
 
 def analyze_features(data: Dict[str, Any]) -> None:
-    """Analyze the prepared features"""
     df = data['full_data']
     features = data['feature_names']
-    
     logger.info("\nFeature Analysis:")
     for feature in features:
         non_zero = (df[feature] != 0).sum()
@@ -181,9 +149,6 @@ if __name__ == "__main__":
         print("\nTraining Data Shape:", data['X_train'].shape)
         print("Number of Features:", len(data['feature_names']))
         print("\nFeatures:", data['feature_names'])
-        
-        # Analyze features
         analyze_features(data)
-        
     except Exception as e:
         logger.error(f"Error in data preparation: {str(e)}")

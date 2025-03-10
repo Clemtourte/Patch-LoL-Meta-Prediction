@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def plot_correlation_heatmap(df: pd.DataFrame, stat_columns: list) -> None:
-    """Plot correlation heatmap of features with winrate"""
     plt.figure(figsize=(12, 10))
     corr_matrix = df[stat_columns + ['winrate']].corr()
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f')
@@ -21,16 +20,14 @@ def plot_correlation_heatmap(df: pd.DataFrame, stat_columns: list) -> None:
     plt.close()
 
 def analyze_feature_groups(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
-    """Analyze features by groups (offensive, defensive, utility)"""
     groups = {
         'offensive': [col for col in df.columns if any(x in col for x in 
-            ['attackdamage', 'base_damage', 'attackspeed'])],
+                      ['attackdamage', 'base_damage', 'attackspeed', 'ap_ratio', 'ad_ratio', 'bonus_ad_ratio'])],
         'defensive': [col for col in df.columns if any(x in col for x in 
-            ['armor', 'hp', 'spellblock', 'shield'])],
+                      ['armor', 'hp', 'spellblock', 'shield'])],
         'utility': [col for col in df.columns if any(x in col for x in 
-            ['cooldown', 'movespeed', 'cost', 'range'])]
+                      ['cooldown', 'movespeed', 'cost', 'range'])]
     }
-    
     results = {}
     for group_name, features in groups.items():
         valid_features = [f for f in features if f in df.columns]
@@ -41,13 +38,10 @@ def analyze_feature_groups(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
                 'total_changes': changes.sum(),
                 'correlations': correlations
             }
-    
     return results
 
 def analyze_changes_over_time(df: pd.DataFrame, feature_names: list) -> None:
-    """Plot the number of changes per patch"""
     changes_per_patch = df.groupby('patch')[feature_names].apply(lambda x: (x != 0).sum())
-    
     plt.figure(figsize=(15, 5))
     changes_per_patch.sum(axis=1).plot(kind='bar')
     plt.title('Number of Changes per Patch')
@@ -59,80 +53,72 @@ def analyze_changes_over_time(df: pd.DataFrame, feature_names: list) -> None:
     plt.close()
 
 def analyze_significance(df: pd.DataFrame, stat_columns: list) -> pd.DataFrame:
-    """Analyze statistical significance of changes"""
     significant_changes = []
     for col in stat_columns:
-        if df[col].any():  # If there are any non-zero values
-            before = df.loc[df[col] != 0, 'winrate'] - df.loc[df[col] != 0, col]
-            after = df.loc[df[col] != 0, 'winrate']
-            if len(before) > 1:  # Need at least 2 samples for t-test
+        if df[col].any():
+            mask = df[col] != 0
+            if mask.sum() < 2:
+                continue
+            before = df.loc[mask, 'winrate'] - df.loc[mask, col]
+            after = df.loc[mask, 'winrate']
+            if len(before) > 1:
                 t_stat, p_value = stats.ttest_rel(before, after)
-                effect_size = (after.mean() - before.mean()) / before.std()
+                effect_size = (after.mean() - before.mean()) / before.std() if before.std() != 0 else np.nan
                 significant_changes.append({
                     'stat': col,
                     't_statistic': t_stat,
                     'p_value': p_value,
                     'effect_size': effect_size,
-                    'sample_size': len(before)
+                    'sample_size': mask.sum()
                 })
-    
     return pd.DataFrame(significant_changes)
 
 def analyze_prediction_data() -> Dict[str, Any]:
-    """Main analysis function"""
     logger.info("Starting data analysis")
-    
-    # Get the prepared data
     data = prepare_prediction_data()
     df = data['full_data']
     stat_columns = data['feature_names']
     
-    # Basic dataset statistics
     logger.info("\n=== Dataset Size ===")
     logger.info(f"Total samples: {len(df)}")
     logger.info(f"Unique champions: {df['champion_name'].nunique()}")
     logger.info(f"Unique patches: {df['patch'].nunique()}")
     
-    # Winrate statistics
     logger.info("\n=== Winrate Statistics ===")
     logger.info(df['winrate'].describe())
     
-    # Plot winrate distribution
     plt.figure(figsize=(10, 5))
     sns.histplot(df['winrate'], bins=30)
     plt.title('Winrate Distribution')
     plt.savefig('../graphs/winrate_distribution.png')
     plt.close()
     
-    # Analyze stat changes
     logger.info("\n=== Stat Changes Statistics ===")
     changes_stats = df[stat_columns].describe()
     logger.info(changes_stats)
     
-    # Calculate correlations
     correlations = []
     for col in stat_columns:
         mask = df[col] != 0
-        if mask.sum() > 0:
-            corr = stats.pearsonr(df[col][mask], df['winrate'][mask])
-            correlations.append({
-                'stat': col,
-                'correlation': corr[0],
-                'p_value': corr[1],
-                'non_zero_changes': mask.sum()
-            })
+        if mask.sum() < 2:
+            continue
+        corr, p_val = stats.pearsonr(df[col][mask], df['winrate'][mask])
+        correlations.append({
+            'stat': col,
+            'correlation': corr,
+            'p_value': p_val,
+            'non_zero_changes': mask.sum()
+        })
     
     corr_df = pd.DataFrame(correlations)
     corr_df = corr_df.sort_values('correlation', key=abs, ascending=False)
     
-    # Additional analyses
     plot_correlation_heatmap(df, stat_columns)
     group_analysis = analyze_feature_groups(df)
     analyze_changes_over_time(df, stat_columns)
     significance = analyze_significance(df, stat_columns)
     
-    # Plot top correlations
-    if len(corr_df) > 0:
+    if not corr_df.empty:
         top_stats = corr_df.head(5)
         plt.figure(figsize=(15, 10))
         for i, (_, row) in enumerate(top_stats.iterrows(), 1):
@@ -158,17 +144,14 @@ def analyze_prediction_data() -> Dict[str, Any]:
         'significance': significance
     }
     
-    # Print key insights
-    significant_changes = significance[significance['p_value'] < 0.05]
+    sig_changes = significance[significance['p_value'] < 0.05]
     logger.info("\n=== Key Insights ===")
-    logger.info(f"- {len(significant_changes)} out of {len(significance)} changes are statistically significant")
-    
-    if len(corr_df) > 0:
+    logger.info(f"- {len(sig_changes)} out of {len(significance)} changes are statistically significant")
+    if not corr_df.empty:
         top_change = corr_df.iloc[0]
         logger.info(f"- Most correlated change: {top_change['stat']}")
         logger.info(f"- Correlation: {top_change['correlation']:.3f}")
         logger.info(f"- Changes analyzed: {top_change['non_zero_changes']}")
-    
     logger.info(f"- Average winrate: {df['winrate'].mean():.2f}%")
     logger.info(f"- Winrate standard deviation: {df['winrate'].std():.2f}%")
     
@@ -177,14 +160,11 @@ def analyze_prediction_data() -> Dict[str, Any]:
 if __name__ == "__main__":
     try:
         results = analyze_prediction_data()
-        
-        # Print group analysis results
         print("\n=== Feature Group Analysis ===")
         for group, analysis in results['group_analysis'].items():
             print(f"\n{group.title()} Features:")
             print(f"Total changes: {analysis['total_changes']}")
             print("Correlations with winrate:")
             print(analysis['correlations'])
-            
     except Exception as e:
         logger.error(f"Error in analysis: {str(e)}")

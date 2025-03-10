@@ -1,64 +1,38 @@
-import xgboost as xgb
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
-import pandas as pd
 import numpy as np
-from data_preparation import prepare_prediction_data
+import pandas as pd
+import logging
 import matplotlib.pyplot as plt
 import seaborn as sns
-import logging
-from typing import Dict, Any
+from sklearn.model_selection import GridSearchCV, train_test_split, KFold
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
+from data_preparation import prepare_prediction_data
 
+# Configuration du logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Engineer additional features for the model"""
-    # Group related changes
-    df['total_offensive_changes'] = df[[col for col in df.columns 
-        if any(x in col for x in ['damage', 'attack'])]].abs().sum(axis=1)
-    
-    df['total_defensive_changes'] = df[[col for col in df.columns 
-        if any(x in col for x in ['hp', 'armor', 'spellblock'])]].abs().sum(axis=1)
-    
-    df['total_utility_changes'] = df[[col for col in df.columns 
-        if any(x in col for x in ['cooldown', 'cost', 'movespeed'])]].abs().sum(axis=1)
-    
-    # Add per-ability changes
-    abilities = ['Q', 'W', 'E', 'R']
-    for ability in abilities:
-        df[f'total_{ability}_changes'] = df[[col for col in df.columns 
-            if f'ability_{ability}' in col]].abs().sum(axis=1)
-    
-    # Add interaction terms for abilities
-    for ability in abilities:
+    # On crée des features agrégées qui regroupent des changements offensifs, défensifs et utilitaires
+    df['total_offensive_changes'] = df[[col for col in df.columns if any(x in col for x in ['damage', 'attack'])]].abs().sum(axis=1)
+    df['total_defensive_changes'] = df[[col for col in df.columns if any(x in col for x in ['hp', 'armor', 'spellblock'])]].abs().sum(axis=1)
+    df['total_utility_changes'] = df[[col for col in df.columns if any(x in col for x in ['cooldown', 'cost', 'movespeed'])]].abs().sum(axis=1)
+    # Feature par capacité (Q, W, E, R)
+    for ability in ['Q', 'W', 'E', 'R']:
+        df[f'total_{ability}_changes'] = df[[col for col in df.columns if f'ability_{ability}' in col]].abs().sum(axis=1)
+    # Exemple d’interaction : produit entre base_damage et cooldown (si disponibles)
+    for ability in ['Q', 'W', 'E', 'R']:
         damage_col = f'ability_{ability}_base_damage'
         cooldown_col = f'ability_{ability}_cooldown'
         if damage_col in df.columns and cooldown_col in df.columns:
             df[f'{ability}_damage_cooldown'] = df[damage_col] * df[cooldown_col]
-    
     return df
 
-def train_xgboost_model() -> Dict[str, Any]:
-    """Train and evaluate XGBoost model"""
-    logger.info("Starting model training")
-    
-    # Get and prepare data
-    data = prepare_prediction_data()
-    X_train = data['X_train']
-    X_test = data['X_test']
-    y_train = data['y_train']
-    y_test = data['y_test']
-    w_train = data['w_train']
-    w_test = data['w_test']
-    
-    # Engineer features
-    X_train = engineer_features(X_train)
-    X_test = engineer_features(X_test)
-    feature_names = X_train.columns.tolist()
-    
-    # Define model parameters
-    param_grid = {
+def get_models():
+    # Paramètres pour chaque modèle
+    param_grid_xgb = {
         'max_depth': [3, 4, 5],
         'learning_rate': [0.01, 0.1],
         'n_estimators': [100, 200],
@@ -68,59 +42,29 @@ def train_xgboost_model() -> Dict[str, Any]:
         'reg_alpha': [0, 0.1],
         'reg_lambda': [0.1, 1.0]
     }
-    
-    # Create base model - removed early stopping and tree_method
-    base_model = xgb.XGBRegressor(
-        objective='reg:squarederror',
-        random_state=42,
-        enable_categorical=True  # Add this for better handling of categorical features
-    )
-    
-    # Perform grid search
-    logger.info("Starting grid search")
-    grid_search = GridSearchCV(
-        estimator=base_model,
-        param_grid=param_grid,
-        cv=5,
-        scoring='neg_mean_squared_error',
-        n_jobs=-1,
-        verbose=1  # Reduced verbosity
-    )
-    
-    # Simple fit without extra parameters
-    grid_search.fit(X_train, y_train, sample_weight=w_train)
-    
-    best_model = grid_search.best_estimator_
-    logger.info(f"Best parameters: {grid_search.best_params_}")
-    
-    # Make predictions
-    y_pred_train = best_model.predict(X_train)
-    y_pred_test = best_model.predict(X_test)
-    
-    # Calculate metrics
-    metrics = calculate_metrics(y_train, y_pred_train, y_test, y_pred_test, w_train, w_test)
-    logger.info("Model Performance:")
-    for metric, value in metrics.items():
-        logger.info(f"{metric}: {value:.4f}")
-    
-    # Generate plots
-    plot_feature_importance(best_model, feature_names)
-    plot_predictions(y_test, y_pred_test)
-    plot_error_analysis(y_test, y_pred_test)
-    
-    return {
-        'model': best_model,
-        'metrics': metrics,
-        'feature_importance': get_feature_importance(best_model, feature_names),
-        'predictions': {
-            'train': y_pred_train,
-            'test': y_pred_test
-        }
+    param_grid_rf = {
+        'n_estimators': [50, 100],
+        'max_depth': [None, 10, 20],
+        'min_samples_split': [2, 5]
     }
+    param_grid_ridge = {'alpha': [0.1, 1, 10]}
+    param_grid_lasso = {'alpha': [0.001, 0.01, 0.1, 1]}
+    param_grid_en = {'alpha': [0.001, 0.01, 0.1, 1], 'l1_ratio': [0.2, 0.5, 0.8]}
 
-def calculate_metrics(y_train, y_pred_train, y_test, y_pred_test, w_train, w_test) -> Dict[str, float]:
-    """Calculate model performance metrics"""
-    return {
+    models = {
+        'XGBoost': (xgb.XGBRegressor(objective='reg:squarederror', random_state=42, enable_categorical=True), param_grid_xgb),
+        'RandomForest': (RandomForestRegressor(random_state=42), param_grid_rf),
+        'Ridge': (Ridge(random_state=42), param_grid_ridge),
+        'Lasso': (Lasso(random_state=42), param_grid_lasso),
+        'ElasticNet': (ElasticNet(random_state=42), param_grid_en)
+    }
+    return models
+
+def evaluate_model(model, X_train, y_train, X_test, y_test, w_train, w_test):
+    # Prédictions et calcul des métriques
+    y_pred_train = model.predict(X_train)
+    y_pred_test = model.predict(X_test)
+    metrics = {
         'train_rmse': np.sqrt(mean_squared_error(y_train, y_pred_train, sample_weight=w_train)),
         'test_rmse': np.sqrt(mean_squared_error(y_test, y_pred_test, sample_weight=w_test)),
         'train_mae': mean_absolute_error(y_train, y_pred_train, sample_weight=w_train),
@@ -128,79 +72,60 @@ def calculate_metrics(y_train, y_pred_train, y_test, y_pred_test, w_train, w_tes
         'train_r2': r2_score(y_train, y_pred_train, sample_weight=w_train),
         'test_r2': r2_score(y_test, y_pred_test, sample_weight=w_test)
     }
+    return metrics, y_pred_test
 
-def plot_feature_importance(model: xgb.XGBRegressor, feature_names: list) -> None:
-    """Plot feature importance"""
-    importance_df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': model.feature_importances_
-    }).sort_values('importance', ascending=False)
-    
-    plt.figure(figsize=(12, 6))
-    sns.barplot(data=importance_df.head(15), x='importance', y='feature')
-    plt.title('Top 15 Most Important Features')
-    plt.xlabel('Feature Importance')
-    plt.tight_layout()
-    plt.savefig('feature_importance.png')
-    plt.close()
+def main():
+    logger.info("Chargement des données...")
+    data = prepare_prediction_data()
+    X_train = data['X_train']
+    X_test = data['X_test']
+    y_train = data['y_train']
+    y_test = data['y_test']
+    w_train = data['w_train']
+    w_test = data['w_test']
 
-def plot_predictions(y_test, y_pred_test) -> None:
-    """Plot actual vs predicted values"""
-    plt.figure(figsize=(8, 8))
-    plt.scatter(y_test, y_pred_test, alpha=0.5)
-    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-    plt.xlabel('Actual Winrate')
-    plt.ylabel('Predicted Winrate')
-    plt.title('Test Set: Actual vs Predicted')
-    plt.tight_layout()
-    plt.savefig('predictions.png')
-    plt.close()
+    # Appliquer l'ingénierie de features
+    X_train = engineer_features(X_train)
+    X_test = engineer_features(X_test)
+    feature_names = X_train.columns.tolist()
+    logger.info(f"Nombre de features après ingénierie: {len(feature_names)}")
+    
+    models = get_models()
+    results = {}
 
-def plot_error_analysis(y_test, y_pred_test) -> None:
-    """Plot error distribution"""
-    errors = y_pred_test - y_test
-    plt.figure(figsize=(10, 6))
+    # Utiliser 5-fold cross-validation pour chaque modèle
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
     
-    plt.subplot(121)
-    sns.histplot(errors, kde=True)
-    plt.xlabel('Prediction Error')
-    plt.ylabel('Count')
-    plt.title('Error Distribution')
+    for model_name, (model, param_grid) in models.items():
+        logger.info(f"Recherche des meilleurs hyperparamètres pour {model_name}...")
+        grid_search = GridSearchCV(
+            estimator=model,
+            param_grid=param_grid,
+            cv=cv,
+            scoring='neg_mean_squared_error',
+            n_jobs=-1,
+            verbose=1
+        )
+        grid_search.fit(X_train, y_train, sample_weight=w_train)
+        best_model = grid_search.best_estimator_
+        metrics, y_pred_test = evaluate_model(best_model, X_train, y_train, X_test, y_test, w_train, w_test)
+        results[model_name] = {
+            'best_params': grid_search.best_params_,
+            'metrics': metrics,
+            'model': best_model
+        }
+        logger.info(f"{model_name} - Meilleurs paramètres: {grid_search.best_params_}")
+        logger.info(f"{model_name} - Performance sur l'ensemble de test: RMSE = {metrics['test_rmse']:.4f}, MAE = {metrics['test_mae']:.4f}, R² = {metrics['test_r2']:.4f}")
     
-    plt.subplot(122)
-    sns.scatterplot(x=y_test, y=errors)
-    plt.axhline(y=0, color='r', linestyle='--')
-    plt.xlabel('Actual Winrate')
-    plt.ylabel('Prediction Error')
-    plt.title('Error vs Actual Value')
+    # Comparaison finale des modèles
+    summary = pd.DataFrame({
+        model_name: result['metrics'] for model_name, result in results.items()
+    }).T
+    print("\nComparaison des modèles:")
+    print(summary)
     
-    plt.tight_layout()
-    plt.savefig('error_analysis.png')
-    plt.close()
-
-def get_feature_importance(model: xgb.XGBRegressor, feature_names: list) -> pd.DataFrame:
-    """Get feature importance DataFrame"""
-    return pd.DataFrame({
-        'feature': feature_names,
-        'importance': model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    # Optionnel : sauvegarder le résumé
+    summary.to_csv("model_comparison_summary.csv", index=True)
 
 if __name__ == "__main__":
-    try:
-        results = train_xgboost_model()
-        
-        # Print top features
-        print("\nTop 10 most important features:")
-        print(results['feature_importance'].head(10))
-        
-        # Save results
-        results['feature_importance'].to_csv('feature_importance.csv', index=False)
-        
-        # Print key metrics
-        print("\nTest Set Metrics:")
-        print(f"RMSE: {results['metrics']['test_rmse']:.4f}")
-        print(f"MAE: {results['metrics']['test_mae']:.4f}")
-        print(f"R²: {results['metrics']['test_r2']:.4f}")
-        
-    except Exception as e:
-        logger.error(f"Error in model training: {str(e)}")
+    main()
