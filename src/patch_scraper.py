@@ -95,45 +95,43 @@ class PatchNotesScraper:
 
     def determine_change_type(self, label_text, raw_text):
         """
-        Guess what type of change this is: 'damage', 'cooldown', 'mana_cost', etc.
-        We rely on both the label (if any) and the raw text to guess.
+        Devine le type de changement : 'damage', 'cooldown', 'mana_cost', etc.
         """
         label_lower = label_text.lower() if label_text else ''
         raw_lower = raw_text.lower()
 
-        # If the label itself says 'damage'
-        if 'damage' in label_lower:
-            return 'damage'
+        # Pour différencier les bullets de Kassadin R
+        if 'bonus damage' in label_lower:
+            return 'bonus_damage'
+        if 'magic damage' in label_lower:
+            return 'magic_damage'
+        
+        # Pour K’Sante : distinguer knock up et stun
+        if 'knock up' in label_lower:
+            return 'knockup_duration'
+        if 'stun' in label_lower:
+            return 'stun_duration'
+        
+        # Pour Jarvan IV : distinguer shield duration de shield value
+        if 'shield' in label_lower:
+            if 'duration' in label_lower or 'duration' in raw_lower:
+                return 'shield_duration'
+            return 'shield'
+        
         if 'cooldown' in label_lower:
             return 'cooldown'
         if 'mana cost' in label_lower or 'energy cost' in label_lower:
             return 'mana_cost'
-        if 'shield' in label_lower:
-            return 'shield'
         if 'heal' in label_lower:
             return 'heal'
         if 'slow' in label_lower and '%' in raw_lower:
             return 'slow_percent'
-        if 'stun' in label_lower or 'knock up' in label_lower:
-            return 'stun_duration'
         if 'range' in label_lower:
             return 'range'
         
-        # If we couldn't determine from label, try to infer from raw text
+        # Détection générique
         if 'damage' in raw_lower:
             return 'damage'
-        elif 'cooldown' in raw_lower:
-            return 'cooldown'
-        elif 'mana cost' in raw_lower or 'energy cost' in raw_lower:
-            return 'mana_cost'
-        elif 'shield' in raw_lower:
-            return 'shield'
-        elif 'heal' in raw_lower:
-            return 'heal'
-        elif 'slow' in raw_lower and '%' in raw_lower:
-            return 'slow_percent'
-        elif any(x in raw_lower for x in ['stun duration', 'knock up duration']):
-            return 'stun_duration'
         
         return 'unknown'
 
@@ -313,19 +311,22 @@ class PatchNotesScraper:
 
     def update_spell_stats(self, changes, patch_version):
         """
-        Update (or create) SpellStats rows with parsed changes.
-        For each champion change, the old (left-side) values are saved in the "previous_..."
-        columns and the new (right-side) values are saved in the corresponding columns.
+        Met à jour (ou crée) les enregistrements dans SpellStats avec les changements parsés.
+        Les anciennes valeurs (gauche) sont stockées dans les colonnes "previous_..."
+        et les nouvelles valeurs dans les colonnes correspondantes.
         """
-        # Mapping from our change type to the database column name.
         change_mapping = {
             'damage': 'base_damage',
+            'magic_damage': 'base_damage',
+            'bonus_damage': 'base_damage',
             'cooldown': 'cooldown',
             'mana_cost': 'mana_cost',
             'shield': 'shield_value',
+            'shield_duration': 'shield_duration',
             'heal': 'heal_value',
             'slow_percent': 'slow_percent',
             'stun_duration': 'stun_duration',
+            'knockup_duration': 'knockup_duration',
             'range': 'range'
         }
         
@@ -338,7 +339,6 @@ class PatchNotesScraper:
                 
                 logger.info(f"Updating DB for {champion} {spell_type} ({spell_name})")
                 
-                # Look up an existing record for this champion, spell type, spell name and patch
                 record = session.query(SpellStats).filter_by(
                     version=patch_version,
                     champion=champion,
@@ -347,7 +347,6 @@ class PatchNotesScraper:
                 ).first()
                 
                 if not record:
-                    # Create a new record if none exists
                     record = SpellStats(
                         version=patch_version,
                         champion=champion,
@@ -356,18 +355,24 @@ class PatchNotesScraper:
                     )
                     session.add(record)
                 
-                # For each change bullet (for example, a change in cooldown or damage)
                 for change in champ_change['changes']:
                     ctype = change.get('type')
                     if ctype in change_mapping:
                         col = change_mapping[ctype]
-                        # Set the "old" values (left of arrow) into previous_<col>
-                        setattr(record, f"previous_{col}", change.get('before_values'))
-                        # Set the "new" values (right of arrow) into the column
-                        setattr(record, col, change.get('after_values'))
                         
-                        # If scaling info is available, update the corresponding ratio columns.
-                        # For example, if before_ratios contains an "ap" key, store it in previous_ap_ratio.
+                        # Si aucune valeur précedente n'est trouvée, on considère 0
+                        before_vals = change.get('before_values') or [0]
+                        after_vals = change.get('after_values')
+                        
+                        # Si after_vals est un nombre unique et before_vals est une liste,
+                        # on répète la valeur après pour correspondre au nombre d'éléments.
+                        if isinstance(after_vals, (int, float)) and isinstance(before_vals, list) and len(before_vals) > 1:
+                            after_vals = [after_vals] * len(before_vals)
+                        
+                        setattr(record, f"previous_{col}", before_vals)
+                        setattr(record, col, after_vals)
+                        
+                        # Pour les ratios (AP, AD, etc.)
                         for ratio_key, ratio_col in [('ap', 'ap_ratio'),
                                                     ('ad', 'ad_ratio'),
                                                     ('bonus_ad', 'bonus_ad_ratio'),
@@ -377,11 +382,10 @@ class PatchNotesScraper:
                             if ratio_key in change.get('after_ratios', {}):
                                 setattr(record, ratio_col, change['after_ratios'][ratio_key])
                         
-                        logger.info(f"  - {ctype} updated: previous {col}={change.get('before_values')} -> {col}={change.get('after_values')}")
+                        logger.info(f"  - {ctype} updated: previous {col}={before_vals} -> {col}={after_vals}")
                     else:
                         logger.warning(f"Unmapped change type '{ctype}' for {champion} {spell_type} ({spell_name})")
                 
-                # Commit after processing each champion's changes
                 session.commit()
                 logger.info(f"Record updated for {champion} {spell_type} ({spell_name})")
             
@@ -498,12 +502,12 @@ if __name__ == "__main__":
     scraper = PatchNotesScraper()
     
     # 1) Scrape a single patch from URL
-    scraper.scrape_patch_from_url("https://www.leagueoflegends.com/en-gb/news/game-updates/patch-13-3-notes/")
+    scraper.scrape_patch_from_url("https://www.leagueoflegends.com/en-gb/news/game-updates/patch-13-15-notes/")
     
     # 2) Scrape from a local file
     # scraper.scrape_patch_from_file("patch_notes.html", "13.3")
     
     # 3) Scrape a range of patches
-    # scrape_patch_range("13.1", "13.3", language="en-gb")
+    #scrape_patch_range("13.1", "14.24", language="en-gb")
     
     pass
