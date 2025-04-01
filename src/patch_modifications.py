@@ -5,7 +5,7 @@ import numpy as np
 import re
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import ChampionStats, SpellStats, Base, PatchChanges
+from models import ChampionStats, SpellStats, ItemStats, Base, PatchChanges
 from typing import Dict, Any, List
 
 logging.basicConfig(
@@ -76,6 +76,18 @@ class PatchChangeDetector:
         finally:
             session.close()
 
+    def get_item_stats(self, patch_version: str) -> Dict[int, ItemStats]:
+        """Récupère les ItemStats pour un patch donné (version normalisée) et les indexe par item_id."""
+        session = self.Session()
+        norm_patch = normalize_patch_version(patch_version)
+        try:
+            items = session.query(ItemStats).filter(
+                ItemStats.version.like(f"{norm_patch}%")
+            ).all()
+            return {item.item_id: item for item in items}
+        finally:
+            session.close()
+
     def compute_base_stat_changes(self, old_patch: str, new_patch: str) -> Dict[str, Dict[str, float]]:
         """Calcule les changements dans les stats de base entre deux patches."""
         old_stats = self.get_champion_stats(old_patch)
@@ -125,24 +137,21 @@ class PatchChangeDetector:
           { champion: { spell_type: { field: [diff_rank1, diff_rank2, ...], ... }, ... } }
         """
         spell_stats = self.get_spell_stats(patch_version)
-        # Liste des champs numériques à comparer
         fields = ["base_damage", "cooldown", "mana_cost", "range",
                   "shield_value", "heal_value", "slow_percent",
                   "stun_duration", "knockup_duration", "root_duration"]
-        # On peut aussi ajouter les ratios si besoin
         ratio_fields = ["ap_ratio", "ad_ratio", "bonus_ad_ratio", "max_health_ratio"]
         
         changes = {}
         for champion, spells in spell_stats.items():
             changes.setdefault(champion, {})
             for spell in spells:
-                spell_type = spell.spell_type  # Assurez-vous que ce champ est bien renseigné
+                # On suppose ici que le champ 'spell_type' existe dans SpellStats
+                spell_type = getattr(spell, 'spell_type', 'unknown')
                 changes[champion].setdefault(spell_type, {})
                 for field in fields:
-                    # Charger la valeur actuelle et la valeur précédente (on part de 0 si aucune valeur)
                     new_val = load_json(getattr(spell, field) or "[]")
                     prev_val = load_json(getattr(spell, "previous_" + field) or "[]")
-                    # Si ce sont des listes, effectuer une soustraction élément par élément
                     if isinstance(new_val, list) and isinstance(prev_val, list):
                         n = min(len(new_val), len(prev_val))
                         diff_list = []
@@ -153,7 +162,6 @@ class PatchChangeDetector:
                                 logger.warning(f"Skipping non-numeric value for {champion} {spell_type} {field} at index {i}: {e}")
                         if diff_list and any(x != 0 for x in diff_list):
                             changes[champion][spell_type][field] = diff_list
-                    # Si c'est un nombre unique
                     else:
                         try:
                             new_num = float(new_val)
@@ -167,7 +175,6 @@ class PatchChangeDetector:
                         if diff != 0:
                             changes[champion][spell_type][field] = [diff]
                 
-                # Pour les ratios, on peut faire de même
                 for field in ratio_fields:
                     new_val = getattr(spell, field)
                     prev_val = getattr(spell, "previous_" + field)
@@ -181,22 +188,63 @@ class PatchChangeDetector:
                         prev_num = 0.0
                     diff = new_num - prev_num
                     if diff != 0:
-                        changes[champion][spell.spell_type][field] = [diff]
+                        changes[champion][spell_type][field] = [diff]
         
         return changes
 
+    def compute_item_changes(self, old_patch: str, new_patch: str) -> Dict[str, Dict[str, float]]:
+        """
+        Compare les enregistrements dans la table item_stats pour deux patches donnés.
+        Pour chaque item (identifié par item_id), calcule les différences sur :
+          - total_gold, base_gold, sell_gold
+          - Move Speed extrait de la description (si présent)
+        Retourne un dictionnaire de la forme :
+          { "Item: <nom_item>": { field: diff, ... }, ... }
+        """
+        old_items = self.get_item_stats(old_patch)
+        new_items = self.get_item_stats(new_patch)
+        changes = {}
+        # Fonction pour extraire Move Speed depuis la description (si présent)
+        def extract_move_speed(description: str) -> float:
+            # Exemple de pattern : <attention>25</attention> Move Speed
+            match = re.search(r"<attention>(\d+)</attention>\s*Move Speed", description)
+            if match:
+                return float(match.group(1))
+            return None
+
+        # Comparer les items présents dans les deux versions
+        for item_id, old_item in old_items.items():
+            if item_id in new_items:
+                new_item = new_items[item_id]
+                item_changes = {}
+                for field in ['total_gold', 'base_gold', 'sell_gold']:
+                    old_val = getattr(old_item, field)
+                    new_val = getattr(new_item, field)
+                    if old_val != new_val:
+                        item_changes[field] = new_val - old_val
+                # Extraire et comparer la Move Speed à partir de la description
+                old_ms = extract_move_speed(old_item.description or "")
+                new_ms = extract_move_speed(new_item.description or "")
+                if old_ms is not None and new_ms is not None and old_ms != new_ms:
+                    item_changes['move_speed'] = new_ms - old_ms
+                if item_changes:
+                    # Utiliser le nom de l'item pour l'identifier (précédé de "Item: ")
+                    changes[f"Item: {old_item.name}"] = item_changes
+        return changes
+
     def analyze_patch_changes(self, old_patch: str, new_patch: str) -> Dict[str, Any]:
-        """Analyse l'évolution entre deux patches en combinant stats de champions et changements d'abilités.
-           Pour les abilities, on utilisera les données du nouveau patch (qui contiennent déjà les valeurs avant/après).
+        """Analyse l'évolution entre deux patches en combinant stats de champions, changements d'abilités et changements d'items.
+           Pour les abilities, on utilise les données du patch "new_patch" (contenant les valeurs avant/après).
         """
         base = self.compute_base_stat_changes(old_patch, new_patch)
         per_level = self.compute_per_level_changes(old_patch, new_patch)
-        # Ici, pour les abilities, nous analysons les changements du patch "new_patch"
         abilities = self.compute_spell_changes(new_patch)
+        items = self.compute_item_changes(old_patch, new_patch)
         return {
             'base_stats': base,
             'per_level': per_level,
-            'abilities': abilities
+            'abilities': abilities,
+            'items': items
         }
     
     def save_patch_changes(self, from_patch: str, to_patch: str, changes: Dict[str, Any]) -> None:
@@ -248,6 +296,23 @@ class PatchChangeDetector:
                                     stat_name=f"{spell_type}_{field}_rank{rank}",
                                     change_value=diff_numeric
                                 ))
+            # Enregistrer les changements d'items
+            for item_name, fields_diff in changes.get('items', {}).items():
+                for field, diff_val in fields_diff.items():
+                    try:
+                        diff_numeric = float(diff_val)
+                    except Exception:
+                        logger.warning(f"Skipping non-numeric diff for {item_name} {field}")
+                        continue
+                    if diff_numeric != 0:
+                        session.merge(PatchChanges(
+                            from_patch=from_patch,
+                            to_patch=to_patch,
+                            champion_name=item_name,  # Pour les items, stocker le nom préfixé "Item: ..."
+                            stat_type='item',
+                            stat_name=field,
+                            change_value=diff_numeric
+                        ))
             session.commit()
         except Exception as e:
             session.rollback()
