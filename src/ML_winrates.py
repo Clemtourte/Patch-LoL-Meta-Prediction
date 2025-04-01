@@ -15,23 +15,30 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
-    # On crée des features agrégées qui regroupent des changements offensifs, défensifs et utilitaires
-    df['total_offensive_changes'] = df[[col for col in df.columns if any(x in col for x in ['damage', 'attack'])]].abs().sum(axis=1)
-    df['total_defensive_changes'] = df[[col for col in df.columns if any(x in col for x in ['hp', 'armor', 'spellblock'])]].abs().sum(axis=1)
-    df['total_utility_changes'] = df[[col for col in df.columns if any(x in col for x in ['cooldown', 'cost', 'movespeed'])]].abs().sum(axis=1)
-    # Feature par capacité (Q, W, E, R)
+    """
+    Crée des features agrégées qui regroupent des changements offensifs, défensifs et utilitaires.
+    On ajoute également des features spécifiques par capacité (Q, W, E, R) et des interactions.
+    """
+    # Exemple : agrégation simple sur des features dont le nom contient 'damage' ou 'attack'
+    df['total_offensive_changes'] = df[[col for col in df.columns if 'damage' in col or 'attack' in col]].abs().sum(axis=1)
+    df['total_defensive_changes'] = df[[col for col in df.columns if 'hp' in col or 'armor' in col or 'spellblock' in col]].abs().sum(axis=1)
+    df['total_utility_changes'] = df[[col for col in df.columns if 'cooldown' in col or 'movespeed' in col]].abs().sum(axis=1)
+    
+    # Exemple d'interaction simple : produit entre certaines features si disponibles
     for ability in ['Q', 'W', 'E', 'R']:
-        df[f'total_{ability}_changes'] = df[[col for col in df.columns if f'ability_{ability}' in col]].abs().sum(axis=1)
-    # Exemple d’interaction : produit entre base_damage et cooldown (si disponibles)
-    for ability in ['Q', 'W', 'E', 'R']:
-        damage_col = f'ability_{ability}_base_damage'
-        cooldown_col = f'ability_{ability}_cooldown'
+        damage_col = f'ability_{ability}_base_damage_rank1'
+        cooldown_col = f'ability_{ability}_cooldown_rank1'
         if damage_col in df.columns and cooldown_col in df.columns:
             df[f'{ability}_damage_cooldown'] = df[damage_col] * df[cooldown_col]
+    
+    # Pour les items, on peut agréger certains changements
+    if any(col.startswith('item_') for col in df.columns):
+        df['total_item_gold'] = df[[col for col in df.columns if col.startswith('item_')]].sum(axis=1)
+    
     return df
 
 def get_models():
-    # Paramètres pour chaque modèle
+    # Définition des grilles d'hyperparamètres pour chaque modèle
     param_grid_xgb = {
         'max_depth': [3, 4, 5],
         'learning_rate': [0.01, 0.1],
@@ -76,10 +83,11 @@ def evaluate_model(model, X_train, y_train, X_test, y_test, w_train, w_test):
 
 def main():
     logger.info("Chargement des données...")
+    # La fonction prepare_prediction_data() renvoie désormais le delta winrate comme cible.
     data = prepare_prediction_data()
     X_train = data['X_train']
     X_test = data['X_test']
-    y_train = data['y_train']
+    y_train = data['y_train']  # delta winrate
     y_test = data['y_test']
     w_train = data['w_train']
     w_test = data['w_test']
@@ -124,7 +132,7 @@ def main():
     print("\nComparaison des modèles:")
     print(summary)
     
-    # Optionnel : sauvegarder le résumé
+    # Sauvegarde du résumé
     summary.to_csv("model_comparison_summary.csv", index=True)
 
 if __name__ == "__main__":
