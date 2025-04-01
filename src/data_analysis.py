@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def plot_correlation_heatmap(df: pd.DataFrame, stat_columns: list) -> None:
+    """Trace la heatmap des corrélations entre les features et le winrate"""
     plt.figure(figsize=(12, 10))
     corr_matrix = df[stat_columns + ['winrate']].corr()
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f')
@@ -20,13 +21,15 @@ def plot_correlation_heatmap(df: pd.DataFrame, stat_columns: list) -> None:
     plt.close()
 
 def analyze_feature_groups(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
+    """
+    Analyse les features en les regroupant par catégories.
+    Ici, on distingue les changements liés aux champions et ceux liés aux items.
+    """
     groups = {
-        'offensive': [col for col in df.columns if any(x in col for x in 
-                      ['attackdamage', 'base_damage', 'attackspeed', 'ap_ratio', 'ad_ratio', 'bonus_ad_ratio'])],
-        'defensive': [col for col in df.columns if any(x in col for x in 
-                      ['armor', 'hp', 'spellblock', 'shield'])],
-        'utility': [col for col in df.columns if any(x in col for x in 
-                      ['cooldown', 'movespeed', 'cost', 'range'])]
+        'champion': [col for col in df.columns if col.startswith('base_stat_') 
+                     or col.startswith('per_level_') 
+                     or col.startswith('ability_')],
+        'item': [col for col in df.columns if col.startswith('item_')]
     }
     results = {}
     for group_name, features in groups.items():
@@ -41,6 +44,7 @@ def analyze_feature_groups(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
     return results
 
 def analyze_changes_over_time(df: pd.DataFrame, feature_names: list) -> None:
+    """Trace l'évolution du nombre de changements par patch"""
     changes_per_patch = df.groupby('patch')[feature_names].apply(lambda x: (x != 0).sum())
     plt.figure(figsize=(15, 5))
     changes_per_patch.sum(axis=1).plot(kind='bar')
@@ -53,6 +57,7 @@ def analyze_changes_over_time(df: pd.DataFrame, feature_names: list) -> None:
     plt.close()
 
 def analyze_significance(df: pd.DataFrame, stat_columns: list) -> pd.DataFrame:
+    """Analyse statistique de la significativité des changements"""
     significant_changes = []
     for col in stat_columns:
         if df[col].any():
@@ -75,6 +80,8 @@ def analyze_significance(df: pd.DataFrame, stat_columns: list) -> pd.DataFrame:
 
 def analyze_prediction_data() -> Dict[str, Any]:
     logger.info("Starting data analysis")
+    
+    # Charge les données préparées, qui intègrent désormais les changements d’items
     data = prepare_prediction_data()
     df = data['full_data']
     stat_columns = data['feature_names']
@@ -97,6 +104,7 @@ def analyze_prediction_data() -> Dict[str, Any]:
     changes_stats = df[stat_columns].describe()
     logger.info(changes_stats)
     
+    # Calcul des corrélations pour chaque feature (en ne considérant que les valeurs non nulles)
     correlations = []
     for col in stat_columns:
         mask = df[col] != 0
