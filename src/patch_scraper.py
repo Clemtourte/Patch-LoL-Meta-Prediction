@@ -508,6 +508,6 @@ if __name__ == "__main__":
     # scraper.scrape_patch_from_file("patch_notes.html", "13.3")
     
     # 3) Scrape a range of patches
-    #scrape_patch_range("13.1", "14.24", language="en-gb")
+    # scrape_patch_range("13.1", "14.24", language="en-gb")
     
     pass
