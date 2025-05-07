@@ -1,139 +1,160 @@
 import numpy as np
 import pandas as pd
 import logging
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import GridSearchCV, train_test_split, KFold
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.linear_model import Ridge, Lasso, ElasticNet
-from sklearn.ensemble import RandomForestRegressor
 import xgboost as xgb
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.feature_selection import VarianceThreshold, SelectFromModel
+from sklearn.preprocessing import PolynomialFeatures
 from data_preparation import prepare_prediction_data
 
-# Configuration du logging
+# Logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_temporal_features(df_full, X):
     """
-    Crée des features agrégées qui regroupent des changements offensifs, défensifs et utilitaires.
-    On ajoute également des features spécifiques par capacité (Q, W, E, R) et des interactions.
+    Add rolling, delta features, plus champ_mean and patch_mean.
     """
-    # Exemple : agrégation simple sur des features dont le nom contient 'damage' ou 'attack'
-    df['total_offensive_changes'] = df[[col for col in df.columns if 'damage' in col or 'attack' in col]].abs().sum(axis=1)
-    df['total_defensive_changes'] = df[[col for col in df.columns if 'hp' in col or 'armor' in col or 'spellblock' in col]].abs().sum(axis=1)
-    df['total_utility_changes'] = df[[col for col in df.columns if 'cooldown' in col or 'movespeed' in col]].abs().sum(axis=1)
-    
-    # Exemple d'interaction simple : produit entre certaines features si disponibles
-    for ability in ['Q', 'W', 'E', 'R']:
-        damage_col = f'ability_{ability}_base_damage_rank1'
-        cooldown_col = f'ability_{ability}_cooldown_rank1'
-        if damage_col in df.columns and cooldown_col in df.columns:
-            df[f'{ability}_damage_cooldown'] = df[damage_col] * df[cooldown_col]
-    
-    # Pour les items, on peut agréger certains changements
-    if any(col.startswith('item_') for col in df.columns):
-        df['total_item_gold'] = df[[col for col in df.columns if col.startswith('item_')]].sum(axis=1)
-    
-    return df
+    df = df_full.copy()
+    # Ordinalisation des patches
+    patches = sorted(df['patch'].unique(), key=lambda x: [int(p) for p in x.split('.')])
+    patch_map = {p: i for i, p in enumerate(patches)}
+    df['patch_idx'] = df['patch'].map(patch_map)
 
-def get_models():
-    # Définition des grilles d'hyperparamètres pour chaque modèle
-    param_grid_xgb = {
-        'max_depth': [3, 4, 5],
-        'learning_rate': [0.01, 0.1],
-        'n_estimators': [100, 200],
-        'min_child_weight': [1, 3],
-        'subsample': [0.8, 1.0],
-        'gamma': [0, 0.1],
-        'reg_alpha': [0, 0.1],
-        'reg_lambda': [0.1, 1.0]
-    }
-    param_grid_rf = {
-        'n_estimators': [50, 100],
-        'max_depth': [None, 10, 20],
-        'min_samples_split': [2, 5]
-    }
-    param_grid_ridge = {'alpha': [0.1, 1, 10]}
-    param_grid_lasso = {'alpha': [0.001, 0.01, 0.1, 1]}
-    param_grid_en = {'alpha': [0.001, 0.01, 0.1, 1], 'l1_ratio': [0.2, 0.5, 0.8]}
+    # Rolling et précédent
+    df.sort_values(['champion_name', 'patch_idx'], inplace=True)
+    df['champ_prev_win'] = df.groupby('champion_name')['winrate'].shift(1)
+    df['champ_roll3']    = df.groupby('champion_name')['winrate'] \
+                              .rolling(3, min_periods=1).mean() \
+                              .reset_index(level=0, drop=True)
 
-    models = {
-        'XGBoost': (xgb.XGBRegressor(objective='reg:squarederror', random_state=42, enable_categorical=True), param_grid_xgb),
-        'RandomForest': (RandomForestRegressor(random_state=42), param_grid_rf),
-        'Ridge': (Ridge(random_state=42), param_grid_ridge),
-        'Lasso': (Lasso(random_state=42), param_grid_lasso),
-        'ElasticNet': (ElasticNet(random_state=42), param_grid_en)
-    }
-    return models
+    # Moyennes
+    champ_mean = df.groupby('champion_name')['winrate'].transform('mean')
+    patch_mean = df.groupby('patch')['winrate'].transform('mean')
+    global_mean = df['winrate'].mean()
 
-def evaluate_model(model, X_train, y_train, X_test, y_test, w_train, w_test):
-    # Prédictions et calcul des métriques
-    y_pred_train = model.predict(X_train)
-    y_pred_test = model.predict(X_test)
-    metrics = {
-        'train_rmse': np.sqrt(mean_squared_error(y_train, y_pred_train, sample_weight=w_train)),
-        'test_rmse': np.sqrt(mean_squared_error(y_test, y_pred_test, sample_weight=w_test)),
-        'train_mae': mean_absolute_error(y_train, y_pred_train, sample_weight=w_train),
-        'test_mae': mean_absolute_error(y_test, y_pred_test, sample_weight=w_test),
-        'train_r2': r2_score(y_train, y_pred_train, sample_weight=w_train),
-        'test_r2': r2_score(y_test, y_pred_test, sample_weight=w_test)
-    }
-    return metrics, y_pred_test
+    # Merge dans X
+    X = X.copy()
+    X['patch_idx']      = df.loc[X.index, 'patch_idx']
+    X['champ_prev_win'] = df.loc[X.index, 'champ_prev_win'].fillna(global_mean)
+    X['champ_roll3']    = df.loc[X.index, 'champ_roll3']
+    X['champ_mean']     = champ_mean.loc[X.index]
+    X['patch_mean']     = patch_mean.loc[X.index]
+    X['champ_delta']    = df.loc[X.index, 'winrate'] - champ_mean.loc[X.index]
+
+    return X
 
 def main():
-    logger.info("Chargement des données...")
-    # La fonction prepare_prediction_data() renvoie désormais le delta winrate comme cible.
+    logger.info("Loading and preparing data...")
     data = prepare_prediction_data()
-    X_train = data['X_train']
-    X_test = data['X_test']
-    y_train = data['y_train']  # delta winrate
-    y_test = data['y_test']
-    w_train = data['w_train']
-    w_test = data['w_test']
+    full_df    = data['full_data']
+    X_train, X_test = data['X_train'], data['X_test']
+    y_train, y_test = data['y_train'], data['y_test']
+    w_train, w_test = data['w_train'], data['w_test']
 
-    # Appliquer l'ingénierie de features
-    X_train = engineer_features(X_train)
-    X_test = engineer_features(X_test)
-    feature_names = X_train.columns.tolist()
-    logger.info(f"Nombre de features après ingénierie: {len(feature_names)}")
-    
-    models = get_models()
-    results = {}
+    # 1) Temporal + basic
+    logger.info("Adding temporal & mean features...")
+    X_train = add_temporal_features(full_df.loc[X_train.index], X_train)
+    X_test  = add_temporal_features(full_df.loc[X_test.index],  X_test)
+    # Ajouter pickrate & total_games
+    for col in ['pickrate', 'total_games']:
+        X_train[col] = full_df.loc[X_train.index, col]
+        X_test[col]  = full_df.loc[X_test.index,  col]
 
-    # Utiliser 5-fold cross-validation pour chaque modèle
-    cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    
-    for model_name, (model, param_grid) in models.items():
-        logger.info(f"Recherche des meilleurs hyperparamètres pour {model_name}...")
-        grid_search = GridSearchCV(
-            estimator=model,
-            param_grid=param_grid,
-            cv=cv,
-            scoring='neg_mean_squared_error',
-            n_jobs=-1,
-            verbose=1
-        )
-        grid_search.fit(X_train, y_train, sample_weight=w_train)
-        best_model = grid_search.best_estimator_
-        metrics, y_pred_test = evaluate_model(best_model, X_train, y_train, X_test, y_test, w_train, w_test)
-        results[model_name] = {
-            'best_params': grid_search.best_params_,
-            'metrics': metrics,
-            'model': best_model
-        }
-        logger.info(f"{model_name} - Meilleurs paramètres: {grid_search.best_params_}")
-        logger.info(f"{model_name} - Performance sur l'ensemble de test: RMSE = {metrics['test_rmse']:.4f}, MAE = {metrics['test_mae']:.4f}, R² = {metrics['test_r2']:.4f}")
-    
-    # Comparaison finale des modèles
-    summary = pd.DataFrame({
-        model_name: result['metrics'] for model_name, result in results.items()
-    }).T
-    print("\nComparaison des modèles:")
-    print(summary)
-    
-    # Sauvegarde du résumé
-    summary.to_csv("model_comparison_summary.csv", index=True)
+    # 2) Polynômes degré 2
+    logger.info("Generating polynomial features (degree=2)...")
+    poly = PolynomialFeatures(2, include_bias=False)
+    X_train_poly = pd.DataFrame(
+        poly.fit_transform(X_train),
+        index=X_train.index,
+        columns=poly.get_feature_names_out(X_train.columns)
+    )
+    X_test_poly = pd.DataFrame(
+        poly.transform(X_test),
+        index=X_test.index,
+        columns=X_train_poly.columns
+    )
+    logger.info(f"→ {X_train_poly.shape[1]} features after poly")
 
-if __name__ == "__main__":
+    # 3) VarianceThreshold
+    logger.info("Applying VarianceThreshold...")
+    vt = VarianceThreshold(0.01)
+    X_train_vt = pd.DataFrame(
+        vt.fit_transform(X_train_poly),
+        index=X_train_poly.index,
+        columns=X_train_poly.columns[vt.get_support()]
+    )
+    X_test_vt = pd.DataFrame(
+        vt.transform(X_test_poly),
+        index=X_test_poly.index,
+        columns=X_train_vt.columns
+    )
+    logger.info(f"→ {X_train_vt.shape[1]} features after VT")
+
+    # 4) Sélection par un modèle léger
+    logger.info("Selecting features with preliminary XGBRegressor...")
+    base = xgb.XGBRegressor(
+        n_estimators=50, learning_rate=0.1, max_depth=3,
+        subsample=0.8, colsample_bytree=0.8,
+        reg_alpha=1, reg_lambda=10,
+        objective='reg:squarederror', random_state=42, verbosity=0
+    )
+    selector = SelectFromModel(base, threshold='median')
+    selector.fit(X_train_vt, y_train, sample_weight=w_train)
+    keep = selector.get_support(indices=True)
+    X_train_sel = X_train_vt.iloc[:, keep]
+    X_test_sel  = X_test_vt.iloc[:, keep]
+    logger.info(f"→ {X_train_sel.shape[1]} features selected")
+
+    # 5) DMatrix pour CV
+    dtrain = xgb.DMatrix(X_train_sel, label=y_train, weight=w_train)
+
+    # 6) CV XGBoost
+    params = {
+        'objective': 'reg:squarederror',
+        'learning_rate': 0.05,
+        'max_depth': 5,
+        'subsample': 0.8,
+        'colsample_bytree': 0.8,
+        'gamma': 0.1,
+        'reg_alpha': 0.1,
+        'reg_lambda': 1.0,
+        'seed': 42,
+        'verbosity': 0
+    }
+    logger.info("Running CV to find optimal rounds...")
+    cvres = xgb.cv(
+        params, dtrain,
+        num_boost_round=1000,
+        nfold=5,
+        early_stopping_rounds=10,
+        metrics='rmse',
+        seed=42,
+        as_pandas=True,
+        verbose_eval=False
+    )
+    best_rounds = len(cvres)
+    logger.info(f"→ Best rounds: {best_rounds}")
+
+    # 7) Entraînement final
+    model = xgb.XGBRegressor(
+        n_estimators=best_rounds,
+        **{k: params[k] for k in
+           ['learning_rate','max_depth','subsample','colsample_bytree','gamma','reg_alpha','reg_lambda']},
+        objective='reg:squarederror',
+        random_state=42,
+        verbosity=0
+    )
+    logger.info("Training final model...")
+    model.fit(X_train_sel, y_train, sample_weight=w_train, verbose=False)
+
+    # 8) Évaluation
+    logger.info("Evaluating on test set...")
+    y_pred = model.predict(X_test_sel)
+    rmse = mean_squared_error(y_test, y_pred, squared=False, sample_weight=w_test)
+    mae  = mean_absolute_error(y_test, y_pred, sample_weight=w_test)
+    r2   = r2_score(y_test, y_pred, sample_weight=w_test)
+    logger.info(f"Final Results → RMSE={rmse:.3f}, MAE={mae:.3f}, R2={r2:.3f}")
+
+if __name__ == '__main__':
     main()
