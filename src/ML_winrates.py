@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import logging
+import joblib
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.feature_selection import VarianceThreshold, SelectFromModel
@@ -24,14 +25,17 @@ def add_temporal_features(df_full, X):
     # Rolling et précédent
     df.sort_values(['champion_name', 'patch_idx'], inplace=True)
     df['champ_prev_win'] = df.groupby('champion_name')['winrate'].shift(1)
-    df['champ_roll3']    = df.groupby('champion_name')['winrate'] \
-                              .rolling(3, min_periods=1).mean() \
-                              .reset_index(level=0, drop=True)
+    df['champ_roll3']    = (
+        df.groupby('champion_name')['winrate']
+          .rolling(3, min_periods=1)
+          .mean()
+          .reset_index(level=0, drop=True)
+    )
 
     # Moyennes
-    champ_mean = df.groupby('champion_name')['winrate'].transform('mean')
-    patch_mean = df.groupby('patch')['winrate'].transform('mean')
-    global_mean = df['winrate'].mean()
+    champ_mean   = df.groupby('champion_name')['winrate'].transform('mean')
+    patch_mean   = df.groupby('patch')['winrate'].transform('mean')
+    global_mean  = df['winrate'].mean()
 
     # Merge dans X
     X = X.copy()
@@ -46,8 +50,8 @@ def add_temporal_features(df_full, X):
 
 def main():
     logger.info("Loading and preparing data...")
-    data = prepare_prediction_data()
-    full_df    = data['full_data']
+    data        = prepare_prediction_data()
+    full_df     = data['full_data']
     X_train, X_test = data['X_train'], data['X_test']
     y_train, y_test = data['y_train'], data['y_test']
     w_train, w_test = data['w_train'], data['w_test']
@@ -56,7 +60,6 @@ def main():
     logger.info("Adding temporal & mean features...")
     X_train = add_temporal_features(full_df.loc[X_train.index], X_train)
     X_test  = add_temporal_features(full_df.loc[X_test.index],  X_test)
-    # Ajouter pickrate & total_games
     for col in ['pickrate', 'total_games']:
         X_train[col] = full_df.loc[X_train.index, col]
         X_test[col]  = full_df.loc[X_test.index,  col]
@@ -155,6 +158,11 @@ def main():
     mae  = mean_absolute_error(y_test, y_pred, sample_weight=w_test)
     r2   = r2_score(y_test, y_pred, sample_weight=w_test)
     logger.info(f"Final Results → RMSE={rmse:.3f}, MAE={mae:.3f}, R2={r2:.3f}")
+
+    # 9) Sauvegarde du modèle et des features
+    joblib.dump(model, 'xgb_winrate_model_improved.joblib')
+    pd.Series(X_train_sel.columns).to_csv('xgb_features_improved.csv', index=False)
+    logger.info("Model and features saved.")
 
 if __name__ == '__main__':
     main()
