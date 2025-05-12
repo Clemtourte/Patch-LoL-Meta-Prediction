@@ -48,7 +48,10 @@ def validate_data(final_df: pd.DataFrame) -> None:
             non_zero = (final_df[col] != 0).sum()
             logger.info(f"{col}: {non_zero} non-zero values")
 
-def prepare_prediction_data() -> Dict[str, Any]:
+def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
+    """
+    Prépare les données pour la prédiction avec option de séparation temporelle.
+    """
     logger.info("Starting data preparation")
     
     engine = create_engine('sqlite:///../datasets/league_data.db')
@@ -165,10 +168,12 @@ def prepare_prediction_data() -> Dict[str, Any]:
     # Trier par champion et par patch en utilisant patch_to_tuple
     final_df = final_df.sort_values(
         by=["champion_name", "patch"],
-        key=lambda x: x.map(patch_to_tuple)
+        key=lambda x: x.map(patch_to_tuple) if x.name == "patch" else x
     )
+    
     # Calculer la différence de winrate (delta_winrate) pour chaque champion
     final_df["delta_winrate"] = final_df.groupby("champion_name")["winrate"].diff()
+    
     # Retirer les lignes dont delta_winrate est NaN (première occurrence de chaque champion)
     final_df = final_df.dropna(subset=["delta_winrate"])
     
@@ -177,17 +182,38 @@ def prepare_prediction_data() -> Dict[str, Any]:
     y = final_df['delta_winrate']
     weights = final_df['total_games'] / final_df['total_games'].mean()
     
-    logger.info("Splitting into train/test sets")
-    X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
-        X, y, weights, test_size=0.2, random_state=42
-    )
+    # MODIFICATION IMPORTANTE: Division train/test avec option temporelle
+    if temporal_split:
+        # Tri chronologique des patches
+        patches = sorted(final_df['patch'].unique(), key=patch_to_tuple)
+        # 80% des patches pour l'entraînement
+        split_idx = int(len(patches) * 0.8)
+        train_patches = patches[:split_idx]
+        
+        # Création des masques train/test
+        train_mask = final_df['patch'].isin(train_patches)
+        X_train = X[train_mask]
+        X_test = X[~train_mask]
+        y_train = y[train_mask]
+        y_test = y[~train_mask]
+        w_train = weights[train_mask]
+        w_test = weights[~train_mask]
+        
+        logger.info(f"Temporal split: {len(train_patches)} patches for training, {len(patches) - len(train_patches)} for testing")
+    else:
+        # Split classique
+        X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
+            X, y, weights, test_size=0.2, random_state=42
+        )
+        logger.info("Random train/test split")
     
+    logger.info(f"Training set size: {X_train.shape[0]}, Test set size: {X_test.shape[0]}")
     logger.info("Data preparation completed")
     
     return {
         'X_train': X_train,
         'X_test': X_test,
-        'y_train': y_train,    # ici, le delta winrate
+        'y_train': y_train,
         'y_test': y_test,
         'w_train': w_train,
         'w_test': w_test,
@@ -211,7 +237,7 @@ def analyze_features(data: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     try:
-        data = prepare_prediction_data()
+        data = prepare_prediction_data(temporal_split=True)
         print("\nTraining Data Shape:", data['X_train'].shape)
         print("Number of Features:", len(data['feature_names']))
         print("\nFeatures:", data['feature_names'])
