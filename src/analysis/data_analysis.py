@@ -3,6 +3,9 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
 import logging
 from typing import Dict, Any

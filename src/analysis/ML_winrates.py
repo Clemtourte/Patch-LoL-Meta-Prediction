@@ -6,9 +6,13 @@ import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import TimeSeriesSplit, cross_val_score
-from data_preparation import prepare_prediction_data
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 
+from data_preparation import prepare_prediction_data
 # Configuration du logging
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 

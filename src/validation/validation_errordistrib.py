@@ -7,7 +7,11 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
+
 
 # Import des mêmes fonctions d'ajout de caractéristiques et d'agrégation
 # (Utilisez les mêmes fonctions que dans les scripts précédents)
@@ -110,17 +114,42 @@ def aggregate_ability_changes(X):
 
 # Définir les classes de champions
 def assign_champion_class(champion_name):
-    """
-    Assigne une classe à un champion basée sur une classification simplifiée.
-    Cette fonction est une approximation - idéalement vous auriez une source de données plus précise.
-    """
-    # Liste non exhaustive - à remplacer par une source plus complète
-    tanks = ['Maokai', 'Malphite', 'Sion', 'Ornn', 'Shen', 'Nautilus', 'Leona', 'Braum', 'Sejuani', 'Alistar']
-    fighters = ['Darius', 'Garen', 'Renekton', 'Irelia', 'Riven', 'Jax', 'Fiora', 'Camille', 'Aatrox', 'Lee Sin', 'Olaf', 'Wukong']
-    mages = ['Ryze', 'Syndra', 'Orianna', 'Viktor', 'Cassiopeia', 'Annie', 'Veigar', 'Brand', 'Lux', 'Xerath', 'Ziggs', 'Vel\'Koz']
-    assassins = ['Zed', 'Akali', 'Katarina', 'Talon', 'Fizz', 'Kayn', 'Shaco', 'Evelynn', 'Kha\'Zix', 'Rengar']
-    marksmen = ['Ashe', 'Caitlyn', 'Jhin', 'Jinx', 'Vayne', 'Ezreal', 'Draven', 'Varus', 'Tristana', 'Kalista', 'Xayah', 'Kai\'Sa']
-    supports = ['Soraka', 'Janna', 'Lulu', 'Nami', 'Sona', 'Yuumi', 'Karma', 'Seraphine', 'Bard', 'Thresh', 'Pyke']
+    tanks = [
+        'Maokai', 'Malphite', 'Sion', 'Ornn', 'Shen', 'Nautilus', 'Leona', 'Braum', 'Sejuani', 'Alistar',
+        'Amumu', 'Blitzcrank', 'Cho\'Gath', 'Dr. Mundo', 'Galio', 'Gragas', 'Poppy', 'Rammus', 'Tahm Kench', 
+        'Taric', 'Thresh', 'Volibear', 'Warwick', 'Zac', 'Rell', 'Nunu', 'Ivern'
+    ]
+    
+    fighters = [
+        'Darius', 'Garen', 'Renekton', 'Irelia', 'Riven', 'Jax', 'Fiora', 'Camille', 'Aatrox', 'Lee Sin', 'Olaf', 'Wukong',
+        'Gnar', 'Hecarim', 'Illaoi', 'Jarvan IV', 'Kayn', 'Kled', 'Mordekaiser', 'Nasus', 'Pantheon', 'Sett', 
+        'Tryndamere', 'Udyr', 'Vi', 'Yorick', 'Yone', 'Ambessa', 'Briar', 'Gwen', 'Viego'
+    ]
+    
+    mages = [
+        'Ryze', 'Syndra', 'Orianna', 'Viktor', 'Cassiopeia', 'Annie', 'Veigar', 'Brand', 'Lux', 'Xerath', 'Ziggs', 'Vel\'Koz',
+        'Ahri', 'Anivia', 'Azir', 'Elise', 'Fiddlesticks', 'Heimerdinger', 'Karthus', 'Kassadin', 'Katarina',
+        'Kennen', 'LeBlanc', 'Lissandra', 'Malzahar', 'Neeko', 'Rumble', 'Swain', 'Taliyah', 'Twisted Fate', 'Vladimir',
+        'Zoe', 'Zyra', 'Aurelion Sol', 'Lillia', 'Seraphine', 'Vex', 'Hwei', 'Aurora'
+    ]
+    
+    assassins = [
+        'Zed', 'Akali', 'Katarina', 'Talon', 'Fizz', 'Kayn', 'Shaco', 'Evelynn', 'Kha\'Zix', 'Rengar',
+        'Diana', 'Ekko', 'Kassadin', 'LeBlanc', 'Nocturne', 'Qiyana', 'Yasuo', 'Yone', 'Master Yi', 
+        'Nidalee', 'Kindred'
+    ]
+    
+    marksmen = [
+        'Ashe', 'Caitlyn', 'Jhin', 'Jinx', 'Vayne', 'Ezreal', 'Draven', 'Varus', 'Tristana', 'Kalista', 'Xayah', 'Kai\'Sa',
+        'Aphelios', 'Corki', 'Graves', 'Jayce', 'Kog\'Maw', 'Lucian', 'Miss Fortune', 'Quinn', 'Sivir', 
+        'Teemo', 'Twitch', 'Urgot', 'Zeri', 'Nilah', 'Smolder'
+    ]
+    
+    supports = [
+        'Soraka', 'Janna', 'Lulu', 'Nami', 'Sona', 'Yuumi', 'Karma', 'Seraphine', 'Bard', 'Thresh', 'Pyke',
+        'Alistar', 'Blitzcrank', 'Braum', 'Leona', 'Morgana', 'Nautilus', 'Rakan', 'Senna', 'Shen', 'Taric', 
+        'Zilean', 'Zyra', 'Milio', 'Renata Glasc', 'Galio'
+    ]
     
     if champion_name in tanks:
         return 'Tank'

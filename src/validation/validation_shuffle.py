@@ -6,6 +6,9 @@ import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import joblib
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
 
 def add_temporal_features(df_full, X):
