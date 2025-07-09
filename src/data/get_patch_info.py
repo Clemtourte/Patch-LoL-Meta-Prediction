@@ -6,12 +6,15 @@ import logging
 from packaging import version
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import Base, ChampionStats, ItemStats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-engine = create_engine('sqlite:///../datasets/league_data.db')
+engine = create_engine("sqlite:///../../datasets/league_data.db")
 SessionMaker = sessionmaker(bind=engine)
 
 def get_available_versions() -> list[str]:

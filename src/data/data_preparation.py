@@ -54,7 +54,7 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
     """
     logger.info("Starting data preparation")
     
-    engine = create_engine('sqlite:///../datasets/league_data.db')
+    engine = create_engine('sqlite:///../../datasets/league_data.db')
     
     # Récupération des changements liés aux champions (base_stats, per_level, abilities)
     champ_changes_query = """
@@ -154,7 +154,7 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
         merged_changes,
         winrates,
         on=['patch', 'champion_name'],
-        how='inner'
+        how='left'
     )
     
     # Filtrer de nouveau pour s'assurer que la colonne patch est au bon format

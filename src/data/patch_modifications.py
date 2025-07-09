@@ -5,6 +5,10 @@ import numpy as np
 import re
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from models import SpellStats, Base
 from models import ChampionStats, SpellStats, ItemStats, Base, PatchChanges
 from typing import Dict, Any, List
 
@@ -44,7 +48,7 @@ def slice_field(field, ranks):
 
 class PatchChangeDetector:
     def __init__(self):
-        self.engine = create_engine('sqlite:///../datasets/league_data.db')
+        self.engine = create_engine('sqlite:///../../datasets/league_data.db')
         self.Session = sessionmaker(bind=self.engine)
 
     def get_champion_stats(self, patch_version: str) -> Dict[str, ChampionStats]:

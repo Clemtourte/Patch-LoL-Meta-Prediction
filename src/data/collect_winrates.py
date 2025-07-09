@@ -2,9 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, Index
 from sqlalchemy.orm import sessionmaker
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import ChampionStats, ChampionWinrates
 import logging
 import time
+
 
 logging.basicConfig(
    level=logging.INFO,
@@ -17,19 +21,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def generate_patch_list():
-   """Generate list of patches from 13.1 to 14.24"""
-   patches = []
-   # Season 13
-   for i in range(1, 25):
-       patches.append(f"13.{i}")
-   # Season 14
-   for i in range(1, 25):
-       patches.append(f"14.{i}")
-   return patches
+    """Generate list of patches from 13.1 to 14.24"""
+    patches = []
+    # Season 13
+    for i in range(1, 25):
+        patches.append(f"13.{i}")
+    # Season 14
+    for i in range(1, 25):
+        patches.append(f"14.{i}")
+    
+    # Skip problematic patches
+    patches_to_skip = ['13.2']  # Ajoutez d'autres patches ici si nécessaire
+    patches = [p for p in patches if p not in patches_to_skip]
+    
+    return patches
 
 class MetaScraper:
    def __init__(self):
-       self.engine = create_engine('sqlite:///../datasets/league_data.db')
+       self.engine = create_engine('sqlite:///../../datasets/league_data.db')
        self.Session = sessionmaker(bind=self.engine)
        self.base_url = "https://www.metasrc.com/lol/{}/build/{}"
        

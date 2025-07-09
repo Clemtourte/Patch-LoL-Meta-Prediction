@@ -5,6 +5,10 @@ import re
 import json
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
+# Ajout du chemin pour importer models
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import SpellStats, Base
 
 logging.basicConfig(level=logging.INFO,
@@ -13,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class PatchNotesScraper:
-    def __init__(self, db_path="sqlite:///../datasets/league_data.db"):
+    def __init__(self, db_path="sqlite:///../../datasets/league_data.db"):
         """Initialize the scraper with database connection."""
         self.engine = create_engine(db_path)
         self.Session = sessionmaker(bind=self.engine)
@@ -106,7 +110,7 @@ class PatchNotesScraper:
         if 'magic damage' in label_lower:
             return 'magic_damage'
         
-        # Pour K’Sante : distinguer knock up et stun
+        # Pour K'Sante : distinguer knock up et stun
         if 'knock up' in label_lower:
             return 'knockup_duration'
         if 'stun' in label_lower:
@@ -157,13 +161,13 @@ class PatchNotesScraper:
         """
         change = {'raw_text': text}
         
-        # We require an arrow "⇒" to detect old vs new
-        arrow_match = re.search(r'(.*?)⇒(.*)', text)
+        # We require an arrow "⇒" or similar symbols to detect old vs new
+        arrow_match = re.search(r'(.*?)(⇒|→|>)(.*)', text)
         if not arrow_match:
             return None  # No arrow => not a numeric change
 
         before_part = arrow_match.group(1).strip()
-        after_part  = arrow_match.group(2).strip()
+        after_part  = arrow_match.group(3).strip()
 
         # Attempt to see if there's a label like "Damage:" or "Cooldown:"
         label_match = re.search(r'^([^:]+):\s*(.*)$', before_part)
@@ -238,23 +242,13 @@ class PatchNotesScraper:
         else:
             logger.warning("Could not detect patch version in HTML.")
 
-        # Find champion sections
+        # Find champion sections - CORRIGÉ
         champion_changes = []
         champion_blocks = soup.find_all('div', class_='patch-change-block')
-        if not champion_blocks:
-            logger.warning("No standard champion blocks found in HTML. Attempting fallback.")
-            # fallback approach if the patch notes use a different structure
-            content_divs = soup.find_all('div', class_='content-border')
-            for div in content_divs:
-                champion_name_tag = div.find(['h3', 'h4'], text=re.compile(r'[A-Z][a-z]+'))
-                if champion_name_tag:
-                    champion_blocks.append(div)
-
+        
         for block in champion_blocks:
-            # Attempt to find champion name
-            champion_header = block.find(['h3', 'h4'], class_='change-title')
-            if not champion_header:
-                champion_header = block.find(['h3', 'h4'], text=re.compile(r'[A-Z][a-z]+'))
+            # Find champion name
+            champion_header = block.find('h3', class_='change-title')
             if not champion_header:
                 continue
 
@@ -262,34 +256,45 @@ class PatchNotesScraper:
             if champion_link:
                 champion_name = champion_link.text.strip()
             else:
-                champion_name = re.sub(r'[^a-zA-Z\s]', '', champion_header.text.strip())
+                champion_name = champion_header.text.strip()
 
             logger.info(f"Processing champion: {champion_name}")
 
-            # Find ability sections
-            ability_sections = block.find_all(['h4', 'h5'], class_='change-detail-title ability-title')
-            if not ability_sections:
-                # fallback if no dedicated class
-                ability_sections = block.find_all(['h4', 'h5'], text=re.compile(r'(Q|W|E|R) -|Passive'))
+            # NOUVEAU : Chercher les abilities ET les changements directement dans le block
+            current_ability = None
+            current_ability_name = None
+            ability_changes = []
             
-            for ability in ability_sections:
-                ability_name = ability.text.strip()
-                spell_type = self.parse_ability_type(ability_name)
-                if not spell_type:
-                    logger.warning(f"Could not determine spell type for: {ability_name}")
-                    continue
-
-                logger.info(f"  Processing ability: {ability_name} ({spell_type})")
-                changes_list = ability.find_next('ul')
-                if not changes_list:
-                    logger.warning(f"No <ul> with changes found for {champion_name} {spell_type}")
-                    continue
+            # Parcourir tous les éléments du block
+            for element in block.find_all(['h4', 'li']):
                 
-                ability_changes = []
-                for item in changes_list.find_all('li'):
-                    line_text = item.text.strip()
-                    if '⇒' not in line_text:
-                        # skip lines that do not have an arrow
+                # Si c'est un titre d'ability
+                if element.name == 'h4' and 'ability-title' in element.get('class', []):
+                    # Sauvegarder l'ability précédente s'il y en a une
+                    if current_ability and ability_changes:
+                        champion_changes.append({
+                            'champion': champion_name,
+                            'spell_type': current_ability,
+                            'spell_name': current_ability_name,
+                            'changes': ability_changes
+                        })
+                    
+                    # Nouvelle ability
+                    current_ability_name = element.text.strip()
+                    current_ability = self.parse_ability_type(current_ability_name)
+                    ability_changes = []
+                    
+                    if current_ability:
+                        logger.info(f"  Processing ability: {current_ability_name} ({current_ability})")
+                
+                # Si c'est un changement (li)
+                elif element.name == 'li' and current_ability:
+                    line_text = element.get_text(strip=True)
+                    print(f"DEBUG: Analyzing line: {line_text}")
+                    
+                    # Cherchez différents types de flèches
+                    if not re.search(r'(⇒|→|>)', line_text):
+                        print(f"DEBUG: No arrow found in: {line_text}")
                         continue
 
                     parsed = self.parse_change(line_text)
@@ -297,15 +302,16 @@ class PatchNotesScraper:
                         ability_changes.append(parsed)
                         logger.info(f"    Found change: {parsed['type']}")
                     else:
-                        logger.debug(f"Skipping line due to no numeric parse: {line_text}")
-
-                if ability_changes:
-                    champion_changes.append({
-                        'champion': champion_name,
-                        'spell_type': spell_type,
-                        'spell_name': ability_name,
-                        'changes': ability_changes
-                    })
+                        print(f"DEBUG: Failed to parse: {line_text}")
+            
+            # Sauvegarder la dernière ability
+            if current_ability and ability_changes:
+                champion_changes.append({
+                    'champion': champion_name,
+                    'spell_type': current_ability,
+                    'spell_name': current_ability_name,
+                    'changes': ability_changes
+                })
 
         return champion_changes, patch_version
 
@@ -502,7 +508,7 @@ if __name__ == "__main__":
     scraper = PatchNotesScraper()
     
     # 1) Scrape a single patch from URL
-    scraper.scrape_patch_from_url("https://www.leagueoflegends.com/en-gb/news/game-updates/patch-13-15-notes/")
+    scraper.scrape_patch_from_url("https://www.leagueoflegends.com/en-gb/news/game-updates/patch-14-24-notes/")
     
     # 2) Scrape from a local file
     # scraper.scrape_patch_from_file("patch_notes.html", "13.3")
