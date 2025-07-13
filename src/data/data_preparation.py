@@ -157,6 +157,28 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
         how='left'
     )
     
+    champions_in_changes = set(merged_changes['champion_name'].unique())
+    champions_in_winrates = set(winrates['champion_name'].unique())
+    champions_perdus = champions_in_winrates - champions_in_changes
+
+    logger.info(f"Champions perdus récupérés: {len(champions_perdus)}")
+
+    # 3. Ajouter seulement les champions perdus avec ≥2 patches
+    for champion in champions_perdus:
+        champ_winrates = winrates[winrates['champion_name'] == champion]
+        if len(champ_winrates) >= 2:  # Au moins 2 patches pour calculer delta
+            # Créer des lignes avec changements = 0
+            champ_rows = champ_winrates.copy()
+            # Ajouter toutes les colonnes de changements avec valeur 0
+            for col in merged_changes.columns:
+                if col not in ['patch', 'champion_name']:
+                    champ_rows[col] = 0
+            
+            # Ajouter au dataset
+            final_df = pd.concat([final_df, champ_rows], ignore_index=True)
+
+    logger.info(f"Dataset final après récupération: {final_df.shape}")
+    
     # Filtrer de nouveau pour s'assurer que la colonne patch est au bon format
     final_df = final_df[final_df['patch'].str.fullmatch(r'\d+\.\d+')]
     
