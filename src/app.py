@@ -7,6 +7,8 @@ from plotly.subplots import make_subplots
 import os
 from datetime import datetime, timedelta
 
+st.cache_data.clear()
+
 # Page config
 st.set_page_config(
     page_title="LoL Meta Predictor",
@@ -38,6 +40,9 @@ st.markdown("""
     .prediction-low { color: #ff4444; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
+
+def filter_significant_changes(df, threshold=0.5):
+    return df[abs(df['predicted_change']) > threshold]
 
 @st.cache_data
 def load_real_data():
@@ -351,10 +356,15 @@ def main():
         
         # Risk table
         st.subheader("📋 Detailed Risk Assessment")
-        risk_table = filtered_df[['champion', 'class', 'predicted_change', 'confidence', 'risk_level']].copy()
-        risk_table['predicted_change'] = risk_table['predicted_change'].round(1)
-        risk_table['confidence'] = (risk_table['confidence'] * 100).round(1)
-        st.dataframe(risk_table, use_container_width=True)
+        significant_changes = filtered_df[abs(filtered_df['predicted_change']) > 0.5]
+
+        if len(significant_changes) == 0:
+            st.info("Aucun champion avec changements significatifs prédits pour ce patch.")
+        else:
+            risk_table = significant_changes[['champion', 'class', 'predicted_change', 'confidence', 'risk_level']].copy()
+            risk_table['predicted_change'] = risk_table['predicted_change'].round(1)
+            risk_table['confidence'] = (risk_table['confidence'] * 100).round(1)
+            st.dataframe(risk_table, use_container_width=True)
     
     with tab4:
         st.header("Strategic Recommendations")

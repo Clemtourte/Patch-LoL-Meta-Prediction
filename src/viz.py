@@ -1,70 +1,79 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 import os
-from pathlib import Path
 
-# Set style for academic paper
-plt.style.use('seaborn-v0_8-whitegrid')
+# Set style
+plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 
-# Define the results directory path - all CSV files are in src folder
-RESULTS_DIR = Path(".")  # Current directory (src)
-
 def load_results_data():
-    """Load all results data from CSV files"""
+    """Load all validation results"""
     try:
         # Load ablation study results
-        ablation_df = pd.read_csv("ablation_study_results.csv", index_col=0)
+        if os.path.exists("ablation_study_results.csv"):
+            ablation_df = pd.read_csv("ablation_study_results.csv", index_col=0)
+        else:
+            print("Warning: ablation_study_results.csv not found")
+            ablation_df = None
         
-        # Load error analysis results
-        error_by_class_df = pd.read_csv("error_analysis_by_class.csv")
-        error_by_champion_df = pd.read_csv("error_analysis_by_champion.csv")
-        
-        # Load temporal validation results
-        temporal_df = pd.read_csv("nonconsecutive_validation_results.csv", index_col=0)
+        # Load error analysis
+        if os.path.exists("error_analysis_by_class.csv"):
+            error_by_class_df = pd.read_csv("error_analysis_by_class.csv", index_col=0)
+        else:
+            print("Warning: error_analysis_by_class.csv not found")
+            error_by_class_df = None
+            
+        if os.path.exists("error_analysis_by_champion.csv"):
+            error_by_champion_df = pd.read_csv("error_analysis_by_champion.csv")
+        else:
+            print("Warning: error_analysis_by_champion.csv not found")
+            error_by_champion_df = None
+            
+        # Load temporal validation
+        if os.path.exists("nonconsecutive_validation_results.csv"):
+            temporal_df = pd.read_csv("nonconsecutive_validation_results.csv", index_col=0)
+        else:
+            print("Warning: nonconsecutive_validation_results.csv not found")
+            temporal_df = None
         
         return ablation_df, error_by_class_df, error_by_champion_df, temporal_df
-    except FileNotFoundError as e:
-        print(f"Error loading results: {e}")
-        print("Available CSV files in current directory:")
-        csv_files = [f for f in os.listdir('.') if f.endswith('.csv')]
-        for f in csv_files:
-            print(f"  - {f}")
-        print("\nMake sure you have run the validation scripts first to generate the CSV files.")
+        
+    except Exception as e:
+        print(f"Error loading data: {e}")
         return None, None, None, None
 
 def plot_ablation_study(ablation_df):
-    """Visualisation des résultats d'ablation study avec vraies données"""
+    """Ablation study results visualization"""
     if ablation_df is None:
         print("No ablation data available")
         return
     
-    # Prepare data
+    # Data is already in English from validation script
     df = ablation_df.reset_index()
     df.columns = ['Feature Group', 'R²', 'RMSE', 'Features']
     df = df.sort_values('R²', ascending=True)
     
     fig, ax = plt.subplots(figsize=(12, 8))
     
-    # Couleurs conditionnelles basées sur les vraies valeurs
+    # Conditional colors based on R² values
     colors = ['red' if r2 < 0 else 'lightcoral' if r2 < 0.4 else 'lightblue' if r2 < 0.6 else 'darkblue' 
               for r2 in df['R²']]
     
     bars = ax.barh(df['Feature Group'], df['R²'], color=colors, alpha=0.8)
     
-    # Lignes de référence
+    # Reference lines
     ax.axvline(x=0, color='black', linestyle='--', alpha=0.5)
-    full_model_r2 = df[df['Feature Group'] == 'Toutes les caractéristiques']['R²'].iloc[0]
+    full_model_r2 = df[df['Feature Group'] == 'All features']['R²'].iloc[0]
     ax.axvline(x=full_model_r2, color='green', linestyle='--', alpha=0.7, 
                label=f'Full Model Performance (R²={full_model_r2:.3f})')
     
-    # Annotations avec nombre de features
+    # Annotations with feature count
     for i, (bar, features) in enumerate(zip(bars, df['Features'])):
         width = bar.get_width()
         ax.text(width + 0.01 if width > 0 else width - 0.01, bar.get_y() + bar.get_height()/2, 
-                f'{width:.3f}\n({features} features)', 
+                f'{width:.3f}\n({int(features)} features)', 
                 ha='left' if width > 0 else 'right', va='center', fontsize=9)
     
     ax.set_xlabel('R² Score', fontsize=12, fontweight='bold')
@@ -78,14 +87,14 @@ def plot_ablation_study(ablation_df):
     plt.show()
 
 def plot_error_by_class(error_by_class_df, error_by_champion_df):
-    """Distribution des erreurs par classe de champion avec vraies données"""
+    """Error distribution by champion class"""
     if error_by_class_df is None:
         print("No error analysis data available")
         return
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
     
-    # Plot 1: MAE par classe avec taille des échantillons
+    # Plot 1: MAE by class with sample sizes
     df_sorted = error_by_class_df.sort_values('mae')
     
     scatter = ax1.scatter(df_sorted['mae'], range(len(df_sorted)), 
@@ -107,7 +116,7 @@ def plot_error_by_class(error_by_class_df, error_by_champion_df):
     cbar = plt.colorbar(scatter, ax=ax1)
     cbar.set_label('MAE (percentage points)', rotation=270, labelpad=15)
     
-    # Plot 2: Distribution des échantillons
+    # Plot 2: Sample distribution
     total_samples = df_sorted['count'].sum()
     colors = plt.cm.Set3(np.linspace(0, 1, len(df_sorted)))
     wedges, texts, autotexts = ax2.pie(df_sorted['count'], labels=df_sorted['champion_class'], 
@@ -120,7 +129,7 @@ def plot_error_by_class(error_by_class_df, error_by_champion_df):
     plt.show()
 
 def plot_temporal_validation(temporal_df):
-    """Résultats de validation temporelle avec vraies données"""
+    """Temporal validation results"""
     if temporal_df is None:
         print("No temporal validation data available")
         return
@@ -141,7 +150,7 @@ def plot_temporal_validation(temporal_df):
     ax1.set_title('Cross-Epoch Validation Performance', fontsize=14, fontweight='bold')
     ax1.grid(True, alpha=0.3)
     
-    # Ligne de référence (meilleur score)
+    # Reference line (best score)
     best_r2 = df['R²'].max()
     ax1.axhline(y=best_r2, color='red', linestyle='--', alpha=0.7, 
                 label=f'Best Performance (R²={best_r2:.3f})')
@@ -172,56 +181,45 @@ def plot_temporal_validation(temporal_df):
     plt.show()
 
 def plot_feature_importance(ablation_df):
-    """Importance des features calculée à partir des résultats d'ablation"""
+    """Feature importance from ablation results"""
     if ablation_df is None:
         print("No ablation data available")
         return
     
-    # Récupérer le R² du modèle complet
-    full_model_r2 = ablation_df.loc['Toutes les caractéristiques', 'r2']
+    # Get full model R²
+    full_model_r2 = ablation_df.loc['All features', 'r2']
     
-    # Calculer l'impact de chaque catégorie (différence quand on l'enlève)
-    categories = [
-        ('Temporal Features\n(Previous WR, Trends)', 'Sans caractéristiques temporelles'),
-        ('Ability Changes\n(Damage, Cooldown)', 'Sans changements d\'aptitudes'),
-        ('Champion Base Stats\n(HP, Armor, AD)', 'Sans statistiques de champion'),
-        ('Item Modifications\n(Cost, Stats)', 'Sans changements d\'objets'),
-        ('Relative Positioning\n(vs Patch Mean)', 'Sans caractéristiques relatives')
-    ]
+    # Calculate impact of each category
+    impact_data = []
+    for idx in ablation_df.index:
+        if idx != 'All features' and 'only' not in idx:
+            if 'Without' in idx:
+                without_r2 = ablation_df.loc[idx, 'r2']
+                impact = full_model_r2 - without_r2
+                clean_label = idx.replace('Without ', '')
+                impact_data.append({
+                    'Category': clean_label,
+                    'Impact': impact,
+                    'Percentage': (impact / full_model_r2) * 100
+                })
     
-    # Calculer l'importance comme différence de performance
-    importance_data = []
-    colors = ['darkred', 'darkblue', 'darkgreen', 'purple', 'orange']
+    impact_df = pd.DataFrame(impact_data).sort_values('Impact', ascending=True)
     
-    for (category_name, ablation_name), color in zip(categories, colors):
-        if ablation_name in ablation_df.index:
-            without_r2 = ablation_df.loc[ablation_name, 'r2']
-            importance = full_model_r2 - without_r2
-            importance_data.append((category_name, importance, color))
+    fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Trier par importance
-    importance_data.sort(key=lambda x: x[1], reverse=True)
+    colors = ['darkgreen' if imp > 0.2 else 'green' if imp > 0.1 else 'orange' if imp > 0.05 else 'red' 
+              for imp in impact_df['Impact']]
     
-    categories, importance, colors = zip(*importance_data)
-    
-    fig, ax = plt.subplots(figsize=(12, 8))
-    
-    bars = ax.barh(categories, importance, color=colors, alpha=0.7)
-    
-    # Ligne de référence
-    ax.axvline(x=0, color='black', linestyle='-', alpha=0.8)
+    bars = ax.barh(impact_df['Category'], impact_df['Impact'], color=colors, alpha=0.8)
     
     # Annotations
-    for bar, imp in zip(bars, importance):
+    for bar, pct in zip(bars, impact_df['Percentage']):
         width = bar.get_width()
-        ax.text(width + 0.005 if width > 0 else width - 0.005, 
-                bar.get_y() + bar.get_height()/2, 
-                f'{width:.3f}', ha='left' if width > 0 else 'right', 
-                va='center', fontweight='bold')
+        ax.text(width + 0.005, bar.get_y() + bar.get_height()/2,
+                f'{pct:.1f}%', ha='left', va='center', fontweight='bold')
     
-    ax.set_xlabel('Performance Impact (Δ R² when removed)', fontweight='bold')
-    ax.set_title('Feature Category Importance Analysis\n(Impact on Model Performance)', 
-                fontsize=14, fontweight='bold')
+    ax.set_xlabel('Impact on R² Score', fontsize=12, fontweight='bold')
+    ax.set_title('Feature Category Importance Analysis', fontsize=14, fontweight='bold')
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
@@ -229,13 +227,13 @@ def plot_feature_importance(ablation_df):
     plt.show()
 
 def create_performance_table(ablation_df):
-    """Tableau récapitulatif des performances avec vraies données"""
+    """Performance summary table"""
     if ablation_df is None:
         print("No ablation data available")
         return
     
-    # Récupérer les métriques du modèle complet
-    full_model = ablation_df.loc['Toutes les caractéristiques']
+    # Get full model metrics
+    full_model = ablation_df.loc['All features']
     r2_score = full_model['r2']
     rmse_score = full_model['rmse']
     n_features = int(full_model['n_features'])
@@ -245,7 +243,7 @@ def create_performance_table(ablation_df):
         'Value': [
             f'{r2_score:.4f}', 
             f'{rmse_score:.4f}', 
-            'See error analysis', 
+            '0.4839',  # From ML_winrates output
             n_features, 
             'First 80% patches (temporal)', 
             'Last 20% patches (temporal)'
@@ -291,14 +289,14 @@ def create_performance_table(ablation_df):
     plt.show()
 
 def plot_error_distribution(error_by_champion_df):
-    """Visualisation de la distribution des erreurs"""
+    """Error distribution visualization"""
     if error_by_champion_df is None:
         print("No champion error data available")
         return
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
     
-    # Plot 1: Distribution des erreurs
+    # Plot 1: Error distribution
     errors = error_by_champion_df['error'].dropna()
     ax1.hist(errors, bins=20, alpha=0.7, color='lightcoral', edgecolor='black')
     ax1.axvline(errors.mean(), color='red', linestyle='--', 
@@ -311,7 +309,7 @@ def plot_error_distribution(error_by_champion_df):
     ax1.legend()
     ax1.grid(True, alpha=0.3)
     
-    # Plot 2: Erreurs absolues vs vraies valeurs
+    # Plot 2: Absolute errors vs true values
     abs_errors = error_by_champion_df['abs_error'].dropna()
     true_values = error_by_champion_df['y_true'].dropna()
     
@@ -331,8 +329,57 @@ def plot_error_distribution(error_by_champion_df):
     plt.savefig('error_distribution.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+def plot_model_benchmark():
+    """Model comparison visualization"""
+    # Data from your comparison results
+    models_data = {
+        'Model': ['Random Forest', 'XGBoost', 'Ridge Regression'],
+        'R²': [0.7437, 0.7321, 0.5363],
+        'RMSE': [0.7716, 0.7889, 1.2533],
+        'MAE': [0.4271, 0.4839, 0.7532]
+    }
+    
+    df = pd.DataFrame(models_data)
+    
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+    
+    # Plot 1: R² comparison
+    colors = ['green', 'blue', 'orange']
+    bars1 = ax1.bar(df['Model'], df['R²'], color=colors, alpha=0.7)
+    ax1.set_ylabel('R² Score', fontweight='bold')
+    ax1.set_title('Model Performance Comparison', fontweight='bold')
+    ax1.set_ylim(0, 1)
+    
+    for bar, val in zip(bars1, df['R²']):
+        ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                f'{val:.3f}', ha='center', va='bottom', fontweight='bold')
+    
+    # Plot 2: RMSE comparison
+    bars2 = ax2.bar(df['Model'], df['RMSE'], color=colors, alpha=0.7)
+    ax2.set_ylabel('RMSE (percentage points)', fontweight='bold')
+    ax2.set_title('Root Mean Squared Error', fontweight='bold')
+    
+    for bar, val in zip(bars2, df['RMSE']):
+        ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                f'{val:.3f}', ha='center', va='bottom', fontweight='bold')
+    
+    # Plot 3: MAE comparison
+    bars3 = ax3.bar(df['Model'], df['MAE'], color=colors, alpha=0.7)
+    ax3.set_ylabel('MAE (percentage points)', fontweight='bold')
+    ax3.set_title('Mean Absolute Error', fontweight='bold')
+    
+    for bar, val in zip(bars3, df['MAE']):
+        ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                f'{val:.3f}', ha='center', va='bottom', fontweight='bold')
+    
+    plt.suptitle('Machine Learning Model Comparison for Patch Impact Prediction', 
+                 fontsize=14, fontweight='bold', y=1.02)
+    plt.tight_layout()
+    plt.savefig('model_benchmark.png', dpi=300, bbox_inches='tight')
+    plt.show()
+
 def generate_all_visualizations():
-    """Génère toutes les visualisations pour le mémoire avec vraies données"""
+    """Generate all visualizations for thesis"""
     
     print("Loading results data...")
     ablation_df, error_by_class_df, error_by_champion_df, temporal_df = load_results_data()
@@ -361,11 +408,22 @@ def generate_all_visualizations():
     print("6. Error Distribution...")
     plot_error_distribution(error_by_champion_df)
     
-    print("All visualizations generated! Files saved as PNG.")
+    print("7. Model Benchmark...")
+    plot_model_benchmark()
+    
+    print("\nAll visualizations generated! Files saved as PNG.")
+    print("Generated files:")
+    print("- ablation_study.png")
+    print("- error_by_class.png")
+    print("- temporal_validation.png")
+    print("- feature_importance.png")
+    print("- performance_summary.png")
+    print("- error_distribution.png")
+    print("- model_benchmark.png")
 
 def show_available_data():
-    """Affiche un résumé des données disponibles"""
-    print("Checking available results files in src directory...")
+    """Show summary of available data"""
+    print("Checking available results files...")
     
     files_to_check = [
         "ablation_study_results.csv",
@@ -382,14 +440,14 @@ def show_available_data():
             print(f"✗ {file}: Missing")
     
     # Show all CSV files in current directory
-    print("\nAll CSV files in src directory:")
+    print("\nAll CSV files in current directory:")
     csv_files = [f for f in os.listdir('.') if f.endswith('.csv')]
     for f in csv_files:
         print(f"  - {f}")
 
-# Exécuter
+# Execute
 if __name__ == "__main__":
-    print("=== Dynamic Visualization Script ===")
+    print("=== LoL Patch Prediction - Visualization Generator ===")
     show_available_data()
-    print("\n" + "="*40 + "\n")
+    print("\n" + "="*50 + "\n")
     generate_all_visualizations()

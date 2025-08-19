@@ -1,6 +1,6 @@
 # Rapport de Validation du R²
 
-Date d'exécution: 2025-07-10 17:26:34
+Date d'exécution: 2025-08-18 16:19:53
 
 ## 1. Test de Shuffling des Étiquettes
 

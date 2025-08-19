@@ -33,7 +33,6 @@ def patch_to_tuple(patch: str):
     if re.fullmatch(r'\d+\.\d+', patch):
         return tuple(map(int, patch.split('.')))
     else:
-        # On renvoie un tuple par défaut et on peut loguer si nécessaire (ici on le supprime pour éviter le bruit)
         return (0, 0)
 
 def validate_data(final_df: pd.DataFrame) -> None:
@@ -149,7 +148,7 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
     merged_changes = pd.merge(champ_matrix, item_matrix, on='patch', how='left')
     merged_changes.fillna(0, inplace=True)
     
-    # Fusionner avec les données de winrates
+    # MERGE PRINCIPAL - comme dans ton ancien script
     final_df = pd.merge(
         merged_changes,
         winrates,
@@ -157,27 +156,50 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
         how='left'
     )
     
+    # 🎯 LOGIQUE INTELLIGENTE pour récupérer champions perdus
+    logger.info("Identification des champions avec données manquantes...")
+    
     champions_in_changes = set(merged_changes['champion_name'].unique())
     champions_in_winrates = set(winrates['champion_name'].unique())
     champions_perdus = champions_in_winrates - champions_in_changes
-
-    logger.info(f"Champions perdus récupérés: {len(champions_perdus)}")
-
-    # 3. Ajouter seulement les champions perdus avec ≥2 patches
+    
+    logger.info(f"Champions avec changements: {len(champions_in_changes)}")
+    logger.info(f"Champions perdus (pas de changements): {len(champions_perdus)}")
+    
+    # ✅ FILTRE QUALITÉ : Seulement champions avec ≥3 patches ET activité récente
+    champions_perdus_qualifies = []
     for champion in champions_perdus:
         champ_winrates = winrates[winrates['champion_name'] == champion]
-        if len(champ_winrates) >= 2:  # Au moins 2 patches pour calculer delta
-            # Créer des lignes avec changements = 0
-            champ_rows = champ_winrates.copy()
-            # Ajouter toutes les colonnes de changements avec valeur 0
-            for col in merged_changes.columns:
-                if col not in ['patch', 'champion_name']:
-                    champ_rows[col] = 0
-            
-            # Ajouter au dataset
-            final_df = pd.concat([final_df, champ_rows], ignore_index=True)
-
-    logger.info(f"Dataset final après récupération: {final_df.shape}")
+        
+        # Critères de qualité :
+        # 1. Au moins 3 patches (pour calculer trends)
+        # 2. Présent dans au moins un patch récent (14.20+)
+        recent_patches = champ_winrates[champ_winrates['patch'].str.match(r'14\.(2[0-4]|1[9-9])')]
+        
+        if len(champ_winrates) >= 3 and len(recent_patches) > 0:
+            champions_perdus_qualifies.append(champion)
+    
+    logger.info(f"Champions perdus qualifiés: {len(champions_perdus_qualifies)}")
+    if champions_perdus_qualifies:
+        logger.info(f"Liste: {sorted(champions_perdus_qualifies)}")
+    
+    # Ajouter SEULEMENT les champions qualifiés
+    total_added = 0
+    for champion in champions_perdus_qualifies:
+        champ_winrates = winrates[winrates['champion_name'] == champion]
+        
+        # Créer des lignes avec changements = 0
+        champ_rows = champ_winrates.copy()
+        # Ajouter toutes les colonnes de changements avec valeur 0
+        for col in merged_changes.columns:
+            if col not in ['patch', 'champion_name']:
+                champ_rows[col] = 0
+        
+        # Ajouter au dataset
+        final_df = pd.concat([final_df, champ_rows], ignore_index=True)
+        total_added += len(champ_rows)
+    
+    logger.info(f"Total ajouté: {total_added} lignes pour champions perdus qualifiés")
     
     # Filtrer de nouveau pour s'assurer que la colonne patch est au bon format
     final_df = final_df[final_df['patch'].str.fullmatch(r'\d+\.\d+')]
@@ -199,12 +221,22 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
     # Retirer les lignes dont delta_winrate est NaN (première occurrence de chaque champion)
     final_df = final_df.dropna(subset=["delta_winrate"])
     
+    # 📊 STATS FINALES
+    unique_champions = final_df['champion_name'].nunique()
+    champions_avec_changements = final_df[final_df[merged_changes.columns[2:]].abs().sum(axis=1) > 0]['champion_name'].nunique()
+    champions_sans_changements = unique_champions - champions_avec_changements
+    
+    logger.info(f" Dataset final: {len(final_df)} lignes, {unique_champions} champions uniques")
+    logger.info(f"   Champions avec changements: {champions_avec_changements}")
+    logger.info(f"   Champions sans changements: {champions_sans_changements}")
+    logger.info(f"   Ratio signal/bruit: {champions_avec_changements/unique_champions:.2%}")
+    
     feature_cols = [col for col in merged_changes.columns if col not in ['patch', 'champion_name']]
     X = final_df[feature_cols]
     y = final_df['delta_winrate']
     weights = final_df['total_games'] / final_df['total_games'].mean()
     
-    # MODIFICATION IMPORTANTE: Division train/test avec option temporelle
+    # Division train/test avec option temporelle
     if temporal_split:
         # Tri chronologique des patches
         patches = sorted(final_df['patch'].unique(), key=patch_to_tuple)
@@ -222,6 +254,8 @@ def prepare_prediction_data(temporal_split=True) -> Dict[str, Any]:
         w_test = weights[~train_mask]
         
         logger.info(f"Temporal split: {len(train_patches)} patches for training, {len(patches) - len(train_patches)} for testing")
+        logger.info(f"Train patches: {train_patches}")
+        logger.info(f"Test patches: {[p for p in patches if p not in train_patches]}")
     else:
         # Split classique
         X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(

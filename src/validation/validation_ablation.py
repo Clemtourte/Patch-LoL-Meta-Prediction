@@ -1,28 +1,23 @@
-# validation_ablation.py
 import numpy as np
 import pandas as pd
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.metrics import r2_score, mean_squared_error
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-import joblib
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
 
-# Import des mêmes fonctions d'ajout de caractéristiques et d'agrégation
-# (Utilisez les mêmes fonctions que dans le script précédent)
-
 def add_temporal_features(df_full, X):
-    """Ajoute des caractéristiques temporelles aux données."""
+    """Add temporal features to the data."""
     df = df_full.copy()
-    # Ordinalisation des patches
+    # Patch ordinalization
     patches = sorted(df['patch'].unique(), key=lambda x: [int(p) for p in x.split('.')])
     patch_map = {p: i for i, p in enumerate(patches)}
     df['patch_idx'] = df['patch'].map(patch_map)
 
-    # Rolling et précédent
+    # Rolling and previous
     df.sort_values(['champion_name', 'patch_idx'], inplace=True)
     df['champ_prev_win'] = df.groupby('champion_name')['winrate'].shift(1)
     df['champ_roll3'] = (
@@ -32,11 +27,11 @@ def add_temporal_features(df_full, X):
           .reset_index(level=0, drop=True)
     )
     
-    # Tendance sur 1 et 2 patches
+    # Trend over 1 and 2 patches
     df['win_trend_1'] = df.groupby('champion_name')['winrate'].diff(1)
     df['win_trend_2'] = df.groupby('champion_name')['winrate'].diff(2)
     
-    # Volatilité
+    # Volatility
     df['win_volatility'] = (
         df.groupby('champion_name')['winrate']
           .rolling(3, min_periods=2)
@@ -44,7 +39,7 @@ def add_temporal_features(df_full, X):
           .reset_index(level=0, drop=True)
     )
 
-    # Moyennes et positions relatives
+    # Means and relative positions
     champ_mean = df.groupby('champion_name')['winrate'].transform('mean')
     patch_mean = df.groupby('patch')['winrate'].transform('mean')
     global_mean = df['winrate'].mean()
@@ -53,7 +48,7 @@ def add_temporal_features(df_full, X):
     df['rel_to_patch_mean'] = df['winrate'] - patch_mean
     df['rel_to_global_mean'] = df['winrate'] - global_mean
 
-    # Transfert des caractéristiques dans X
+    # Transfer features to X
     X = X.copy()
     X['patch_idx'] = df.loc[X.index, 'patch_idx']
     X['champ_prev_win'] = df.loc[X.index, 'champ_prev_win'].fillna(global_mean)
@@ -68,14 +63,14 @@ def add_temporal_features(df_full, X):
     return X
 
 def aggregate_ability_changes(X):
-    """Agrège les changements des compétences pour réduire la dimensionnalité."""
+    """Aggregate ability changes to reduce dimensionality."""
     ability_types = ['Passive', 'Q', 'W', 'E', 'R']
     
     agg_features = {}
     
-    # Agrégation par type d'abilité
+    # Aggregation by ability type
     for ability in ability_types:
-        # Identification des colonnes par type
+        # Identify columns by type
         damage_cols = [col for col in X.columns if f'ability_{ability}_base_damage' in col]
         cooldown_cols = [col for col in X.columns if f'ability_{ability}_cooldown' in col]
         mana_cols = [col for col in X.columns if f'ability_{ability}_mana_cost' in col]
@@ -83,7 +78,7 @@ def aggregate_ability_changes(X):
         ad_ratio_cols = [col for col in X.columns if f'ability_{ability}_ad_ratio' in col or 
                         f'ability_{ability}_bonus_ad_ratio' in col]
         
-        # Agrégation par somme ou moyenne selon la nature de la caractéristique
+        # Aggregate by sum or mean depending on the nature of the feature
         if damage_cols:
             agg_features[f'{ability}_damage_change'] = X[damage_cols].sum(axis=1)
         
@@ -99,7 +94,7 @@ def aggregate_ability_changes(X):
         if ad_ratio_cols:
             agg_features[f'{ability}_ad_ratio_change'] = X[ad_ratio_cols].sum(axis=1)
     
-    # Agrégation des statistiques de base
+    # Aggregate base stats
     base_stat_cols = [col for col in X.columns if 'base_stat_' in col]
     per_level_cols = [col for col in X.columns if 'per_level_' in col]
     item_cols = [col for col in X.columns if 'item_' in col]
@@ -111,66 +106,79 @@ def aggregate_ability_changes(X):
     return pd.DataFrame(agg_features, index=X.index)
 
 def run_ablation_study():
-    """Effectue une étude d'ablation pour évaluer l'importance de différents groupes de caractéristiques."""
-    print("Étude d'Ablation")
-    print("===============")
+    print("="*50)
+    print("ABLATION STUDY")
+    print("="*50)
     
-    # Chargement des données
-    data = prepare_prediction_data(temporal_split=True)
-    full_df = data['full_data']
-    X_train, X_test = data['X_train'], data['X_test']
-    y_train, y_test = data['y_train'], data['y_test']
-    w_train, w_test = data['w_train'], data['w_test']
+    # Load data
+    df_full, X, y, w, patches = prepare_prediction_data()
+    patches = df_full['patch']
     
-    # Feature engineering complet
-    X_train = add_temporal_features(full_df.loc[X_train.index], X_train)
-    X_test = add_temporal_features(full_df.loc[X_test.index], X_test)
+    # Add temporal features
+    X = add_temporal_features(df_full, X)
     
-    for col in ['pickrate', 'total_games']:
-        X_train[col] = full_df.loc[X_train.index, col]
-        X_test[col] = full_df.loc[X_test.index, col]
+    # Aggregate ability changes
+    aggregate_cols = list(aggregate_ability_changes(X).columns)
+    X_aggregated = aggregate_ability_changes(X)
     
-    agg_train = aggregate_ability_changes(X_train)
-    agg_test = aggregate_ability_changes(X_test)
+    # Remove individual columns and replace with aggregated
+    cols_to_remove = []
+    for col in X.columns:
+        if any(ability in col for ability in ['ability_Passive', 'ability_Q', 'ability_W', 'ability_E', 'ability_R']):
+            cols_to_remove.append(col)
     
-    X_train_combined = pd.concat([X_train, agg_train], axis=1)
-    X_test_combined = pd.concat([X_test, agg_test], axis=1)
+    X_reduced = X.drop(columns=cols_to_remove)
+    X_final = pd.concat([X_reduced, X_aggregated], axis=1)
     
-    # Définition des groupes de caractéristiques à tester
+    # Temporal split
+    patches_sorted = sorted(patches.unique(), key=lambda x: [int(p) for p in x.split('.')])
+    n_train = int(len(patches_sorted) * 0.8)
+    train_patches = patches_sorted[:n_train]
+    test_patches = patches_sorted[n_train:]
+    
+    train_mask = patches.isin(train_patches)
+    test_mask = patches.isin(test_patches)
+    
+    X_train = X_final[train_mask]
+    X_test = X_final[test_mask]
+    y_train = y[train_mask]
+    y_test = y[test_mask]
+    w_train = w[train_mask]
+    w_test = w[test_mask]
+    
+    # Standardize
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # All feature columns
+    feature_cols = list(X_final.columns)
+    
+    # Define feature groups IN ENGLISH
     feature_groups = {
-        "Toutes les caractéristiques": X_train_combined.columns.tolist(),
-        "Sans caractéristiques temporelles": [col for col in X_train_combined.columns if col not in 
-                                            ['patch_idx', 'champ_prev_win', 'champ_roll3', 
-                                            'win_trend_1', 'win_trend_2', 'win_volatility']],
-        "Sans caractéristiques relatives": [col for col in X_train_combined.columns if col not in 
-                                          ['rel_to_champ_mean', 'rel_to_patch_mean', 'rel_to_global_mean']],
-        "Sans statistiques de champion": [col for col in X_train_combined.columns if not any(s in col for s in 
-                                         ['base_stat_', 'per_level_'])],
-        "Sans changements d'objets": [col for col in X_train_combined.columns if not 'item_' in col],
-        "Sans changements d'aptitudes": [col for col in X_train_combined.columns if not any(s in col for s in 
-                                       ['Passive_', 'Q_', 'W_', 'E_', 'R_'])],
-        "Base stats + per level uniquement": [col for col in X_train_combined.columns if any(s in col for s in 
-                                           ['base_stat_', 'per_level_'])],
-        "Caractéristiques temporelles uniquement": ['patch_idx', 'champ_prev_win', 'champ_roll3', 
-                                                  'win_trend_1', 'win_trend_2', 'win_volatility']
+        'All features': feature_cols,
+        'Without temporal features': [col for col in feature_cols if not any(temp in col for temp in ['patch_idx', 'prev_win', 'roll3', 'trend', 'volatility', 'rel_to'])],
+        'Without relative features': [col for col in feature_cols if 'rel_to' not in col],
+        'Without champion statistics': [col for col in feature_cols if not any(stat in col for stat in ['base_stat_', 'per_level_'])],
+        'Without item changes': [col for col in feature_cols if 'item_' not in col],
+        'Without ability changes': aggregate_cols,
+        'Base stats + per level only': [col for col in feature_cols if 'base_stat_' in col or 'per_level_' in col],
+        'Temporal features only': [col for col in feature_cols if any(temp in col for temp in ['patch_idx', 'prev_win', 'roll3', 'trend', 'volatility', 'rel_to'])]
     }
     
-    # Exécution des tests pour chaque groupe
     results = {}
     
     for group_name, features in feature_groups.items():
-        # Filtrer les caractéristiques qui existent dans le DataFrame
-        features = [f for f in features if f in X_train_combined.columns]
+        if len(features) == 0:
+            print(f"\n{group_name}: No features to test")
+            continue
         
-        # Normalisation
-        scaler = StandardScaler()
-        X_train_subset = X_train_combined[features].fillna(0)
-        X_test_subset = X_test_combined[features].fillna(0)
+        # Select features
+        feature_indices = [i for i, col in enumerate(feature_cols) if col in features]
+        X_train_subset = X_train_scaled[:, feature_indices]
+        X_test_subset = X_test_scaled[:, feature_indices]
         
-        X_train_scaled = scaler.fit_transform(X_train_subset)
-        X_test_scaled = scaler.transform(X_test_subset)
-        
-        # Entraînement
+        # Train model
         model = xgb.XGBRegressor(
             n_estimators=200,
             max_depth=4,
@@ -186,10 +194,10 @@ def run_ablation_study():
             verbosity=0
         )
         
-        model.fit(X_train_scaled, y_train, sample_weight=w_train)
-        y_pred = model.predict(X_test_scaled)
+        model.fit(X_train_subset, y_train, sample_weight=w_train)
+        y_pred = model.predict(X_test_subset)
         
-        # Métriques
+        # Metrics
         r2 = r2_score(y_test, y_pred, sample_weight=w_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred, sample_weight=w_test))
         
@@ -200,14 +208,14 @@ def run_ablation_study():
         }
         
         print(f"\n{group_name}:")
-        print(f"  Nombre de caractéristiques: {len(features)}")
+        print(f"  Number of features: {len(features)}")
         print(f"  R²: {r2:.4f}")
         print(f"  RMSE: {rmse:.4f}")
     
-    # Visualisation
+    # Visualization
     plt.figure(figsize=(12, 8))
     
-    # Tri par R²
+    # Sort by R²
     groups = sorted(results.keys(), key=lambda x: results[x]['r2'], reverse=True)
     r2_values = [results[g]['r2'] for g in groups]
     
@@ -216,9 +224,9 @@ def run_ablation_study():
     
     plt.yticks(bar_positions, groups)
     plt.xlabel('R²')
-    plt.title('Impact des Différents Groupes de Caractéristiques sur le R²')
+    plt.title('Impact of Different Feature Groups on R²')
     
-    # Ajout des valeurs sur les barres
+    # Add values on bars
     for i, bar in enumerate(bars):
         plt.text(bar.get_width() + 0.01, bar.get_y() + bar.get_height()/2, 
                 f"{r2_values[i]:.4f}", va='center')
@@ -227,7 +235,7 @@ def run_ablation_study():
     plt.savefig('ablation_study_results.png')
     plt.close()
     
-    # Export des résultats
+    # Export results
     pd.DataFrame(results).T.to_csv('ablation_study_results.csv')
     
     return results
