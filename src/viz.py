@@ -65,7 +65,7 @@ def plot_ablation_study(ablation_df):
     
     # Reference lines
     ax.axvline(x=0, color='black', linestyle='--', alpha=0.5)
-    full_model_r2 = df[df['Feature Group'] == 'All features']['R²'].iloc[0]
+    full_model_r2 = df['R²'].max()
     ax.axvline(x=full_model_r2, color='green', linestyle='--', alpha=0.7, 
                label=f'Full Model Performance (R²={full_model_r2:.3f})')
     

@@ -111,7 +111,20 @@ def run_nonconsecutive_validation():
     print("="*50)
     
     # Load data
-    df_full, X, y, w, patches = prepare_prediction_data()
+    data = prepare_prediction_data(temporal_split=False)  # Pas de split pour ce test
+    df_full = data['full_data']
+    X_train = data['X_train'] 
+    X_test = data['X_test']
+    y_train = data['y_train']
+    y_test = data['y_test']
+    w_train = data['w_train']
+    w_test = data['w_test']
+
+    # Combine train and test for this validation
+    X = pd.concat([X_train, X_test])
+    y = pd.concat([y_train, y_test]) 
+    w = pd.concat([w_train, w_test])
+    patches = df_full['patch']
     
     # Add temporal features
     X = add_temporal_features(df_full, X)

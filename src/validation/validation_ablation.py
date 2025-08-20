@@ -110,8 +110,20 @@ def run_ablation_study():
     print("ABLATION STUDY")
     print("="*50)
     
-    # Load data
-    df_full, X, y, w, patches = prepare_prediction_data()
+    # Load data - NOUVEAU FORMAT SEULEMENT
+    data = prepare_prediction_data(temporal_split=False)  # Pas de split pour ablation
+    df_full = data['full_data'] 
+    X_train_orig = data['X_train']
+    X_test_orig = data['X_test']
+    y_train_orig = data['y_train'] 
+    y_test_orig = data['y_test']
+    w_train_orig = data['w_train']
+    w_test_orig = data['w_test']
+
+    # Combine train+test pour faire notre propre split temporel
+    X = pd.concat([X_train_orig, X_test_orig])
+    y = pd.concat([y_train_orig, y_test_orig])
+    w = pd.concat([w_train_orig, w_test_orig])
     patches = df_full['patch']
     
     # Add temporal features
