@@ -1,23 +1,28 @@
+# validation_nonconsecutive.py
 import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import joblib
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
 
+# Import des mêmes fonctions d'ajout de caractéristiques et d'agrégation
+# (Utilisez les mêmes fonctions que dans les scripts précédents)
+
 def add_temporal_features(df_full, X):
-    """Add temporal features to the data."""
+    """Ajoute des caractéristiques temporelles aux données."""
     df = df_full.copy()
-    # Patch ordinalization
+    # Ordinalisation des patches
     patches = sorted(df['patch'].unique(), key=lambda x: [int(p) for p in x.split('.')])
     patch_map = {p: i for i, p in enumerate(patches)}
     df['patch_idx'] = df['patch'].map(patch_map)
 
-    # Rolling and previous
+    # Rolling et précédent
     df.sort_values(['champion_name', 'patch_idx'], inplace=True)
     df['champ_prev_win'] = df.groupby('champion_name')['winrate'].shift(1)
     df['champ_roll3'] = (
@@ -27,11 +32,11 @@ def add_temporal_features(df_full, X):
           .reset_index(level=0, drop=True)
     )
     
-    # Trend over 1 and 2 patches
+    # Tendance sur 1 et 2 patches
     df['win_trend_1'] = df.groupby('champion_name')['winrate'].diff(1)
     df['win_trend_2'] = df.groupby('champion_name')['winrate'].diff(2)
     
-    # Volatility
+    # Volatilité
     df['win_volatility'] = (
         df.groupby('champion_name')['winrate']
           .rolling(3, min_periods=2)
@@ -39,7 +44,7 @@ def add_temporal_features(df_full, X):
           .reset_index(level=0, drop=True)
     )
 
-    # Means and relative positions
+    # Moyennes et positions relatives
     champ_mean = df.groupby('champion_name')['winrate'].transform('mean')
     patch_mean = df.groupby('patch')['winrate'].transform('mean')
     global_mean = df['winrate'].mean()
@@ -48,7 +53,7 @@ def add_temporal_features(df_full, X):
     df['rel_to_patch_mean'] = df['winrate'] - patch_mean
     df['rel_to_global_mean'] = df['winrate'] - global_mean
 
-    # Transfer features to X
+    # Transfert des caractéristiques dans X
     X = X.copy()
     X['patch_idx'] = df.loc[X.index, 'patch_idx']
     X['champ_prev_win'] = df.loc[X.index, 'champ_prev_win'].fillna(global_mean)
@@ -62,15 +67,17 @@ def add_temporal_features(df_full, X):
     
     return X
 
+# Suite du script validation_nonconsecutive.py
+
 def aggregate_ability_changes(X):
-    """Aggregate ability changes to reduce dimensionality."""
+    """Agrège les changements des compétences pour réduire la dimensionnalité."""
     ability_types = ['Passive', 'Q', 'W', 'E', 'R']
     
     agg_features = {}
     
-    # Aggregation by ability type
+    # Agrégation par type d'abilité
     for ability in ability_types:
-        # Identify columns by type
+        # Identification des colonnes par type
         damage_cols = [col for col in X.columns if f'ability_{ability}_base_damage' in col]
         cooldown_cols = [col for col in X.columns if f'ability_{ability}_cooldown' in col]
         mana_cols = [col for col in X.columns if f'ability_{ability}_mana_cost' in col]
@@ -78,7 +85,7 @@ def aggregate_ability_changes(X):
         ad_ratio_cols = [col for col in X.columns if f'ability_{ability}_ad_ratio' in col or 
                         f'ability_{ability}_bonus_ad_ratio' in col]
         
-        # Aggregate by sum or mean depending on the nature of the feature
+        # Agrégation par somme ou moyenne selon la nature de la caractéristique
         if damage_cols:
             agg_features[f'{ability}_damage_change'] = X[damage_cols].sum(axis=1)
         
@@ -94,7 +101,7 @@ def aggregate_ability_changes(X):
         if ad_ratio_cols:
             agg_features[f'{ability}_ad_ratio_change'] = X[ad_ratio_cols].sum(axis=1)
     
-    # Aggregate base stats
+    # Agrégation des statistiques de base
     base_stat_cols = [col for col in X.columns if 'base_stat_' in col]
     per_level_cols = [col for col in X.columns if 'per_level_' in col]
     item_cols = [col for col in X.columns if 'item_' in col]
@@ -106,123 +113,124 @@ def aggregate_ability_changes(X):
     return pd.DataFrame(agg_features, index=X.index)
 
 def run_nonconsecutive_validation():
-    print("="*50)
-    print("CROSS-EPOCH VALIDATION")
-    print("="*50)
+    """
+    Teste le modèle sur des patchs non consécutifs pour évaluer sa robustesse
+    à différentes 'époques' du jeu.
+    """
+    print("Validation sur Patchs Non-consécutifs")
+    print("====================================")
     
-    # Load data
-    data = prepare_prediction_data(temporal_split=False)  # Pas de split pour ce test
-    df_full = data['full_data']
-    X_train = data['X_train'] 
-    X_test = data['X_test']
-    y_train = data['y_train']
-    y_test = data['y_test']
-    w_train = data['w_train']
-    w_test = data['w_test']
-
-    # Combine train and test for this validation
-    X = pd.concat([X_train, X_test])
-    y = pd.concat([y_train, y_test]) 
-    w = pd.concat([w_train, w_test])
-    patches = df_full['patch']
+    # Chargement des données complètes
+    data = prepare_prediction_data(temporal_split=False)  # Pas de split temporel ici
+    full_df = data['full_data']
     
-    # Add temporal features
-    X = add_temporal_features(df_full, X)
+    # Obtenir la liste complète des patchs
+    all_patches = sorted(full_df['patch'].unique(), key=lambda x: [int(p) for p in x.split('.')])
+    print(f"Total des patchs disponibles: {len(all_patches)}")
+    print(f"Liste des patchs: {all_patches}")
     
-    # Aggregate ability changes
-    X_aggregated = aggregate_ability_changes(X)
-    
-    # Remove individual columns and replace with aggregated
-    cols_to_remove = []
-    for col in X.columns:
-        if any(ability in col for ability in ['ability_Passive', 'ability_Q', 'ability_W', 'ability_E', 'ability_R']):
-            cols_to_remove.append(col)
-    
-    X_reduced = X.drop(columns=cols_to_remove)
-    X_final = pd.concat([X_reduced, X_aggregated], axis=1)
-    
-    # Define epoch groups IN ENGLISH
-    epoch_groups = {
-        'Season 13 start': lambda p: p.startswith('13.') and int(p.split('.')[1]) <= 5,
-        'Season 13 mid': lambda p: p.startswith('13.') and 6 <= int(p.split('.')[1]) <= 15,
-        'Season 13 end': lambda p: p.startswith('13.') and int(p.split('.')[1]) >= 16,
-        'Season 14 start': lambda p: p.startswith('14.') and int(p.split('.')[1]) <= 8,
-        'Season 14 mid': lambda p: p.startswith('14.') and 9 <= int(p.split('.')[1]) <= 16,
-        'Season 14 end': lambda p: p.startswith('14.') and int(p.split('.')[1]) >= 17
+    # Diviser les patchs en groupes
+    patch_groups = {
+        "Season 13 start": [p for p in all_patches if p.startswith("13.") and int(p.split('.')[1]) <= 8],
+        "Season 13 end": [p for p in all_patches if p.startswith("13.") and int(p.split('.')[1]) > 8],
+        "Season 14 start": [p for p in all_patches if p.startswith("14.") and int(p.split('.')[1]) <= 8],
+        "Season 14 end": [p for p in all_patches if p.startswith("14.") and int(p.split('.')[1]) > 8]
     }
+    
+    # Afficher les groupes de patchs
+    for group, patches in patch_groups.items():
+        print(f"\n{group}: {patches}")
+    
+    # Combinaisons de test: entraîner sur un groupe, tester sur un autre
+    test_combinations = [
+        ("Season 13 start", "Season 13 end"),
+        ("Season 13 start", "Season 14 start"),
+        ("Season 13 start", "Season 14 end"),
+        ("Season 13 end", "Season 14 start"),
+        ("Season 13 end", "Season 14 end"),
+        ("Season 14 start", "Season 14 end")
+    ]
     
     results = {}
     
-    # Test all combinations
-    for train_group, train_filter in epoch_groups.items():
-        for test_group, test_filter in epoch_groups.items():
-            if train_group == test_group:
-                continue
-            
-            print(f"\nTraining on {train_group}, Testing on {test_group}")
-            
-            # Create masks
-            train_mask = patches.apply(train_filter)
-            test_mask = patches.apply(test_filter)
-            
-            if train_mask.sum() < 10 or test_mask.sum() < 10:
-                print(f"  Insufficient data (train: {train_mask.sum()}, test: {test_mask.sum()})")
-                continue
-            
-            X_train = X_final[train_mask]
-            X_test = X_final[test_mask]
-            y_train = y[train_mask]
-            y_test = y[test_mask]
-            w_train = w[train_mask]
-            w_test = w[test_mask]
-            
-            # Standardize
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-            
-            # Train model
-            model = xgb.XGBRegressor(
-                n_estimators=200,
-                max_depth=4,
-                learning_rate=0.03,
-                subsample=0.8,
-                colsample_bytree=0.7,
-                reg_alpha=1.0,
-                reg_lambda=1.0,
-                gamma=0.05,
-                min_child_weight=3,
-                objective='reg:squarederror',
-                random_state=42,
-                verbosity=0
-            )
-            
-            model.fit(X_train_scaled, y_train, sample_weight=w_train)
-            y_pred = model.predict(X_test_scaled)
-            
-            # Metrics
-            r2 = r2_score(y_test, y_pred, sample_weight=w_test)
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred, sample_weight=w_test))
-            mae = mean_absolute_error(y_test, y_pred, sample_weight=w_test)
-            
-            results[f"{train_group} -> {test_group}"] = {
-                'r2': r2,
-                'rmse': rmse,
-                'mae': mae,
-                'n_train': train_mask.sum(),
-                'n_test': test_mask.sum()
-            }
-            
-            print(f"  Training samples: {train_mask.sum()}")
-            print(f"  Test samples: {test_mask.sum()}")
-            print(f"  R²: {r2:.4f}")
-            print(f"  RMSE: {rmse:.4f}")
-            print(f"  MAE: {mae:.4f}")
+    # Exécuter les tests pour chaque combinaison
+    for train_group, test_group in test_combinations:
+        print(f"\nTest: Entraînement sur {train_group}, Test sur {test_group}")
+        
+        # Créer des masques pour les patchs d'entraînement et de test
+        train_mask = full_df['patch'].isin(patch_groups[train_group])
+        test_mask = full_df['patch'].isin(patch_groups[test_group])
+        
+        # Extraire les données
+        X_train = full_df.loc[train_mask, data['feature_names']]
+        y_train = full_df.loc[train_mask, 'delta_winrate']
+        w_train = full_df.loc[train_mask, 'total_games'] / full_df.loc[train_mask, 'total_games'].mean()
+        
+        X_test = full_df.loc[test_mask, data['feature_names']]
+        y_test = full_df.loc[test_mask, 'delta_winrate']
+        w_test = full_df.loc[test_mask, 'total_games'] / full_df.loc[test_mask, 'total_games'].mean()
+        
+        # Feature engineering
+        X_train = add_temporal_features(full_df.loc[train_mask], X_train)
+        X_test = add_temporal_features(full_df.loc[test_mask], X_test)
+        
+        for col in ['pickrate', 'total_games']:
+            X_train[col] = full_df.loc[train_mask, col]
+            X_test[col] = full_df.loc[test_mask, col]
+        
+        agg_train = aggregate_ability_changes(X_train)
+        agg_test = aggregate_ability_changes(X_test)
+        
+        X_train_combined = pd.concat([X_train, agg_train], axis=1)
+        X_test_combined = pd.concat([X_test, agg_test], axis=1)
+        
+        # Normalisation
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train_combined.fillna(0))
+        X_test_scaled = scaler.transform(X_test_combined.fillna(0))
+        
+        # Entraînement
+        model = xgb.XGBRegressor(
+            n_estimators=200,
+            max_depth=4,
+            learning_rate=0.03,
+            subsample=0.8,
+            colsample_bytree=0.7,
+            reg_alpha=1.0,
+            reg_lambda=1.0,
+            gamma=0.05,
+            min_child_weight=3,
+            objective='reg:squarederror',
+            random_state=42,
+            verbosity=0
+        )
+        
+        model.fit(X_train_scaled, y_train, sample_weight=w_train)
+        y_pred = model.predict(X_test_scaled)
+        
+        # Métriques
+        r2 = r2_score(y_test, y_pred, sample_weight=w_test)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred, sample_weight=w_test))
+        mae = mean_absolute_error(y_test, y_pred, sample_weight=w_test)
+        
+        results[f"{train_group} -> {test_group}"] = {
+            'r2': r2,
+            'rmse': rmse,
+            'mae': mae,
+            'n_train': train_mask.sum(),
+            'n_test': test_mask.sum()
+        }
+        
+        print(f"  Échantillons d'entraînement: {train_mask.sum()}")
+        print(f"  Échantillons de test: {test_mask.sum()}")
+        print(f"  R²: {r2:.4f}")
+        print(f"  RMSE: {rmse:.4f}")
+        print(f"  MAE: {mae:.4f}")
     
-    # Visualization
+    # Visualisation
     plt.figure(figsize=(12, 8))
     
-    # Sort by R²
+    # Tri par R²
     combinations = sorted(results.keys(), key=lambda x: results[x]['r2'], reverse=True)
     r2_values = [results[c]['r2'] for c in combinations]
     
@@ -231,9 +239,9 @@ def run_nonconsecutive_validation():
     
     plt.yticks(bar_positions, combinations)
     plt.xlabel('R²')
-    plt.title('Model Performance on Different Game Epochs')
+    plt.title('Performance du Modèle sur Différentes Époques du Jeu')
     
-    # Add values on bars
+    # Ajout des valeurs sur les barres
     for i, bar in enumerate(bars):
         plt.text(bar.get_width() + 0.01, bar.get_y() + bar.get_height()/2, 
                 f"{r2_values[i]:.4f}", va='center')
@@ -242,7 +250,7 @@ def run_nonconsecutive_validation():
     plt.savefig('nonconsecutive_validation_results.png')
     plt.close()
     
-    # Export results
+    # Export des résultats
     pd.DataFrame(results).T.to_csv('nonconsecutive_validation_results.csv')
     
     return results

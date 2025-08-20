@@ -126,11 +126,10 @@ def prepare_features(data):
     y_train, y_test = data['y_train'], data['y_test']
     w_train, w_test = data['w_train'], data['w_test']
 
-    # Ajout de caractéristiques temporelles
+    # AJOUTE CES LIGNES pour être cohérent avec validation_ablation :
     X_train = add_temporal_features(full_df.loc[X_train.index], X_train)
     X_test = add_temporal_features(full_df.loc[X_test.index], X_test)
     
-    # Ajout des métriques de base
     for col in ['pickrate', 'total_games']:
         X_train[col] = full_df.loc[X_train.index, col]
         X_test[col] = full_df.loc[X_test.index, col]

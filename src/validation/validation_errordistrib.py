@@ -114,121 +114,56 @@ def aggregate_ability_changes(X):
 
 # Définir les classes de champions
 def assign_champion_class(champion_name):
-    """Assign champion to their primary class with comprehensive coverage"""
-    
     tanks = [
-        'Alistar', 'Amumu', 'Blitzcrank', 'Braum', 'ChoGath', 'DrMundo', 
-        'Galio', 'Garen', 'Gragas', 'Leona', 'Malphite', 'Maokai', 
-        'Nautilus', 'Nunu', 'Ornn', 'Poppy', 'Rammus', 'Rell', 
-        'Sejuani', 'Shen', 'Singed', 'Sion', 'Skarner', 'TahmKench', 
-        'Taric', 'Thresh', 'Udyr', 'Volibear', 'Zac'
+        'Maokai', 'Malphite', 'Sion', 'Ornn', 'Shen', 'Nautilus', 'Leona', 'Braum', 'Sejuani', 'Alistar',
+        'Amumu', 'Blitzcrank', 'Cho\'Gath', 'Dr. Mundo', 'Galio', 'Gragas', 'Poppy', 'Rammus', 'Tahm Kench', 
+        'Taric', 'Thresh', 'Volibear', 'Warwick', 'Zac', 'Rell', 'Nunu', 'Ivern', 'DrMundo','KSante','Singed','Skarner','TahmKench'
     ]
     
     fighters = [
-        'Aatrox', 'Camille', 'Darius', 'Fiora', 'Gangplank', 'Garen',
-        'Gwen', 'Hecarim', 'Illaoi', 'Irelia', 'JarvanIV', 'Jax', 
-        'Jayce', 'Kayn', 'Kled', 'LeeSin', 'Mordekaiser', 'Nasus', 
-        'Olaf', 'Pantheon', 'RekSai', 'Renekton', 'Rengar', 'Riven', 
-        'Rumble', 'Sett', 'Shyvana', 'Sylas', 'Trundle', 'Tryndamere', 
-        'Urgot', 'Vi', 'Viego', 'Warwick', 'MonkeyKing', 'XinZhao', 
-        'Yasuo', 'Yone', 'Yorick'
+        'Darius', 'Garen', 'Renekton', 'Irelia', 'Riven', 'Jax', 'Fiora', 'Camille', 'Aatrox', 'Lee Sin', 'Olaf', 'Wukong',
+        'Gnar', 'Hecarim', 'Illaoi', 'Jarvan IV', 'Kayn', 'Kled', 'Mordekaiser', 'Nasus', 'Pantheon', 'Sett', 
+        'Tryndamere', 'Udyr', 'Vi', 'Yorick', 'Yone', 'Ambessa', 'Briar', 'Gwen', 'Viego', 'MonkeyKing','LeeSin','Shyvana'
     ]
     
     mages = [
-        'Ahri', 'Anivia', 'Annie', 'AurelionSol', 'Azir', 'Brand', 
-        'Cassiopeia', 'Corki', 'Elise', 'Fiddlesticks', 'Fizz', 'Heimerdinger',
-        'Hwei', 'Karma', 'Karthus', 'Kassadin', 'Katarina', 'Kennen',
-        'LeBlanc', 'Lissandra', 'Lux', 'Malzahar', 'Morgana', 'Neeko',
-        'Nidalee', 'Orianna', 'Ryze', 'Seraphine', 'Swain', 'Sylas',
-        'Syndra', 'Taliyah', 'Teemo', 'TwistedFate', 'Veigar', 'Velkoz',
-        'Vex', 'Viktor', 'Vladimir', 'Xerath', 'Ziggs', 'Zilean', 'Zoe', 'Zyra'
-    ]
-    
-    marksmen = [
-        'Aphelios', 'Ashe', 'Caitlyn', 'Corki', 'Draven', 'Ezreal',
-        'Graves', 'Jhin', 'Jinx', 'Kaisa', 'Kalista', 'Kindred',
-        'KogMaw', 'Lucian', 'MissFortune', 'Nilah', 'Quinn', 'Samira',
-        'Senna', 'Sivir', 'Smolder', 'Tristana', 'Twitch', 'Varus',
-        'Vayne', 'Xayah', 'Zeri'
-    ]
-    
-    supports = [
-        'Bard', 'Blitzcrank', 'Brand', 'Braum', 'Janna', 'Karma',
-        'Leona', 'Lulu', 'Lux', 'Milio', 'Morgana', 'Nami',
-        'Nautilus', 'Pyke', 'Rakan', 'Rell', 'Renata', 'Senna',
-        'Seraphine', 'Sona', 'Soraka', 'Swain', 'Taric', 'Thresh',
-        'Yuumi', 'Zilean', 'Zyra'
+        'Ryze', 'Syndra', 'Orianna', 'Viktor', 'Cassiopeia', 'Annie', 'Veigar', 'Brand', 'Lux', 'Xerath', 'Ziggs', 'Vel\'Koz',
+        'Ahri', 'Anivia', 'Azir', 'Elise', 'Fiddlesticks', 'Heimerdinger', 'Karthus', 'Kassadin', 'Katarina',
+        'Kennen', 'LeBlanc', 'Lissandra', 'Malzahar', 'Neeko', 'Rumble', 'Swain', 'Taliyah', 'Twisted Fate', 'Vladimir',
+        'Zoe', 'Zyra', 'Aurelion Sol', 'Lillia', 'Seraphine', 'Vex', 'Hwei', 'Aurora', 'AurelionSol', 'Sylas','Kayle'
     ]
     
     assassins = [
-        'Akali', 'Akshan', 'Diana', 'Ekko', 'Elise', 'Evelynn',
-        'Fizz', 'Kassadin', 'Katarina', 'Kayn', 'Khazix', 'LeBlanc',
-        'Naafiri', 'Nidalee', 'Nocturne', 'Pyke', 'Qiyana', 'Rengar',
-        'Shaco', 'Talon', 'Zed'
+        'Zed', 'Akali', 'Katarina', 'Talon', 'Fizz', 'Kayn', 'Shaco', 'Evelynn', 'Kha\'Zix', 'Rengar',
+        'Diana', 'Ekko', 'Kassadin', 'LeBlanc', 'Nocturne', 'Qiyana', 'Yasuo', 'Yone', 'Master Yi', 
+        'Nidalee', 'Kindred','Khazix'
     ]
     
-    # Clean the champion name (remove spaces, special chars)
-    clean_name = champion_name.replace(' ', '').replace("'", '').replace('.', '')
+    marksmen = [
+        'Ashe', 'Caitlyn', 'Jhin', 'Jinx', 'Vayne', 'Ezreal', 'Draven', 'Varus', 'Tristana', 'Kalista', 'Xayah', 'Kai\'Sa',
+        'Aphelios', 'Corki', 'Graves', 'Jayce', 'Kog\'Maw', 'Lucian', 'Miss Fortune', 'Quinn', 'Sivir', 
+        'Teemo', 'Twitch', 'Urgot', 'Zeri', 'Nilah', 'Smolder','KogMaw','MissFortune'
+    ]
     
-    # Check each category (some champions appear in multiple, prioritize their main role)
-    if clean_name in assassins:
-        return 'Assassin'
-    elif clean_name in marksmen:
-        return 'Marksman'
-    elif clean_name in mages:
-        return 'Mage'
-    elif clean_name in supports:
-        return 'Support'
-    elif clean_name in fighters:
-        return 'Fighter'
-    elif clean_name in tanks:
+    supports = [
+        'Soraka', 'Janna', 'Lulu', 'Nami', 'Sona', 'Yuumi', 'Karma', 'Seraphine', 'Bard', 'Thresh', 'Pyke',
+        'Alistar', 'Blitzcrank', 'Braum', 'Leona', 'Morgana', 'Nautilus', 'Rakan', 'Senna', 'Shen', 'Taric', 
+        'Zilean', 'Zyra', 'Milio', 'Renata Glasc', 'Galio','Renata'
+    ]
+    
+    if champion_name in tanks:
         return 'Tank'
+    elif champion_name in fighters:
+        return 'Fighter'
+    elif champion_name in mages:
+        return 'Mage'
+    elif champion_name in assassins:
+        return 'Assassin'
+    elif champion_name in marksmen:
+        return 'Marksman'
+    elif champion_name in supports:
+        return 'Support'
     else:
-        # Additional catch for common alternate names or new champions
-        special_cases = {
-            'DrMundo': 'Tank', 'Mundo': 'Tank',
-            'JarvanIV': 'Fighter', 'Jarvan': 'Fighter', 'J4': 'Fighter',
-            'LeeSin': 'Fighter', 'Lee': 'Fighter',
-            'MasterYi': 'Fighter', 'Yi': 'Fighter',
-            'MissFortune': 'Marksman', 'MF': 'Marksman',
-            'MonkeyKing': 'Fighter', 'Wukong': 'Fighter',
-            'TahmKench': 'Tank', 'Tahm': 'Tank',
-            'TwistedFate': 'Mage', 'TF': 'Mage',
-            'XinZhao': 'Fighter', 'Xin': 'Fighter',
-            'Kaisa': 'Marksman', 'KaiSa': 'Marksman',
-            'Khazix': 'Assassin', 'KhaZix': 'Assassin',
-            'KogMaw': 'Marksman', 'Kog': 'Marksman',
-            'RekSai': 'Fighter', 'Rek': 'Fighter',
-            'Velkoz': 'Mage', 'VelKoz': 'Mage',
-            'ChoGath': 'Tank', 'Cho': 'Tank',
-            'Briar': 'Fighter',  # New champion
-            'Naafiri': 'Assassin',  # New champion
-            'Milio': 'Support',  # New champion
-            'KSante': 'Tank',  # New champion
-            'Nilah': 'Marksman',  # New champion
-            'Belveth': 'Fighter',  # New champion
-            'Renata': 'Support',  # New champion
-            'Vex': 'Mage',  # New champion
-            'Akshan': 'Marksman',  # Can be Marksman/Assassin
-            'Gwen': 'Fighter',  # New champion
-            'Ivern': 'Support',  # Jungle support
-            'Gnar': 'Fighter',  # Transform champion
-            'Jayce': 'Fighter',  # Can be Fighter/Marksman
-            'Graves': 'Marksman',  # Jungle marksman
-            'Kindred': 'Marksman',  # Jungle marksman
-            'Quinn': 'Marksman',  # Top marksman
-            'Urgot': 'Fighter',  # Ranged fighter
-            'Azir': 'Mage',  # DPS mage
-            'Taliyah': 'Mage',  # Control mage
-            'Smolder': 'Marksman',  # New ADC
-            'Hwei': 'Mage'  # New mage
-        }
-        
-        if clean_name in special_cases:
-            return special_cases[clean_name]
-        
-        # If still unknown, print for debugging
-        print(f"Warning: Unknown champion '{champion_name}' - please add to classification")
         return 'Unknown'
 
 def run_error_distribution_analysis():
@@ -378,8 +313,11 @@ def run_error_distribution_analysis():
     # Export des résultats
     test_df[['champion_name', 'champion_class', 'patch', 'y_true', 'y_pred', 'error', 'abs_error']].to_csv('error_analysis_by_champion.csv')
     class_stats.to_csv('error_analysis_by_class.csv')
+    unknown_champions = test_df[test_df['champion_class'] == 'Unknown']['champion_name'].unique()
+    print("Champions non classés:", unknown_champions)
     
     return test_df, class_stats, champion_stats
+
 
 if __name__ == "__main__":
     run_error_distribution_analysis()
