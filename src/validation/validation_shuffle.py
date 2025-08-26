@@ -11,6 +11,29 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data'))
 from data_preparation import prepare_prediction_data
 
+def analyze_by_change_status(y_test, y_pred, test_df):
+    """Analyse performance par statut de changement."""
+    # Détecte qui a eu des changements
+    patch_change_cols = [col for col in test_df.columns 
+                        if any(s in col for s in ['ability_', 'item_', 'base_stat_', 'per_level_'])]
+    
+    has_changes = (test_df[patch_change_cols].abs().sum(axis=1) > 0)
+    
+    print(f"\n📊 ANALYSE PAR STATUT DE CHANGEMENT:")
+    print(f"Champions AVEC changements: {has_changes.sum()}")
+    if has_changes.sum() > 0:
+        mae_with = mean_absolute_error(y_test[has_changes], y_pred[has_changes])
+        mean_change_with = y_test[has_changes].mean()
+        print(f"  - MAE: {mae_with:.4f}")
+        print(f"  - Changement moyen: {mean_change_with:.4f}")
+    
+    print(f"Champions SANS changements: {(~has_changes).sum()}")
+    if (~has_changes).sum() > 0:
+        mae_without = mean_absolute_error(y_test[~has_changes], y_pred[~has_changes])
+        mean_change_without = y_test[~has_changes].mean()
+        print(f"  - MAE: {mae_without:.4f}")
+        print(f"  - Changement moyen: {mean_change_without:.4f}")
+
 def add_temporal_features(df_full, X):
     """Ajoute des caractéristiques temporelles aux données."""
     df = df_full.copy()
@@ -127,11 +150,8 @@ def run_shuffle_test(n_iterations=10):
         X_train[col] = full_df.loc[X_train.index, col]
         X_test[col] = full_df.loc[X_test.index, col]
     
-    agg_train = aggregate_ability_changes(X_train)
-    agg_test = aggregate_ability_changes(X_test)
-    
-    X_train_combined = pd.concat([X_train, agg_train], axis=1)
-    X_test_combined = pd.concat([X_test, agg_test], axis=1)
+    X_train_combined = X_train.copy()
+    X_test_combined = X_test.copy()
     
     # Normalisation
     scaler = StandardScaler()
